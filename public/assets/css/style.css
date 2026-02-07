@@ -1,0 +1,159 @@
+:root {
+    --primary-navy: #1a237e;
+    --primary-blue: #4267B2;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-navy) !important;
+}
+
+.hero-image {
+    border-radius: 1rem;
+    overflow: hidden;
+    height: 100%;
+    min-height: 500px;
+}
+
+.hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.login-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.benefits-card {
+    background: #f8f9fa;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.benefit-item:last-child {
+    margin-bottom: 0;
+}
+
+.benefit-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.benefit-icon.crypto {
+    color: #00d4aa;
+}
+
+.benefit-icon.rewards {
+    color: #f5a623;
+}
+
+.benefit-icon.crown {
+    color: #1a237e;
+}
+
+.social-login-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.5rem;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.social-login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-apple {
+    background-color: #1a237e;
+}
+
+.btn-pix {
+    background-color: #000;
+}
+
+.btn-facebook {
+    background-color: #4267B2;
+}
+
+.btn-google {
+    background-color: #DB4437;
+}
+
+.btn-wechat {
+    background-color: #7BB32E;
+}
+
+.btn-primary-custom {
+    background-color: var(--primary-navy);
+    border: none;
+    padding: 0.75rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.btn-primary-custom:hover {
+    background-color: #0d47a1;
+}
+
+.form-control {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+    border-color: var(--primary-navy);
+    box-shadow: 0 0 0 0.2rem rgba(26, 35, 126, 0.15);
+}
+
+.currency-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+}
+
+.currency-selector:hover {
+    background-color: #f8f9fa;
+}
+
+.flag-icon {
+    width: 24px;
+    height: 16px;
+}
+
+@media (max-width: 991px) {
+    .hero-image {
+        min-height: 300px;
+        margin-bottom: 2rem;
+    }
+}
