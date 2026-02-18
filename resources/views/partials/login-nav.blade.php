@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand" href="#">SolanaTravels</a>
+        <a class="navbar-brand" href="{{ route('landing') }}">SolanaTravels</a>
         <div class="d-flex align-items-center gap-3">
             <div class="currency-selector">
                 <span class="fw-medium">USD</span>
@@ -11,7 +11,7 @@
             <a href="#" class="text-decoration-none text-dark">
                 <i class="bi bi-chat-dots"></i>
             </a>
-            <a href="#" class="text-decoration-none text-dark fw-medium">Sign in</a>
+            <a href="{{ route('login') }}" class="text-decoration-none text-dark fw-medium">Sign in</a>
         </div>
     </div>
 </nav>

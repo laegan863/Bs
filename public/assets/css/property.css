@@ -1,0 +1,407 @@
+/* ============================
+   Property Detail Page Styles
+   ============================ */
+
+:root {
+    --primary-navy: #1a237e;
+    --primary-blue: #4267B2;
+}
+
+/* ============================
+   Search Strip (Compact)
+   ============================ */
+.property-search-strip {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.search-strip-field {
+    display: flex;
+    align-items: center;
+    padding: 0.4rem 0.75rem;
+}
+
+.search-strip-border {
+    border-left: 1px solid #e9ecef;
+}
+
+.search-strip-field input[type="text"] {
+    font-size: 0.82rem;
+}
+
+/* ============================
+   Photo Gallery
+   ============================ */
+.photo-gallery {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.gallery-main-img {
+    height: 340px;
+    border-radius: 1rem 0 0 1rem;
+    overflow: hidden;
+}
+
+.gallery-main-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-sub-img {
+    height: 166px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.gallery-sub-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-sub-sm {
+    height: 166px;
+}
+
+.gallery-photo-count {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.55);
+    color: white;
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* ============================
+   Property Info Card
+   ============================ */
+.property-info-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.property-name {
+    color: var(--primary-navy);
+    font-size: 1.5rem;
+}
+
+.property-rating-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rating-score {
+    background: var(--primary-navy);
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.5rem;
+}
+
+.property-price {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+}
+
+.property-price-block {
+    line-height: 1.4;
+}
+
+/* ============================
+   Amenity Strip
+   ============================ */
+.amenity-strip {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.amenity-strip::-webkit-scrollbar {
+    display: none;
+}
+
+.amenity-thumb {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 0.75rem;
+    background: white;
+    border: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    color: var(--primary-navy);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.amenity-thumb:hover {
+    background: var(--primary-navy);
+    color: white;
+    border-color: var(--primary-navy);
+}
+
+/* ============================
+   Room Listings
+   ============================ */
+.rooms-header h4 {
+    font-size: 1.15rem;
+}
+
+.room-filter-pill {
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    border: 1px solid #dee2e6;
+    background: white;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.room-filter-pill:hover,
+.room-filter-pill.active {
+    background: var(--primary-navy);
+    color: white;
+    border-color: var(--primary-navy);
+}
+
+/* Room Type Card */
+.room-type-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f0f0f0;
+}
+
+.room-type-title {
+    font-size: 1.15rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary-navy);
+}
+
+/* Room Image Section */
+.room-image-section {
+    padding-right: 1rem;
+    border-right: 1px solid #eee;
+}
+
+.room-image-carousel {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.room-main-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 0.75rem;
+}
+
+.room-img-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    cursor: pointer;
+    z-index: 2;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.room-img-prev {
+    left: 8px;
+}
+
+.room-img-next {
+    right: 8px;
+}
+
+.room-img-dots {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+}
+
+.room-img-dots .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.room-img-dots .dot.active {
+    background: white;
+}
+
+.room-quick-info a {
+    text-decoration: none;
+}
+
+.room-quick-info a:hover {
+    text-decoration: underline;
+}
+
+.room-amenities-list .bi-check-circle {
+    font-size: 0.75rem;
+}
+
+/* Rate Options */
+.room-rates-section {
+    padding-left: 1rem;
+}
+
+.rate-option-row {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 0.5rem 0;
+}
+
+.rate-option-row:last-child {
+    border-bottom: none;
+}
+
+.rate-price-amount {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+}
+
+.rate-promo-tag {
+    background: #f0f4ff;
+    border: 1px dashed #a0b4ff;
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    color: var(--primary-navy);
+}
+
+.rate-info .badge.bg-success {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* ============================
+   Hotel Description
+   ============================ */
+.hotel-description-section {
+    max-width: 900px;
+}
+
+.hotel-info-list {
+    padding-left: 1.2rem;
+    list-style: disc;
+}
+
+.hotel-info-list li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* ============================
+   Button Override
+   ============================ */
+.btn-primary-custom {
+    background: var(--primary-navy);
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.btn-primary-custom:hover {
+    background: #283593;
+}
+
+/* ============================
+   Responsive
+   ============================ */
+@media (max-width: 992px) {
+    .gallery-main-img {
+        height: 240px;
+        border-radius: 1rem 1rem 0 0;
+    }
+
+    .gallery-sub-img {
+        height: 120px;
+    }
+
+    .property-info-card {
+        padding: 1rem;
+    }
+
+    .room-image-section {
+        padding-right: 0;
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .room-rates-section {
+        padding-left: 0;
+    }
+
+    .rate-option-row .row {
+        flex-direction: column;
+    }
+
+    .rate-price {
+        text-align: left !important;
+    }
+
+    .rate-action {
+        text-align: left !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .property-search-strip .d-flex {
+        flex-direction: column;
+    }
+
+    .search-strip-border {
+        border-left: none;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .gallery-main-img {
+        height: 200px;
+    }
+
+    .property-name {
+        font-size: 1.2rem;
+    }
+
+    .property-price {
+        font-size: 1.4rem;
+    }
+
+    .room-type-card {
+        padding: 1rem;
+    }
+}
