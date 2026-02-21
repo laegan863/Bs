@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SearchedContentController;
 use Illuminate\Support\Facades\Route;
 
 // Landing page (public)
@@ -45,4 +47,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings/devices', [SecurityController::class, 'devices'])->name('settings.devices');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Booking & Checkout
+    Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store');
+    Route::get('/booking/checkout', [BookingController::class, 'checkout'])->name('booking.checkout');
+    Route::post('/booking/process', [BookingController::class, 'processPayment'])->name('booking.process');
+    Route::get('/booking/confirmation/{booking}', [BookingController::class, 'confirmation'])->name('booking.confirmation');
 });
+
+Route::controller(SearchedContentController::class)->group(function () {
+    Route::get('/searched', 'index')->name('searched.index');
+    Route::post('/searched', 'store')->name('searched.store');
+});
+
+// BitPay IPN Callback (no auth required)
+Route::post('/booking/bitpay/callback', [BookingController::class, 'bitpayCallback'])->name('booking.bitpay.callback');

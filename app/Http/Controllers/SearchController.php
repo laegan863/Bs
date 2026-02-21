@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\SearchedContentController;
 
 class SearchController extends Controller
 {
@@ -51,6 +52,9 @@ class SearchController extends Controller
             'Content-Type' => 'application/json',
         ])->post($api, $payload);
 
+        $searchedContentController = new SearchedContentController();
+        $searchedData = $searchedContentController->index(2256959);
+
         $data = $response->json();
         $property = $data['properties'][0] ?? null;
 
@@ -84,8 +88,23 @@ class SearchController extends Controller
             }
         }
 
+        // return response()->json([
+        //     'property' => $property,
+        //     'data' => $searchedData,
+        //     'groupedRooms' => $groupedRooms,
+        //     'roomTypeCount' => $roomTypeCount,
+        //     'totalDeals' => $totalDeals,
+        //     'lowestPrice' => $lowestPrice,
+        //     'checkIn' => $checkIn,
+        //     'checkOut' => $checkOut,
+        //     'adults' => $adults,
+        //     'children' => $children,
+        //     'rooms' => $rooms,
+        // ]);
+
         return view('property-detail', [
             'property' => $property,
+            'data' => $searchedData,
             'groupedRooms' => $groupedRooms,
             'roomTypeCount' => $roomTypeCount,
             'totalDeals' => $totalDeals,
