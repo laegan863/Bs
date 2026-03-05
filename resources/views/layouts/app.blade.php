@@ -81,77 +81,120 @@
          Hero Section
          ============================ -->
     <section class="hero-section">
-        <div class="hero-overlay"></div>
-        <div class="container position-relative" style="z-index: 2;">
-            <div class="text-center py-5">
-                <h1 class="hero-title fw-bold mb-2">BOOK RENTAL CARS WITH CRYPTO & SAVE UP TO 60%</h1>
-                <p class="hero-subtitle mb-5">Pay With Crypto for 2,200,000+ Hotels Worldwide. Best Prices Guaranteed.</p>
-            </div>
+        <!-- Decorative floating shapes -->
+        <div class="hero-shape hero-shape-1"></div>
+        <div class="hero-shape hero-shape-2"></div>
+        <div class="hero-shape hero-shape-3"></div>
 
-            <!-- Search Tabs -->
-            <div class="search-tabs-wrapper mx-auto">
-                <ul class="search-tabs nav">
-                    <li class="nav-item">
-                        <a class="search-tab-link active" href="#">
-                            <i class="bi bi-building me-2"></i> Stays
+        <div class="container position-relative" style="z-index: 2;">
+            <div class="row align-items-center py-5">
+                <!-- Left Content -->
+                <div class="col-lg-6 hero-content">
+                    <div class="hero-badge mb-3">
+                        <span class="hero-badge-dot"></span>
+                        2,200,000+ Hotels Worldwide
+                    </div>
+                    <h1 class="hero-title fw-bold mb-3">Find your perfect stay & <span class="hero-title-highlight">save up to 60%</span></h1>
+                    <p class="hero-subtitle mb-4">Book hotels, resorts, and apartments worldwide.<br>Best prices guaranteed. Pay with crypto or card.</p>
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        @if(!Auth::user())
+                        <a href="{{ route('login') }}" class="btn hero-btn-primary px-4 py-2 fw-semibold">
+                            Sign in or Register
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="search-tab-link" href="#">
-                            <i class="bi bi-airplane me-2"></i> Flights
+                        @else
+                        <a href="{{ route('dashboard') }}" class="btn hero-btn-primary px-4 py-2 fw-semibold">
+                            My Dashboard
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="search-tab-link" href="#">
-                            <i class="bi bi-joystick me-2"></i> Activities
+                        @endif
+                        <a href="#" class="btn hero-btn-outline px-4 py-2 fw-medium">
+                            Explore Deals <i class="bi bi-arrow-right ms-1"></i>
                         </a>
-                    </li>
-                </ul>
+                    </div>
+                    <!-- Trust indicators -->
+                    <div class="hero-trust d-flex flex-wrap align-items-center gap-3">
+                        <div class="hero-trust-item">
+                            <i class="bi bi-shield-check"></i>
+                            <span>Secure Payments</span>
+                        </div>
+                        <div class="hero-trust-item">
+                            <i class="bi bi-currency-bitcoin"></i>
+                            <span>100+ Cryptos</span>
+                        </div>
+                        <div class="hero-trust-item">
+                            <i class="bi bi-star-fill"></i>
+                            <span>4.8/5 Rating</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Floating Dots -->
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="hero-dots-wrapper">
+                        <div class="hero-dot hero-dot-1"></div>
+                        <div class="hero-dot hero-dot-2"></div>
+                        <div class="hero-dot hero-dot-3"></div>
+                        <div class="hero-dot hero-dot-4"></div>
+                        <div class="hero-dot hero-dot-5"></div>
+                        <div class="hero-dot hero-dot-6"></div>
+                        <div class="hero-dot hero-dot-7"></div>
+                        <div class="hero-dot hero-dot-8"></div>
+                        <div class="hero-dot hero-dot-9"></div>
+                        <div class="hero-dot hero-dot-10"></div>
+                        <div class="hero-dot hero-dot-11"></div>
+                        <div class="hero-dot hero-dot-12"></div>
+                        <!-- Glowing ring accents -->
+                        <div class="hero-ring hero-ring-1"></div>
+                        <div class="hero-ring hero-ring-2"></div>
+                        <div class="hero-ring hero-ring-3"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Search Bar -->
-            <div class="search-bar mx-auto">
+            <div class="hero-search-bar">
                 <form method="GET" action="{{ route('search') }}" class="row g-0 align-items-center">
                     <div class="col-lg-3">
                         <div class="search-field">
-                            <i class="bi bi-search text-muted me-2"></i>
+                            <div class="search-field-icon"><i class="bi bi-geo-alt-fill"></i></div>
                             <div>
-                                <input type="text" value="2256959" name="property" class="form-control border-0 p-0 shadow-none" placeholder="Search for Places or Properties">
+                                <span class="search-field-label">DESTINATION</span>
+                                <input type="text" value="2256959" name="property" class="form-control border-0 p-0 shadow-none search-field-input" placeholder="Where are you going?">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-2">
                         <div class="search-field search-field-border">
-                            <i class="bi bi-calendar3 text-muted me-2"></i>
+                            <div class="search-field-icon"><i class="bi bi-calendar-event"></i></div>
                             <div class="flex-grow-1">
-                                <span class="fw-medium small">{{ now()->format('d M Y') }}</span>
-                                <small class="text-muted d-block lh-1">{{ now()->format('l') }}</small>
+                                <span class="search-field-label">CHECK-IN</span>
+                                <span class="fw-bold small d-block">{{ now()->format('d M Y') }}</span>
                                 <input type="hidden" name="checkin" value="{{ now()->format('Y-m-d') }}">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-2">
                         <div class="search-field search-field-border">
-                            <i class="bi bi-calendar3 text-muted me-2"></i>
+                            <div class="search-field-icon"><i class="bi bi-calendar-event"></i></div>
                             <div class="flex-grow-1">
-                                <span class="fw-medium small">{{ now()->addDay()->format('d M Y') }}</span>
-                                <small class="text-muted d-block lh-1">{{ now()->addDay()->format('l') }}</small>
+                                <span class="search-field-label">CHECK-OUT</span>
+                                <span class="fw-bold small d-block">{{ now()->addDay()->format('d M Y') }}</span>
                                 <input type="hidden" name="checkout" value="{{ now()->addDay()->format('Y-m-d') }}">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="search-field search-field-border">
-                            <i class="bi bi-people text-muted me-2"></i>
+                            <div class="search-field-icon"><i class="bi bi-people-fill"></i></div>
                             <div>
-                                <span class="fw-medium small">2 Adults - 0 Child</span><br>
-                                <small class="text-muted">1 room</small>
+                                <span class="search-field-label">GUESTS & ROOMS</span>
+                                <span class="fw-bold small">2 Adults</span>
+                                <small class="text-muted"> &middot; 0 Children &middot; 1 Room</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-2 text-end pe-2">
-                        <button type="submit" class="btn btn-primary-custom text-white px-4 py-2 fw-semibold">
-                            SEARCH
+                        <button type="submit" class="btn hero-search-btn">
+                            <i class="bi bi-search me-1"></i> SEARCH
                         </button>
                     </div>
                 </form>
@@ -164,41 +207,61 @@
     <!-- ============================
          Explore Popular Destinations
          ============================ -->
-    <section class="py-5 bg-white">
+    <section class="explore-section py-5 bg-white">
         <div class="container">
-            <div class="text-center mb-4">
+            <div class="text-center mb-5">
                 <span class="section-subtitle">Explore</span>
-                <h2 class="fw-bold">Explore stays in popular destination</h2>
-                <p class="text-muted">Average prices based on current calendar month</p>
+                <h2 class="fw-bold mb-2">Explore stays in popular destinations</h2>
+                <p class="text-muted">Handpicked hotels with the best prices this month</p>
             </div>
 
             <!-- Destination Tabs -->
             <ul class="nav nav-pills destination-tabs justify-content-center mb-4" role="tablist">
-                <li class="nav-item"><a class="nav-link active" data-bs-toggle="pill" href="#beach">Beach</a></li>
-                <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#culture">Culture</a></li>
-                <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#ski">Ski</a></li>
-                <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#family">Family</a></li>
-                <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#wellness">Wellness and Relaxation</a></li>
+                <li class="nav-item"><a class="nav-link active" data-bs-toggle="pill" href="#beach"><i class="bi bi-sun me-1"></i> Beach</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#culture"><i class="bi bi-bank me-1"></i> Culture</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#ski"><i class="bi bi-snow me-1"></i> Ski</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#family"><i class="bi bi-people me-1"></i> Family</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#wellness"><i class="bi bi-heart-pulse me-1"></i> Wellness</a></li>
             </ul>
 
             <!-- Hotel Cards Carousel -->
+            @php
+                $hotels = [
+                    ['name' => 'Santorini Blue Horizon', 'loc' => 'Oia, Greece', 'price' => 189, 'rating' => 4.9, 'reviews' => 2341, 'tag' => 'Popular', 'tagClass' => 'tag-popular'],
+                    ['name' => 'Maldives Paradise Resort', 'loc' => 'Malé, Maldives', 'price' => 425, 'rating' => 4.8, 'reviews' => 1879, 'tag' => 'Best Deal', 'tagClass' => 'tag-deal'],
+                    ['name' => 'Bali Ocean Breeze Villa', 'loc' => 'Seminyak, Bali', 'price' => 156, 'rating' => 4.7, 'reviews' => 3102, 'tag' => 'Trending', 'tagClass' => 'tag-trending'],
+                    ['name' => 'Cancún Riviera Suites', 'loc' => 'Cancún, Mexico', 'price' => 210, 'rating' => 4.6, 'reviews' => 1456, 'tag' => '', 'tagClass' => ''],
+                    ['name' => 'Amalfi Coast Retreat', 'loc' => 'Positano, Italy', 'price' => 340, 'rating' => 4.9, 'reviews' => 987, 'tag' => 'Luxury', 'tagClass' => 'tag-luxury'],
+                    ['name' => 'Phuket Sunset Resort', 'loc' => 'Phuket, Thailand', 'price' => 120, 'rating' => 4.5, 'reviews' => 2678, 'tag' => 'Best Deal', 'tagClass' => 'tag-deal'],
+                ];
+            @endphp
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="beach">
                     <div class="position-relative">
                         <div class="hotel-carousel" id="hotelCarousel">
-                            @for($i = 0; $i < 4; $i++)
+                            @foreach($hotels as $hotel)
                             <div class="hotel-card">
                                 <div class="hotel-card-img">
-                                    <img src="{{ asset('assets/images/login-1.jpg') }}" alt="Hotel">
+                                    <img src="{{ asset('assets/images/login-1.jpg') }}" alt="{{ $hotel['name'] }}">
+                                    <button class="hotel-card-fav" aria-label="Add to favorites"><i class="bi bi-heart"></i></button>
+                                    @if($hotel['tag'])
+                                    <span class="hotel-card-tag {{ $hotel['tagClass'] }}">{{ $hotel['tag'] }}</span>
+                                    @endif
                                 </div>
                                 <div class="hotel-card-body">
-                                    <h6 class="fw-bold mb-1">The London Crest Hotel</h6>
-                                    <p class="small text-muted mb-1">London, United Kingdom</p>
-                                    <span class="fw-bold">$299</span>
-                                    <small class="text-muted">avg. nightly price</small>
+                                    <div class="d-flex align-items-center gap-1 mb-1">
+                                        <span class="hotel-card-rating"><i class="bi bi-star-fill"></i> {{ $hotel['rating'] }}</span>
+                                        <small class="text-muted">({{ number_format($hotel['reviews']) }})</small>
+                                    </div>
+                                    <h6 class="fw-bold mb-1">{{ $hotel['name'] }}</h6>
+                                    <p class="small text-muted mb-2"><i class="bi bi-geo-alt-fill me-1"></i>{{ $hotel['loc'] }}</p>
+                                    <div class="d-flex align-items-baseline gap-1">
+                                        <span class="hotel-card-price">${{ $hotel['price'] }}</span>
+                                        <small class="text-muted">/ night</small>
+                                    </div>
                                 </div>
                             </div>
-                            @endfor
+                            @endforeach
                         </div>
                         <button class="carousel-nav-btn carousel-prev" onclick="scrollCarousel('hotelCarousel', -300)">
                             <i class="bi bi-chevron-left"></i>
@@ -209,43 +272,92 @@
                     </div>
                 </div>
             </div>
+
+            <div class="text-center mt-4">
+                <a href="#" class="btn btn-outline-primary-navy px-4 py-2 fw-medium">View All Destinations <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
         </div>
     </section>
 
     <!-- ============================
          Promotional Banners Slider
          ============================ -->
-    <section class="py-5">
+    <section class="promo-section py-5">
         <div class="container">
-            <div id="promoBannerCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div id="promoBannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
                 <div class="carousel-inner">
+                    <!-- Slide 1 -->
                     <div class="carousel-item active">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="promo-banner-card" style="background: linear-gradient(135deg, #2c3e50, #4ca1af);">
-                                    <div class="p-4 text-white">
-                                        <p class="small mb-1 text-uppercase">Live Now</p>
-                                        <h4 class="fw-bold">BY COMPASS<br>NOT A CLOCK</h4>
-                                        <p class="small opacity-75">THE WORLD IS TOO BIG TO STAY IN ONE PLACE AND LIFE IS TOO SHORT TO DO JUST ONE THING.</p>
+                                <div class="promo-banner-card promo-banner-card-v2" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);">
+                                    <div class="promo-banner-decor"></div>
+                                    <div class="p-4 text-white position-relative">
+                                        <p class="small mb-1 text-uppercase fw-semibold letter-spacing-wide" style="color: #7dd3fc;">
+                                            <i class="bi bi-compass me-1"></i> Live Now
+                                        </p>
+                                        <h3 class="fw-bold mb-2">TRAVEL BY<br>COMPASS</h3>
+                                        <p class="small opacity-75 mb-3">Life is too short to stay in one place. Explore the world your way.</p>
+                                        <a href="#" class="btn btn-sm btn-outline-light px-3 fw-medium">Explore Now <i class="bi bi-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="promo-banner-card" style="background: linear-gradient(135deg, #c0392b, #e74c3c);">
-                                    <div class="p-4 text-white">
-                                        <p class="small mb-1">Let's Explore</p>
-                                        <h4 class="fw-bold">YOUR DREAM<br>DESTINATION</h4>
-                                        <span class="badge bg-warning text-dark px-3 py-2 fw-bold">PROMO AND SAVE 35%</span>
+                                <div class="promo-banner-card promo-banner-card-v2" style="background: linear-gradient(135deg, #b91c1c, #dc2626, #ef4444);">
+                                    <div class="promo-banner-decor"></div>
+                                    <div class="p-4 text-white position-relative">
+                                        <p class="small mb-1 fw-semibold" style="color: #fde68a;">
+                                            <i class="bi bi-lightning-fill me-1"></i> Flash Sale
+                                        </p>
+                                        <h3 class="fw-bold mb-2">YOUR DREAM<br>DESTINATION</h3>
+                                        <div class="d-flex align-items-center gap-2 mb-3">
+                                            <span class="promo-discount-badge">35% OFF</span>
+                                            <span class="small opacity-75">Limited time offer</span>
+                                        </div>
+                                        <a href="#" class="btn btn-sm btn-warning text-dark px-3 fw-bold">Book & Save <i class="bi bi-arrow-right ms-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="carousel-item">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="promo-banner-card promo-banner-card-v2" style="background: linear-gradient(135deg, #4a1a8a, #7c3aed, #a78bfa);">
+                                    <div class="promo-banner-decor"></div>
+                                    <div class="p-4 text-white position-relative">
+                                        <p class="small mb-1 text-uppercase fw-semibold" style="color: #c4b5fd;">
+                                            <i class="bi bi-currency-bitcoin me-1"></i> Crypto Special
+                                        </p>
+                                        <h3 class="fw-bold mb-2">PAY WITH<br>CRYPTO</h3>
+                                        <p class="small opacity-75 mb-3">Save extra 10% when you pay with cryptocurrency.</p>
+                                        <a href="#" class="btn btn-sm btn-light text-dark px-3 fw-bold">Learn More <i class="bi bi-arrow-right ms-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="promo-banner-card promo-banner-card-v2" style="background: linear-gradient(135deg, #065f46, #059669, #34d399);">
+                                    <div class="promo-banner-decor"></div>
+                                    <div class="p-4 text-white position-relative">
+                                        <p class="small mb-1 fw-semibold" style="color: #a7f3d0;">
+                                            <i class="bi bi-airplane-fill me-1"></i> Weekend Getaway
+                                        </p>
+                                        <h3 class="fw-bold mb-2">LAST MINUTE<br>DEALS</h3>
+                                        <div class="d-flex align-items-center gap-2 mb-3">
+                                            <span class="promo-discount-badge" style="background: #065f46;">UP TO 60%</span>
+                                            <span class="small opacity-75">This weekend only</span>
+                                        </div>
+                                        <a href="#" class="btn btn-sm btn-outline-light px-3 fw-medium">View Deals <i class="bi bi-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="carousel-indicators position-relative mt-3">
-                    <button type="button" data-bs-target="#promoBannerCarousel" data-bs-slide-to="0" class="active bg-dark"></button>
-                    <button type="button" data-bs-target="#promoBannerCarousel" data-bs-slide-to="1" class="bg-dark"></button>
-                    <button type="button" data-bs-target="#promoBannerCarousel" data-bs-slide-to="2" class="bg-dark"></button>
+                <div class="carousel-indicators promo-indicators position-relative mt-3">
+                    <button type="button" data-bs-target="#promoBannerCarousel" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#promoBannerCarousel" data-bs-slide-to="1"></button>
                 </div>
             </div>
         </div>
@@ -254,45 +366,294 @@
     <!-- ============================
          Customer Reviews
          ============================ -->
-    <section class="py-5 bg-white">
+    <section class="reviews-section py-5">
         <div class="container">
-            <div class="text-center mb-5">
+            <div class="text-center mb-2">
                 <span class="section-subtitle">Customer Reviews</span>
-                <h2 class="fw-bold">What our customers say</h2>
+                <h2 class="fw-bold mb-1">Loved by travelers worldwide</h2>
+                <p class="text-muted">Real experiences from real guests</p>
             </div>
 
-            <div class="position-relative">
-                <div class="review-carousel" id="reviewCarousel">
-                    @for($i = 0; $i < 4; $i++)
-                    <div class="review-card">
-                        <div class="review-card-img">
-                            <img src="{{ asset('assets/images/login-1.jpg') }}" alt="Review">
-                            <div class="review-card-overlay">
-                                <p class="small text-white mb-2">Loved the rooftop view! The hotel was peaceful, well maintained, and perfect for a short weekend trip.</p>
-                                <div class="review-stars mb-1">
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                </div>
-                                <div class="review-author">
-                                    <span class="badge bg-primary rounded-pill px-3">Victoria Werton</span>
-                                    <small class="text-white-50 d-block">2 months ago</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endfor
+            <!-- Stats row -->
+            <div class="review-stats d-flex justify-content-center gap-4 gap-md-5 mb-5">
+                <div class="text-center">
+                    <h3 class="fw-bold mb-0" style="color: var(--primary-navy);">50K+</h3>
+                    <small class="text-muted">Happy Guests</small>
                 </div>
-                <button class="carousel-nav-btn carousel-prev" onclick="scrollCarousel('reviewCarousel', -300)">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-                <button class="carousel-nav-btn carousel-next" onclick="scrollCarousel('reviewCarousel', 300)">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
+                <div class="review-stats-divider"></div>
+                <div class="text-center">
+                    <h3 class="fw-bold mb-0" style="color: var(--primary-navy);">4.8</h3>
+                    <small class="text-muted"><i class="bi bi-star-fill text-warning"></i> Avg Rating</small>
+                </div>
+                <div class="review-stats-divider"></div>
+                <div class="text-center">
+                    <h3 class="fw-bold mb-0" style="color: var(--primary-navy);">120+</h3>
+                    <small class="text-muted">Countries</small>
+                </div>
             </div>
         </div>
+
+        @php
+            $reviews = [
+                [
+                    'name' => 'Sarah Mitchell',
+                    'location' => 'New York, USA',
+                    'avatar' => 'SM',
+                    'color' => '#3b82f6',
+                    'rating' => 5,
+                    'title' => 'Absolutely stunning!',
+                    'text' => 'The hotel exceeded all expectations. Rooftop views were breathtaking and the staff went above and beyond. Will definitely book through SolanaTravels again!',
+                    'hotel' => 'Santorini Blue Horizon',
+                    'time' => '2 weeks ago',
+                    'verified' => true,
+                ],
+                [
+                    'name' => 'James Rodriguez',
+                    'location' => 'Madrid, Spain',
+                    'avatar' => 'JR',
+                    'color' => '#8b5cf6',
+                    'rating' => 5,
+                    'title' => 'Best crypto booking experience',
+                    'text' => 'Paid with SOL and got 15% back in travel credits. The process was seamless and the resort was paradise. Highly recommend for crypto holders!',
+                    'hotel' => 'Maldives Paradise Resort',
+                    'time' => '1 month ago',
+                    'verified' => true,
+                ],
+                [
+                    'name' => 'Emily Chen',
+                    'location' => 'Singapore',
+                    'avatar' => 'EC',
+                    'color' => '#ec4899',
+                    'rating' => 4,
+                    'title' => 'Perfect family getaway',
+                    'text' => 'Booked a family suite for 5 nights. Kids loved the pool, we loved the spa. Great value for money and the location was unbeatable.',
+                    'hotel' => 'Bali Ocean Breeze Villa',
+                    'time' => '3 weeks ago',
+                    'verified' => true,
+                ],
+                [
+                    'name' => 'Marcus Weber',
+                    'location' => 'Berlin, Germany',
+                    'avatar' => 'MW',
+                    'color' => '#f59e0b',
+                    'rating' => 5,
+                    'title' => 'Incredible value!',
+                    'text' => 'Saved 40% compared to other platforms. The room was spotless, breakfast was amazing, and checking in was a breeze. 10/10 would recommend.',
+                    'hotel' => 'Amalfi Coast Retreat',
+                    'time' => '5 days ago',
+                    'verified' => true,
+                ],
+                [
+                    'name' => 'Aisha Patel',
+                    'location' => 'Mumbai, India',
+                    'avatar' => 'AP',
+                    'color' => '#10b981',
+                    'rating' => 5,
+                    'title' => 'Honeymoon dream come true',
+                    'text' => 'Booked our honeymoon suite using USDT. The ocean-view room was magical at sunset. Thank you SolanaTravels for making it so special!',
+                    'hotel' => 'Phuket Sunset Resort',
+                    'time' => '2 months ago',
+                    'verified' => true,
+                ],
+                [
+                    'name' => 'Lucas Ferreira',
+                    'location' => 'São Paulo, Brazil',
+                    'avatar' => 'LF',
+                    'color' => '#ef4444',
+                    'rating' => 5,
+                    'title' => 'Smooth and easy',
+                    'text' => 'First time using crypto for travel. The platform made everything simple. Hotel was exactly as shown in photos. Great customer support too!',
+                    'hotel' => 'Cancún Riviera Suites',
+                    'time' => '6 days ago',
+                    'verified' => false,
+                ],
+                [
+                    'name' => 'Sophie Laurent',
+                    'location' => 'Paris, France',
+                    'avatar' => 'SL',
+                    'color' => '#6366f1',
+                    'rating' => 5,
+                    'title' => 'Magnifique!',
+                    'text' => 'Everything was perfect from booking to checkout. The concierge arranged a private boat tour for us. Truly a five-star experience.',
+                    'hotel' => 'Santorini Blue Horizon',
+                    'time' => '1 week ago',
+                    'verified' => true,
+                ],
+                [
+                    'name' => 'Yuki Tanaka',
+                    'location' => 'Tokyo, Japan',
+                    'avatar' => 'YT',
+                    'color' => '#0ea5e9',
+                    'rating' => 4,
+                    'title' => 'Great for solo travelers',
+                    'text' => 'Clean, comfortable, and well-located. The 24/7 support helped me change my dates last minute. Very impressed with the flexibility.',
+                    'hotel' => 'Bali Ocean Breeze Villa',
+                    'time' => '3 months ago',
+                    'verified' => true,
+                ],
+            ];
+        @endphp
+
+        <!-- Marquee Row 1 (scrolls left) -->
+        <div class="review-marquee-wrapper mb-3">
+            <div class="review-marquee review-marquee-left">
+                <div class="review-marquee-track">
+                    @foreach($reviews as $review)
+                    <div class="review-card-v2">
+                        <div class="review-card-v2-header">
+                            <div class="review-avatar" style="background: {{ $review['color'] }};">
+                                {{ $review['avatar'] }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="fw-bold small">{{ $review['name'] }}</span>
+                                    @if($review['verified'])
+                                    <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.75rem;"></i>
+                                    @endif
+                                </div>
+                                <small class="text-muted d-block" style="font-size: 0.7rem;"><i class="bi bi-geo-alt me-1"></i>{{ $review['location'] }}</small>
+                            </div>
+                            <div class="review-quote-icon">
+                                <i class="bi bi-quote"></i>
+                            </div>
+                        </div>
+                        <div class="review-card-v2-stars mb-1">
+                            @for($s = 0; $s < $review['rating']; $s++)
+                            <i class="bi bi-star-fill"></i>
+                            @endfor
+                            @for($s = $review['rating']; $s < 5; $s++)
+                            <i class="bi bi-star"></i>
+                            @endfor
+                        </div>
+                        <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">{{ $review['title'] }}</h6>
+                        <p class="review-card-v2-text">{{ $review['text'] }}</p>
+                        <div class="review-card-v2-footer">
+                            <span class="review-hotel-tag"><i class="bi bi-building me-1"></i>{{ $review['hotel'] }}</span>
+                            <small class="text-muted">{{ $review['time'] }}</small>
+                        </div>
+                    </div>
+                    @endforeach
+                    {{-- Duplicate for seamless loop --}}
+                    @foreach($reviews as $review)
+                    <div class="review-card-v2">
+                        <div class="review-card-v2-header">
+                            <div class="review-avatar" style="background: {{ $review['color'] }};">
+                                {{ $review['avatar'] }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="fw-bold small">{{ $review['name'] }}</span>
+                                    @if($review['verified'])
+                                    <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.75rem;"></i>
+                                    @endif
+                                </div>
+                                <small class="text-muted d-block" style="font-size: 0.7rem;"><i class="bi bi-geo-alt me-1"></i>{{ $review['location'] }}</small>
+                            </div>
+                            <div class="review-quote-icon">
+                                <i class="bi bi-quote"></i>
+                            </div>
+                        </div>
+                        <div class="review-card-v2-stars mb-1">
+                            @for($s = 0; $s < $review['rating']; $s++)
+                            <i class="bi bi-star-fill"></i>
+                            @endfor
+                            @for($s = $review['rating']; $s < 5; $s++)
+                            <i class="bi bi-star"></i>
+                            @endfor
+                        </div>
+                        <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">{{ $review['title'] }}</h6>
+                        <p class="review-card-v2-text">{{ $review['text'] }}</p>
+                        <div class="review-card-v2-footer">
+                            <span class="review-hotel-tag"><i class="bi bi-building me-1"></i>{{ $review['hotel'] }}</span>
+                            <small class="text-muted">{{ $review['time'] }}</small>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <!-- Marquee Row 2 (scrolls right, slower) -->
+        <div class="review-marquee-wrapper">
+            <div class="review-marquee review-marquee-right">
+                <div class="review-marquee-track">
+                    @foreach(array_reverse($reviews) as $review)
+                    <div class="review-card-v2">
+                        <div class="review-card-v2-header">
+                            <div class="review-avatar" style="background: {{ $review['color'] }};">
+                                {{ $review['avatar'] }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="fw-bold small">{{ $review['name'] }}</span>
+                                    @if($review['verified'])
+                                    <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.75rem;"></i>
+                                    @endif
+                                </div>
+                                <small class="text-muted d-block" style="font-size: 0.7rem;"><i class="bi bi-geo-alt me-1"></i>{{ $review['location'] }}</small>
+                            </div>
+                            <div class="review-quote-icon">
+                                <i class="bi bi-quote"></i>
+                            </div>
+                        </div>
+                        <div class="review-card-v2-stars mb-1">
+                            @for($s = 0; $s < $review['rating']; $s++)
+                            <i class="bi bi-star-fill"></i>
+                            @endfor
+                            @for($s = $review['rating']; $s < 5; $s++)
+                            <i class="bi bi-star"></i>
+                            @endfor
+                        </div>
+                        <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">{{ $review['title'] }}</h6>
+                        <p class="review-card-v2-text">{{ $review['text'] }}</p>
+                        <div class="review-card-v2-footer">
+                            <span class="review-hotel-tag"><i class="bi bi-building me-1"></i>{{ $review['hotel'] }}</span>
+                            <small class="text-muted">{{ $review['time'] }}</small>
+                        </div>
+                    </div>
+                    @endforeach
+                    @foreach(array_reverse($reviews) as $review)
+                    <div class="review-card-v2">
+                        <div class="review-card-v2-header">
+                            <div class="review-avatar" style="background: {{ $review['color'] }};">
+                                {{ $review['avatar'] }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="fw-bold small">{{ $review['name'] }}</span>
+                                    @if($review['verified'])
+                                    <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.75rem;"></i>
+                                    @endif
+                                </div>
+                                <small class="text-muted d-block" style="font-size: 0.7rem;"><i class="bi bi-geo-alt me-1"></i>{{ $review['location'] }}</small>
+                            </div>
+                            <div class="review-quote-icon">
+                                <i class="bi bi-quote"></i>
+                            </div>
+                        </div>
+                        <div class="review-card-v2-stars mb-1">
+                            @for($s = 0; $s < $review['rating']; $s++)
+                            <i class="bi bi-star-fill"></i>
+                            @endfor
+                            @for($s = $review['rating']; $s < 5; $s++)
+                            <i class="bi bi-star"></i>
+                            @endfor
+                        </div>
+                        <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">{{ $review['title'] }}</h6>
+                        <p class="review-card-v2-text">{{ $review['text'] }}</p>
+                        <div class="review-card-v2-footer">
+                            <span class="review-hotel-tag"><i class="bi bi-building me-1"></i>{{ $review['hotel'] }}</span>
+                            <small class="text-muted">{{ $review['time'] }}</small>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <!-- Fade edges -->
+        <div class="review-marquee-fade-left"></div>
+        <div class="review-marquee-fade-right"></div>
     </section>
 
     <!-- ============================

@@ -158,7 +158,7 @@ class BookingController extends Controller
                 'phone' => [
                     'countryCode' => '1',
                     'areaCode' => '',
-                    'number' => $validated['guest_phone'] ?? '',
+                    'number' => $validated['guest_phone'] ?? '09762016124',
                 ],
                 'newsletter' => false,
             ],
@@ -231,6 +231,11 @@ class BookingController extends Controller
             'free_cancellation' => $bookingData['free_cancellation'] ?? false,
             'cancellation_deadline' => $bookingData['cancellation_deadline'] ?? null,
         ]);
+
+        // return response()->json([
+        //     'booking' => $booking,
+        //     'agoda_result' => $agodaResult,
+        // ]);
 
         if ($agodaResult && ($agodaResult['status'] ?? '') === '200') {
             $agodaDetails = $agodaResult['bookingDetails'][0] ?? null;
