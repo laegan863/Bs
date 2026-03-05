@@ -8,25 +8,16 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    /**
-     * Show the user's profile.
-     */
     public function show()
     {
         return view('profile.index', ['user' => Auth::user()]);
     }
 
-    /**
-     * Show the edit profile form.
-     */
     public function edit()
     {
         return view('profile.edit', ['user' => Auth::user()]);
     }
 
-    /**
-     * Update the user's profile.
-     */
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -44,7 +35,6 @@ class ProfileController extends Controller
         ]);
 
         if ($request->hasFile('avatar')) {
-            // Delete old avatar if exists
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
                 Storage::disk('public')->delete($user->avatar);
             }

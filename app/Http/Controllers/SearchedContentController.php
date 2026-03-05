@@ -32,12 +32,5 @@ class SearchedContentController extends Controller
             'information' => $this->extractToJson($PropertyInformation),
             'facilities' => $this->extractToJson($PropertyFacilities),
         ];
-
-        return response()->json([
-            'room_images' => $this->extractToJson($PropertyRoomImages),
-            'images' => $this->extractToJson($PropertyImages),
-            'information' => $this->extractToJson($PropertyInformation),
-            'facilities' => $this->extractToJson($PropertyFacilities),
-        ]);
     }
 }

@@ -22,7 +22,7 @@
             <!-- Avatar Upload -->
             <div class="text-center mb-4">
                 <div class="sidebar-avatar mx-auto mb-2" style="width: 100px; height: 100px;">
-                    @if($user->avatar)
+                    @if($user->avatar && file_exists(public_path('storage/' . $user->avatar)))
                         <img src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" id="avatarPreview">
                     @else
                         <div class="sidebar-avatar-placeholder" id="avatarPlaceholder" style="width: 100px; height: 100px; font-size: 2rem;">

@@ -18,8 +18,16 @@
 
                     <!-- Booking Reference -->
                     <div class="confirmation-reference mb-4">
-                        <small class="text-muted d-block mb-1">Booking Reference</small>
-                        <span class="fw-bold" style="font-size: 1.3rem; color: var(--primary-navy); letter-spacing: 2px;">{{ $booking->transaction_reference }}</span>
+                        @if($booking->agodaBooking)
+                        <div class="d-inline-block px-4 py-3 mb-3 rounded-4" style="background: linear-gradient(135deg, var(--primary-navy, #1a1a5e) 0%, var(--primary-blue, #3366cc) 100%); min-width: 280px;">
+                            <small class="d-block mb-1 text-white-50" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;">Agoda Booking ID</small>
+                            <span class="fw-bold text-white" style="font-size: 1.6rem; letter-spacing: 3px;">{{ $booking->agodaBooking->agoda_booking_id }}</span>
+                        </div>
+                        @endif
+                        <div>
+                            <small class="text-muted d-block mb-1">Transaction Reference</small>
+                            <span class="fw-bold" style="font-size: 1rem; color: var(--primary-navy); letter-spacing: 2px;">{{ $booking->transaction_reference }}</span>
+                        </div>
                     </div>
 
                     <!-- Booking Details Card -->

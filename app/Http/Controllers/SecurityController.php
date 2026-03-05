@@ -2,32 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Jenssegers\Agent\Agent;
 
 class SecurityController extends Controller
 {
-    /**
-     * Show the security and settings page.
-     */
     public function index()
     {
         return view('security.index', ['user' => Auth::user()]);
     }
 
-    /**
-     * Show the edit email form.
-     */
     public function editEmail()
     {
         return view('security.email', ['user' => Auth::user()]);
     }
 
-    /**
-     * Update the user's email.
-     */
     public function updateEmail(Request $request)
     {
         $validated = $request->validate([
@@ -44,17 +38,11 @@ class SecurityController extends Controller
         return redirect()->route('settings.index')->with('success', 'Email updated successfully!');
     }
 
-    /**
-     * Show the edit mobile form.
-     */
     public function editMobile()
     {
         return view('security.mobile', ['user' => Auth::user()]);
     }
 
-    /**
-     * Update the user's mobile number.
-     */
     public function updateMobile(Request $request)
     {
         $validated = $request->validate([
@@ -71,17 +59,11 @@ class SecurityController extends Controller
         return redirect()->route('settings.index')->with('success', 'Mobile number updated successfully!');
     }
 
-    /**
-     * Show the change password form.
-     */
     public function editPassword()
     {
         return view('security.password');
     }
 
-    /**
-     * Update the user's password.
-     */
     public function updatePassword(Request $request)
     {
         $validated = $request->validate([
@@ -98,38 +80,65 @@ class SecurityController extends Controller
         return redirect()->route('settings.index')->with('success', 'Password changed successfully!');
     }
 
-    /**
-     * Show connected devices (static).
-     */
-    public function devices()
+    public function devices(Request $request)
     {
-        $devices = [
-            [
-                'name'     => 'Chrome on Windows',
-                'icon'     => 'bi-laptop',
-                'location' => 'New York, United States',
-                'ip'       => '192.168.1.101',
-                'last_active' => 'Active now',
-                'current'  => true,
-            ],
-            [
-                'name'     => 'Safari on iPhone',
-                'icon'     => 'bi-phone',
-                'location' => 'New York, United States',
-                'ip'       => '192.168.1.102',
-                'last_active' => '2 hours ago',
-                'current'  => false,
-            ],
-            [
-                'name'     => 'Firefox on MacOS',
-                'icon'     => 'bi-laptop',
-                'location' => 'Los Angeles, United States',
-                'ip'       => '10.0.0.55',
-                'last_active' => '3 days ago',
-                'current'  => false,
-            ],
-        ];
+        $currentSessionId = session()->getId();
 
-        return view('security.devices', ['devices' => $devices]);
+        $sessions = DB::table('sessions')
+            ->where('user_id', Auth::id())
+            ->orderByDesc('last_activity')
+            ->get();
+
+        $agent = new Agent();
+
+        $devices = $sessions->map(function ($session) use ($agent, $currentSessionId) {
+            $agent->setUserAgent($session->user_agent);
+
+            $browser  = $agent->browser() ?: 'Unknown Browser';
+            $platform = $agent->platform() ?: 'Unknown OS';
+            $platformVersion = $agent->version($platform);
+            $isCurrent = $session->id === $currentSessionId;
+
+            if ($agent->isPhone()) {
+                $icon = 'bi-phone';
+            } elseif ($agent->isTablet()) {
+                $icon = 'bi-tablet';
+            } else {
+                $icon = 'bi-laptop';
+            }
+
+            $deviceName = $platform . ($platformVersion ? ' ' . $platformVersion : '');
+
+            $lastActive = Carbon::createFromTimestamp($session->last_activity);
+
+            return [
+                'id'          => $session->id,
+                'name'        => $deviceName,
+                'browser'     => $browser,
+                'icon'        => $icon,
+                'ip'          => $session->ip_address ?? 'Unknown',
+                'last_active' => $isCurrent ? 'Active now' : $lastActive->diffForHumans(),
+                'last_active_date' => $lastActive->format('M d, Y \a\t g:ia'),
+                'current'     => $isCurrent,
+            ];
+        });
+
+        $deviceCount = $devices->count();
+
+        return view('security.devices', compact('devices', 'deviceCount'));
+    }
+
+    public function destroySession(Request $request, string $sessionId)
+    {
+        if ($sessionId === session()->getId()) {
+            return back()->with('error', 'You cannot sign out of your current session here. Use the logout button instead.');
+        }
+
+        DB::table('sessions')
+            ->where('id', $sessionId)
+            ->where('user_id', Auth::id())
+            ->delete();
+
+        return back()->with('success', 'Device signed out successfully.');
     }
 }

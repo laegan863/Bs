@@ -2,7 +2,7 @@
     <!-- User Info -->
     <div class="sidebar-user text-center">
         <div class="sidebar-avatar mx-auto mb-3">
-            @if(Auth::user()->avatar)
+            @if(Auth::user()->avatar && file_exists(public_path('storage/' . Auth::user()->avatar)))
                 <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar">
             @else
                 <div class="sidebar-avatar-placeholder">
@@ -36,7 +36,7 @@
             <i class="bi bi-chevron-right"></i>
         </a>
 
-        <a href="#" class="sidebar-nav-item {{ request()->routeIs('payment.*') ? 'active' : '' }}">
+        <a href="{{ route('payment.index') }}" class="sidebar-nav-item {{ request()->routeIs('payment.*') ? 'active' : '' }}">
             <div class="d-flex align-items-center gap-3">
                 <i class="bi bi-credit-card"></i>
                 <span>Payment Methods</span>
@@ -44,7 +44,7 @@
             <i class="bi bi-chevron-right"></i>
         </a>
 
-        <a href="#" class="sidebar-nav-item {{ request()->routeIs('bookings.upcoming') ? 'active' : '' }}">
+        <a href="{{ route('bookings.index') }}" class="sidebar-nav-item {{ request()->routeIs('bookings.*') && request()->query('tab') !== 'previous' ? 'active' : '' }}">
             <div class="d-flex align-items-center gap-3">
                 <i class="bi bi-calendar-check"></i>
                 <span>Upcoming Bookings</span>
@@ -52,7 +52,7 @@
             <i class="bi bi-chevron-right"></i>
         </a>
 
-        <a href="#" class="sidebar-nav-item {{ request()->routeIs('bookings.previous') ? 'active' : '' }}">
+        <a href="{{ route('bookings.index') }}?tab=previous" class="sidebar-nav-item {{ request()->routeIs('bookings.*') && request()->query('tab') === 'previous' ? 'active' : '' }}">
             <div class="d-flex align-items-center gap-3">
                 <i class="bi bi-clock-history"></i>
                 <span>Previous Bookings</span>
