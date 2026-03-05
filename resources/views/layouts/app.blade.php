@@ -56,7 +56,7 @@
                     <li class="nav-item">
                         <a href="{{ route('profile.show') }}" class="nav-link d-flex align-items-center gap-2 text-dark">
                             <div class="nav-avatar">
-                                @if(Auth::user()->avatar)
+                                @if(Auth::user()->avatar && file_exists(public_path('storage/' . Auth::user()->avatar)))
                                     <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar">
                                 @else
                                     <div class="nav-avatar-placeholder">
@@ -83,9 +83,30 @@
     <section class="hero-section">
         <div class="hero-overlay"></div>
         <div class="container position-relative" style="z-index: 2;">
-            <div class="text-center text-white py-5">
-                <h1 class="hero-title fw-bold mb-2">BOOK HOTELS WITH CRYPTO & SAVE UP TO 75%</h1>
+            <div class="text-center py-5">
+                <h1 class="hero-title fw-bold mb-2">BOOK RENTAL CARS WITH CRYPTO & SAVE UP TO 60%</h1>
                 <p class="hero-subtitle mb-5">Pay With Crypto for 2,200,000+ Hotels Worldwide. Best Prices Guaranteed.</p>
+            </div>
+
+            <!-- Search Tabs -->
+            <div class="search-tabs-wrapper mx-auto">
+                <ul class="search-tabs nav">
+                    <li class="nav-item">
+                        <a class="search-tab-link active" href="#">
+                            <i class="bi bi-building me-2"></i> Stays
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="search-tab-link" href="#">
+                            <i class="bi bi-airplane me-2"></i> Flights
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="search-tab-link" href="#">
+                            <i class="bi bi-joystick me-2"></i> Activities
+                        </a>
+                    </li>
+                </ul>
             </div>
 
             <!-- Search Bar -->
@@ -95,7 +116,7 @@
                         <div class="search-field">
                             <i class="bi bi-search text-muted me-2"></i>
                             <div>
-                                <input type="text" value="2256959" name="property" class="form-control border-0 p-0 shadow-none" placeholder="Search for Properties or Places">
+                                <input type="text" value="2256959" name="property" class="form-control border-0 p-0 shadow-none" placeholder="Search for Places or Properties">
                             </div>
                         </div>
                     </div>
@@ -103,8 +124,9 @@
                         <div class="search-field search-field-border">
                             <i class="bi bi-calendar3 text-muted me-2"></i>
                             <div class="flex-grow-1">
-                                <small class="text-muted d-block lh-1 mb-1">Check-in</small>
-                                <input type="date" name="checkin" class="form-control border-0 p-0 shadow-none fw-medium small search-date-input" id="checkinDate" value="{{ now()->format('Y-m-d') }}">
+                                <span class="fw-medium small">{{ now()->format('d M Y') }}</span>
+                                <small class="text-muted d-block lh-1">{{ now()->format('l') }}</small>
+                                <input type="hidden" name="checkin" value="{{ now()->format('Y-m-d') }}">
                             </div>
                         </div>
                     </div>
@@ -112,8 +134,9 @@
                         <div class="search-field search-field-border">
                             <i class="bi bi-calendar3 text-muted me-2"></i>
                             <div class="flex-grow-1">
-                                <small class="text-muted d-block lh-1 mb-1">Check-out</small>
-                                <input type="date" name="checkout" class="form-control border-0 p-0 shadow-none fw-medium small search-date-input" id="checkoutDate" value="{{ now()->addDay()->format('Y-m-d') }}">
+                                <span class="fw-medium small">{{ now()->addDay()->format('d M Y') }}</span>
+                                <small class="text-muted d-block lh-1">{{ now()->addDay()->format('l') }}</small>
+                                <input type="hidden" name="checkout" value="{{ now()->addDay()->format('Y-m-d') }}">
                             </div>
                         </div>
                     </div>
@@ -122,13 +145,13 @@
                             <i class="bi bi-people text-muted me-2"></i>
                             <div>
                                 <span class="fw-medium small">2 Adults - 0 Child</span><br>
-                                <small class="text-muted">1 Room</small>
+                                <small class="text-muted">1 room</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-2 text-end pe-2">
-                        <button type="submit" class="btn btn-primary-custom text-white px-4 py-2">
-                            <i class="bi bi-search me-1"></i> Search
+                        <button type="submit" class="btn btn-primary-custom text-white px-4 py-2 fw-semibold">
+                            SEARCH
                         </button>
                     </div>
                 </form>

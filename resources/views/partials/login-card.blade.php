@@ -9,9 +9,9 @@
     <button class="social-login-btn btn-facebook">
         <i class="bi bi-facebook"></i>
     </button>
-    <button class="social-login-btn btn-google">
+    <a href="{{ route('auth.google') }}" class="social-login-btn btn-google">
         <i class="bi bi-google"></i>
-    </button>
+    </a>
     <button class="social-login-btn btn-wechat">
         <i class="bi bi-wechat"></i>
     </button>

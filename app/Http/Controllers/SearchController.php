@@ -57,8 +57,8 @@ class SearchController extends Controller
 
         $data = $response->json();
         $property = $data['properties'][0] ?? null;
+        $searchedId = $data['searchId'] ?? null;
 
-        // Group rooms by parentRoomName
         $groupedRooms = [];
         if ($property && isset($property['rooms'])) {
             foreach ($property['rooms'] as $room) {
@@ -73,11 +73,9 @@ class SearchController extends Controller
             }
         }
 
-        // Count unique room types and total deals
         $roomTypeCount = count($groupedRooms);
         $totalDeals = $property ? count($property['rooms'] ?? []) : 0;
 
-        // Find lowest price
         $lowestPrice = null;
         if ($property && isset($property['rooms'])) {
             foreach ($property['rooms'] as $room) {
@@ -88,21 +86,8 @@ class SearchController extends Controller
             }
         }
 
-        // return response()->json([
-        //     'property' => $property,
-        //     'data' => $searchedData,
-        //     'groupedRooms' => $groupedRooms,
-        //     'roomTypeCount' => $roomTypeCount,
-        //     'totalDeals' => $totalDeals,
-        //     'lowestPrice' => $lowestPrice,
-        //     'checkIn' => $checkIn,
-        //     'checkOut' => $checkOut,
-        //     'adults' => $adults,
-        //     'children' => $children,
-        //     'rooms' => $rooms,
-        // ]);
-
         return view('property-detail', [
+            'searchedId' => $searchedId,
             'property' => $property,
             'data' => $searchedData,
             'groupedRooms' => $groupedRooms,

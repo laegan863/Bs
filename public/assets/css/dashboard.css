@@ -345,3 +345,26 @@
     color: var(--primary-navy);
     flex-shrink: 0;
 }
+
+/* ============================
+   Booking Cards
+   ============================ */
+
+.booking-card {
+    background: white;
+    border-radius: 0.75rem;
+    border: 1px solid #e9ecef;
+    transition: box-shadow 0.2s;
+}
+
+.booking-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.booking-card-past {
+    opacity: 0.85;
+}
+
+.booking-card-past:hover {
+    opacity: 1;
+}

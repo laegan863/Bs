@@ -10,17 +10,11 @@ use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
-    /**
-     * Show the registration form.
-     */
     public function showRegister()
     {
         return view('register');
     }
 
-    /**
-     * Handle registration.
-     */
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -44,17 +38,11 @@ class AuthController extends Controller
         return redirect()->route('dashboard')->with('success', 'Account created successfully!');
     }
 
-    /**
-     * Show the login form.
-     */
     public function showLogin()
     {
         return view('login');
     }
 
-    /**
-     * Handle login.
-     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -73,9 +61,6 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    /**
-     * Handle logout.
-     */
     public function logout(Request $request)
     {
         Auth::logout();

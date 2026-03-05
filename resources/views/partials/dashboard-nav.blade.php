@@ -28,7 +28,7 @@
                 <li class="nav-item">
                     <a href="{{ route('profile.show') }}" class="nav-link d-flex align-items-center gap-2 text-dark">
                         <div class="nav-avatar">
-                            @if(Auth::user()->avatar)
+                            @if(Auth::user()->avatar && file_exists(public_path('storage/' . Auth::user()->avatar)))
                                 <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar">
                             @else
                                 <div class="nav-avatar-placeholder">

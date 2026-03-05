@@ -7,10 +7,13 @@
             <a href="{{ route('settings.index') }}" class="btn btn-outline-secondary btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width:32px;height:32px;">
                 <i class="bi bi-arrow-left"></i>
             </a>
-            <h4 class="fw-bold mb-0">Connected Devices</h4>
+            <h4 class="fw-bold mb-0">Connected devices</h4>
         </div>
 
-        <p class="text-muted small mb-4">These are the devices currently logged in to your account. If you don't recognize a device, sign out of it immediately.</p>
+        <p class="text-muted small mb-1">
+            Your account is currently signed into <strong>{{ $deviceCount }} {{ Str::plural('device', $deviceCount) }}</strong> on SolanaTravels
+        </p>
+        <p class="text-muted small mb-4">You're signed into SolanaTravels</p>
 
         <div class="devices-list">
             @foreach($devices as $device)
@@ -27,16 +30,19 @@
                                 @endif
                             </div>
                             <div class="small text-muted mt-1">
-                                <span>{{ $device['location'] }}</span>
-                                <span class="mx-1">&middot;</span>
-                                <span>IP: {{ $device['ip'] }}</span>
+                                {{ $device['browser'] }}
                             </div>
-                            <div class="small {{ $device['current'] ? 'text-success' : 'text-muted' }} mt-1">
-                                {{ $device['last_active'] }}
+                            <div class="small text-muted mt-1">
+                                {{ $device['last_active_date'] }}
                             </div>
                         </div>
                         @if(!$device['current'])
-                            <button class="btn btn-primary-custom text-white btn-sm">Sign out</button>
+                            <form method="POST" action="{{ route('settings.session.destroy', $device['id']) }}"
+                                  onsubmit="return confirm('Sign out this device?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-link text-primary fw-semibold p-0 text-decoration-none">Sign out</button>
+                            </form>
                         @endif
                     </div>
                 </div>

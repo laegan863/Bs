@@ -379,15 +379,22 @@
                                             <button class="btn btn-primary-custom btn-hover-glow text-white w-100 py-2 fw-semibold btn-book-now"
                                                 data-room-id="{{ $room['roomId'] ?? '' }}"
                                                 data-room-name="{{ $room['roomName'] ?? $groupName }}"
+                                                data-block-id="{{ $room['blockId'] ?? '' }}"
                                                 data-room-type="{{ $groupName }}"
                                                 data-bed-type="{{ $bedType ?? 'N/A' }}"
                                                 data-price="{{ $room['rate']['inclusive'] ?? 0 }}"
+                                                data-rate-exclusive="{{ $room['rate']['exclusive'] ?? 0 }}"
+                                                data-rate-tax="{{ $room['rate']['tax'] ?? 0 }}"
+                                                data-rate-fees="{{ $room['rate']['fees'] ?? 0 }}"
+                                                data-rate-currency="{{ $room['rate']['currency'] ?? 'USD' }}"
+                                                data-rate-method="{{ $room['rate']['method'] ?? 'PRPN' }}"
+                                                data-payment-model="{{ $room['paymentModel'] ?? 'Merchant' }}"
                                                 data-free-breakfast="{{ $room['freeBreakfast'] ? '1' : '0' }}"
                                                 data-free-cancellation="{{ $room['freeCancellation'] ? '1' : '0' }}"
                                                 data-cancellation-deadline="{{ $room['cancellationPolicy']['date'][0]['onward'] ?? '' }}"
                                                 data-property-id="{{ $property['propertyId'] ?? '' }}"
                                                 data-property-name="{{ $property['propertyName'] ?? '' }}"
-                                                data-property-image="{{ $pictures[0]['URL'] ?? '' }}"
+                                                data-property-image="{{ $mainRoomImage }}"
                                                 data-check-in="{{ $checkIn ?? '' }}"
                                                 data-check-out="{{ $checkOut ?? '' }}"
                                                 data-rooms="{{ $rooms ?? 1 }}"
@@ -411,85 +418,6 @@
     <!-- ============================
          Customer Reviews
          ============================ -->
-    {{-- <section class="py-5 bg-white">
-        <div class="container">
-            <div class="text-center mb-5">
-                <span class="section-subtitle">Guest Reviews</span>
-                <h2 class="fw-bold">What our Guest say</h2>
-            </div>
-
-            <div class="position-relative">
-                <div class="review-carousel" id="reviewCarousel">
-                    @for($i = 0; $i < 4; $i++)
-                    <div class="review-card">
-                        <div class="review-card-img">
-                            <img src="{{ asset('assets/images/login-1.jpg') }}" alt="Review">
-                            <div class="review-card-overlay">
-                                <p class="small text-white mb-2">Loved the rooftop view! The hotel was peaceful, well maintained, and perfect for a short weekend trip.</p>
-                                <div class="review-stars mb-1">
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                    <i class="bi bi-star-fill text-warning"></i>
-                                </div>
-                                <div class="review-author">
-                                    <span class="badge bg-primary rounded-pill px-3">Victoria Werton</span>
-                                    <small class="text-white-50 d-block">2 months ago</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endfor
-                </div>
-                <button class="carousel-nav-btn carousel-prev" onclick="scrollCarousel('reviewCarousel', -300)">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-                <button class="carousel-nav-btn carousel-next" onclick="scrollCarousel('reviewCarousel', 300)">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-    </section> --}}
-
-    <!-- ============================
-         Crypto Section
-         ============================ -->
-    {{-- <section class="crypto-section py-5">
-        <div class="container text-center">
-            <span class="section-subtitle text-white-50">Crypto-friendly Bookings</span>
-            <h2 class="fw-bold text-white mb-5">Your money is valued here.</h2>
-
-            <div class="position-relative mb-5">
-                <div class="crypto-carousel d-flex align-items-center justify-content-center gap-3" id="cryptoCarousel">
-                    <button class="carousel-nav-btn carousel-prev" onclick="scrollCarousel('cryptoLogos', -200)" style="position:relative;left:0;">
-                        <i class="bi bi-arrow-left"></i>
-                    </button>
-                    <div class="crypto-logos d-flex gap-3 overflow-hidden" id="cryptoLogos">
-                        @for($i = 1; $i < 10; $i++)
-                        <div class="crypto-logo-item">
-                            <span class="fw-bold text-white">
-                                <img src="{{ asset('assets/images/payment/' . $i . '.png') }}" alt="" class="img-fluid">
-                            </span>
-                        </div>
-                        @endfor
-                    </div>
-                    <button class="carousel-nav-btn carousel-next" onclick="scrollCarousel('cryptoLogos', 200)" style="position:relative;right:0;">
-                        <i class="bi bi-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="row align-items-center justify-content-between">
-                <div class="col-lg-6 text-lg-start">
-                    <p class="text-white-50 small">We're proud to be the leading crypto-native travel platform, enabling you to book trips worldwide using over 100+ <strong class="text-white">cryptocurrencies</strong> or traditional payment methods—quickly and seamlessly.</p>
-                </div>
-                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                    <a href="#" class="btn btn-outline-light px-4 py-2 fw-medium">See All Payment Options <i class="bi bi-arrow-right ms-1"></i></a>
-                </div>
-            </div>
-        </div>
-    </section> --}}
 
     <!-- ============================
          Hotel Facilities
@@ -853,6 +781,7 @@ leisure and sports' => 'bi-trophy',
                 document.getElementById('formPropertyName').value = data.propertyName;
                 document.getElementById('formPropertyImage').value = data.propertyImage;
                 document.getElementById('formRoomId').value = data.roomId;
+                document.getElementById('formBlockId').value = data.blockId;
                 document.getElementById('formRoomName').value = data.roomName;
                 document.getElementById('formRoomType').value = data.roomType;
                 document.getElementById('formBedType').value = data.bedType;
@@ -866,6 +795,12 @@ leisure and sports' => 'bi-trophy',
                 document.getElementById('formFreeCancellation').value = data.freeCancellation;
                 document.getElementById('formCancellationDeadline').value = data.cancellationDeadline;
                 document.getElementById('formFreeBreakfast').value = data.freeBreakfast;
+                document.getElementById('formRateExclusive').value = data.rateExclusive;
+                document.getElementById('formRateTax').value = data.rateTax;
+                document.getElementById('formRateFees').value = data.rateFees;
+                document.getElementById('formRateCurrency').value = data.rateCurrency;
+                document.getElementById('formRateMethod').value = data.rateMethod;
+                document.getElementById('formPaymentModel').value = data.paymentModel;
 
                 selectPaymentType('pay_now');
 
@@ -998,10 +933,12 @@ leisure and sports' => 'bi-trophy',
                 <div class="modal-footer booking-modal-footer">
                     <form action="{{ route('booking.store') }}" method="POST" class="w-100">
                         @csrf
+                        <input type="hidden" name="searched_id" id="formSearchedId" value="{{ $searchedId ?? '' }}">
                         <input type="hidden" name="property_id" id="formPropertyId">
                         <input type="hidden" name="property_name" id="formPropertyName">
                         <input type="hidden" name="property_image" id="formPropertyImage">
                         <input type="hidden" name="room_id" id="formRoomId">
+                        <input type="hidden" name="block_id" id="formBlockId">
                         <input type="hidden" name="room_name" id="formRoomName">
                         <input type="hidden" name="room_type" id="formRoomType">
                         <input type="hidden" name="bed_type" id="formBedType">
@@ -1015,6 +952,12 @@ leisure and sports' => 'bi-trophy',
                         <input type="hidden" name="free_cancellation" id="formFreeCancellation">
                         <input type="hidden" name="cancellation_deadline" id="formCancellationDeadline">
                         <input type="hidden" name="free_breakfast" id="formFreeBreakfast">
+                        <input type="hidden" name="rate_exclusive" id="formRateExclusive">
+                        <input type="hidden" name="rate_tax" id="formRateTax">
+                        <input type="hidden" name="rate_fees" id="formRateFees">
+                        <input type="hidden" name="rate_currency" id="formRateCurrency">
+                        <input type="hidden" name="rate_method" id="formRateMethod">
+                        <input type="hidden" name="payment_model" id="formPaymentModel">
                         <input type="hidden" name="payment_type" id="formPaymentType" value="pay_now">
 
                         <button type="submit" class="btn btn-primary-custom btn-hover-glow text-white w-100 py-3 fw-bold" style="font-size: 1.05rem;">
