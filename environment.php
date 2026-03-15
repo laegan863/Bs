@@ -65,11 +65,3 @@ AWS_USE_PATH_STYLE_ENDPOINT=false
 VITE_APP_NAME="${APP_NAME}"
 
 
-BS_URL='https://affiliatefeed.agoda.com/datafeeds/feed/'
-BS_SITE_ID=1952979
-BS_TOKEN='4ad00a2dac6e6ba6ecaf41a668bf1e8c'
-
-BITPAY_API_URL=https://test.bitpay.com/invoices
-BITPAY_API_TOKEN=test_token_placeholder
-
-
