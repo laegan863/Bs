@@ -6,6 +6,7 @@
     <title>SolanaTravels - Book Hotels with Crypto & Save Up to 75%</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/landing.css') }}">
@@ -13,6 +14,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 </head>
 <body>
 
@@ -83,8 +87,8 @@
     <section class="hero-section" style="background: url('{{ asset('img1.jpeg') }}') center/cover no-repeat; position: relative;">
         <div class="container position-relative" style="z-index: 2;">
             <div class="text-center py-5">
-                <h1 class="fw-bold mb-2" style="color: #1a1a2e; font-size: 2.5rem; letter-spacing: 0.5px;">BOOK HOST WITH CRYPTO &amp; SAVE UP TO 60%</h1>
-                <p class="mb-4" style="color: #1a1a2e; font-size: 1.1rem;">Pay With Crypto for 2,200,000+ Hotels Worldwide. Best Prices Guaranteed</p>
+                <h1 class="fw-bold mb-2" style="color: #1a1a2e; font-size: 2.5rem; letter-spacing: 0.5px;">Book Hotels with Crypto. Save Up to 75%</h1>
+                <p class="mb-4" style="color: #1a1a2e; font-size: 1.1rem;">Pay with crypto at 1,800,000+ hotels worldwide. Best prices guaranteed</p>
             </div>
 
             <!-- Search Bar -->
@@ -100,35 +104,64 @@
                         </div>
                     </div>
                     <div class="col-lg-2">
-                        <div class="search-field search-field-border">
+                        <div class="search-field search-field-border" id="checkinField" style="cursor: pointer;">
                             <div class="search-field-icon"><i class="bi bi-calendar-event"></i></div>
                             <div class="flex-grow-1">
                                 <span class="search-field-label">CHECK-IN</span>
-                                <span class="fw-bold small d-block">{{ now()->format('d M Y') }}</span>
+                                <span class="fw-bold small d-block" id="checkinDisplay">{{ now()->format('d M Y') }}</span>
                                 <input type="hidden" name="checkin" value="{{ now()->format('Y-m-d') }}">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-2">
-                        <div class="search-field search-field-border">
+                        <div class="search-field search-field-border" onclick="$('#checkinField').click();" style="cursor: pointer;">
                             <div class="search-field-icon"><i class="bi bi-calendar-event"></i></div>
                             <div class="flex-grow-1">
                                 <span class="search-field-label">CHECK-OUT</span>
-                                <span class="fw-bold small d-block">{{ now()->addDay()->format('d M Y') }}</span>
+                                <span class="fw-bold small d-block" id="checkoutDisplay">{{ now()->addDay()->format('d M Y') }}</span>
                                 <input type="hidden" name="checkout" value="{{ now()->addDay()->format('Y-m-d') }}">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-3">
-                        <div class="search-field search-field-border">
+                        <div class="search-field search-field-border" style="cursor: pointer; position: relative;">
                             <div class="search-field-icon"><i class="bi bi-people-fill"></i></div>
-                            <div>
+                            <div class="flex-grow-1" id="guestDropdownToggle" style="cursor: pointer;">
                                 <span class="search-field-label">GUESTS & ROOMS</span>
-                                <span class="fw-bold small">2 Adults</span>
-                                <small class="text-muted"> &middot; 0 Children &middot; 1 Room</small>
+                                <span class="fw-bold small" id="guestDisplayBold">2 Adults</span>
+                                <small class="text-muted" id="guestDisplaySmall"> &middot; 0 Children &middot; 1 Room</small>
+                            </div>
+                            <div class="dropdown-menu p-3 show" id="guestDropdown" style="min-width: 300px; display: none; position: absolute; top: 100%; left: 0; z-index: 1050;">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span>Adults</span>
+                                    <div class="d-flex align-items-center">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation(); changeCount('adults', -1)">-</button>
+                                        <span id="adultsCount" class="mx-3">2</span>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation(); changeCount('adults', 1)">+</button>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span>Children</span>
+                                    <div class="d-flex align-items-center">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation(); changeCount('children', -1)">-</button>
+                                        <span id="childrenCount" class="mx-3">0</span>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation(); changeCount('children', 1)">+</button>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Rooms</span>
+                                    <div class="d-flex align-items-center">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation(); changeCount('rooms', -1)">-</button>
+                                        <span id="roomsCount" class="mx-3">1</span>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation(); changeCount('rooms', 1)">+</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <input type="hidden" name="adults" value="2">
+                    <input type="hidden" name="children" value="0">
+                    <input type="hidden" name="rooms" value="1">
                     <div class="col-lg-2 text-end pe-2">
                         <button type="submit" class="btn hero-search-btn">
                             <i class="bi bi-search me-1"></i> SEARCH
@@ -220,85 +253,33 @@
          Promotional Banners Slider
          ============================ -->
     <section class="promo-section py-5">
-        <div class="container">
-            <div id="promoBannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-                <div class="carousel-inner">
-                    <!-- Slide 1 -->
-                    <div class="carousel-item active">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="promo-banner-card promo-banner-card-v2" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);">
-                                    <div class="promo-banner-decor"></div>
-                                    <div class="p-4 text-white position-relative">
-                                        <p class="small mb-1 text-uppercase fw-semibold letter-spacing-wide" style="color: #7dd3fc;">
-                                            <i class="bi bi-compass me-1"></i> Live Now
-                                        </p>
-                                        <h3 class="fw-bold mb-2">TRAVEL BY<br>COMPASS</h3>
-                                        <p class="small opacity-75 mb-3">Life is too short to stay in one place. Explore the world your way.</p>
-                                        <a href="#" class="btn btn-sm btn-outline-light px-3 fw-medium">Explore Now <i class="bi bi-arrow-right ms-1"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="promo-banner-card promo-banner-card-v2" style="background: linear-gradient(135deg, #b91c1c, #dc2626, #ef4444);">
-                                    <div class="promo-banner-decor"></div>
-                                    <div class="p-4 text-white position-relative">
-                                        <p class="small mb-1 fw-semibold" style="color: #fde68a;">
-                                            <i class="bi bi-lightning-fill me-1"></i> Flash Sale
-                                        </p>
-                                        <h3 class="fw-bold mb-2">YOUR DREAM<br>DESTINATION</h3>
-                                        <div class="d-flex align-items-center gap-2 mb-3">
-                                            <span class="promo-discount-badge">35% OFF</span>
-                                            <span class="small opacity-75">Limited time offer</span>
-                                        </div>
-                                        <a href="#" class="btn btn-sm btn-warning text-dark px-3 fw-bold">Book & Save <i class="bi bi-arrow-right ms-1"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Slide 2 -->
-                    <div class="carousel-item">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="promo-banner-card promo-banner-card-v2" style="background: linear-gradient(135deg, #4a1a8a, #7c3aed, #a78bfa);">
-                                    <div class="promo-banner-decor"></div>
-                                    <div class="p-4 text-white position-relative">
-                                        <p class="small mb-1 text-uppercase fw-semibold" style="color: #c4b5fd;">
-                                            <i class="bi bi-currency-bitcoin me-1"></i> Crypto Special
-                                        </p>
-                                        <h3 class="fw-bold mb-2">PAY WITH<br>CRYPTO</h3>
-                                        <p class="small opacity-75 mb-3">Save extra 10% when you pay with cryptocurrency.</p>
-                                        <a href="#" class="btn btn-sm btn-light text-dark px-3 fw-bold">Learn More <i class="bi bi-arrow-right ms-1"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="promo-banner-card promo-banner-card-v2" style="background: linear-gradient(135deg, #065f46, #059669, #34d399);">
-                                    <div class="promo-banner-decor"></div>
-                                    <div class="p-4 text-white position-relative">
-                                        <p class="small mb-1 fw-semibold" style="color: #a7f3d0;">
-                                            <i class="bi bi-airplane-fill me-1"></i> Weekend Getaway
-                                        </p>
-                                        <h3 class="fw-bold mb-2">LAST MINUTE<br>DEALS</h3>
-                                        <div class="d-flex align-items-center gap-2 mb-3">
-                                            <span class="promo-discount-badge" style="background: #065f46;">UP TO 60%</span>
-                                            <span class="small opacity-75">This weekend only</span>
-                                        </div>
-                                        <a href="#" class="btn btn-sm btn-outline-light px-3 fw-medium">View Deals <i class="bi bi-arrow-right ms-1"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="promo-card h-100">
+                    <span class="promo-badge">Featured</span>
+                    <h2 class="promo-title">Your ticket to the World Cup</h2>
+                    <p class="promo-text">
+                        Lock in match seats and build your trip all in one place.
+                    </p>
+                    <a href="#" class="promo-btn">Get tickets</a>
                 </div>
-                <div class="carousel-indicators promo-indicators position-relative mt-3">
-                    <button type="button" data-bs-target="#promoBannerCarousel" data-bs-slide-to="0" class="active"></button>
-                    <button type="button" data-bs-target="#promoBannerCarousel" data-bs-slide-to="1"></button>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="promo-card h-100">
+                    <span class="promo-badge">Promotion</span>
+                    <h2 class="promo-title">Family favorites: Save up to 40% on stays</h2>
+                    <p class="promo-text">
+                        Members save up to 40% on select homes the whole family will love.
+                        Book by March 16, 2026.
+                    </p>
+                    <a href="#" class="promo-btn">Book now</a>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- ============================
          Customer Reviews
@@ -915,6 +896,7 @@
                 <div class="col-lg-4">
                     <h4 class="fw-bold mb-2" style="color: var(--primary-navy);">SolanaTravels</h4>
                     <p class="text-muted small">We accept Credit Card, Debit Card<br>and Cryptocurrency payments.</p>
+                    <img src="{{ asset('footer.png') }}" alt="" class="img-fluid">
                 </div>
                 <div class="col-lg-2 col-md-4">
                     <h6 class="fw-bold text-uppercase mb-3">Solana Travels</h6>
@@ -955,7 +937,101 @@
     <!-- Bottom color bar -->
     <div style="height: 6px; background: linear-gradient(90deg, var(--primary-navy), #3949ab, #5c6bc0);"></div>
 
+    <!-- Guest Selection Modal -->
+    <div class="modal fade" id="guestModal" tabindex="-1" aria-labelledby="guestModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="guestModalLabel">Select Guests & Rooms</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Adults</span>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="changeCount('adults', -1)">-</button>
+                            <span id="adultsCount" class="mx-3">2</span>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="changeCount('adults', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Children</span>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="changeCount('children', -1)">-</button>
+                            <span id="childrenCount" class="mx-3">0</span>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="changeCount('children', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Rooms</span>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="changeCount('rooms', -1)">-</button>
+                            <span id="roomsCount" class="mx-3">1</span>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="changeCount('rooms', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="updateGuests()">Done</button>
+                </div>
+            </div>
+        </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#checkinField').daterangepicker({
+                startDate: moment('{{ now()->format('Y-m-d') }}'),
+                endDate: moment('{{ now()->addDay()->format('Y-m-d') }}'),
+                locale: {
+                    format: 'DD MMM YYYY'
+                },
+                autoApply: true
+            }, function(start, end, label) {
+                $('#checkinDisplay').text(start.format('DD MMM YYYY'));
+                $('#checkoutDisplay').text(end.format('DD MMM YYYY'));
+                $('input[name="checkin"]').val(start.format('YYYY-MM-DD'));
+                $('input[name="checkout"]').val(end.format('YYYY-MM-DD'));
+            });
+        });
+
+        // Initialize counts
+        let counts = {adults: 2, children: 0, rooms: 1};
+
+        function changeCount(type, delta) {
+            counts[type] = Math.max(0, counts[type] + delta);
+            document.getElementById(type + 'Count').textContent = counts[type];
+            updateGuestsDisplay();
+        }
+
+        function updateGuestsDisplay() {
+            document.querySelector('[name="adults"]').value = counts.adults;
+            document.querySelector('[name="children"]').value = counts.children;
+            document.querySelector('[name="rooms"]').value = counts.rooms;
+            document.getElementById('guestDisplayBold').textContent = `${counts.adults} Adults`;
+            document.getElementById('guestDisplaySmall').textContent = ` · ${counts.children} Children · ${counts.rooms} Room${counts.rooms > 1 ? 's' : ''}`;
+        }
+
+        // Custom dropdown toggle for guests
+        document.getElementById('guestDropdownToggle').addEventListener('click', function(e) {
+            e.stopPropagation();
+            var dd = document.getElementById('guestDropdown');
+            dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close guest dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            var dd = document.getElementById('guestDropdown');
+            var toggle = document.getElementById('guestDropdownToggle');
+            if (!dd.contains(e.target) && !toggle.contains(e.target)) {
+                dd.style.display = 'none';
+            }
+        });
+
+        // Set initial counts
+        document.addEventListener('DOMContentLoaded', function() {
+            updateGuestsDisplay();
+        });
+    </script>
     <script src="{{ asset('assets/js/landing.js') }}"></script>
 </body>
 </html>

@@ -64,9 +64,9 @@ AWS_USE_PATH_STYLE_ENDPOINT=false
 
 VITE_APP_NAME="${APP_NAME}"
 
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-GOOGLE_REDIRECT_URI="${APP_URL}/auth/google/callback"
+GOOGLE_CLIENT_ID=1082021674441-2bccq60tfru2mvr0krio2h91427pnrpp.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
 
 BS_URL='https://affiliatefeed.agoda.com/datafeeds/feed/'
 BS_SITE_ID=1952979
