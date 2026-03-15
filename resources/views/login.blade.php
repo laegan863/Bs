@@ -19,15 +19,15 @@
                     <h6 class="fw-bold mb-3">LOG IN TO</h6>
                     <div class="benefit-item">
                         <i class="bi bi-currency-bitcoin benefit-icon crypto"></i>
-                        <span class="small">Access 100+ crypto payment options</span>
+                        <span class="small">100+ Crypto Payment Options</span>
                     </div>
                     <div class="benefit-item">
                         <i class="bi bi-arrow-repeat benefit-icon rewards"></i>
-                        <span class="small">Get up to 10% back in rewards</span>
+                        <span class="small">20% Back in USDC</span>
                     </div>
                     <div class="benefit-item">
                         <i class="bi bi-gem benefit-icon crown"></i>
-                        <span class="small">See exclusive member pricing</span>
+                        <span class="small">Exclusive Member-Only Pricing — IndustryLowest Rates</span>
                     </div>
                 </div>
 
