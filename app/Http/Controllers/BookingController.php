@@ -451,25 +451,34 @@ class BookingController extends Controller
                 ->withHeaders([
                     'Authorization' => '1952979:97af8aba-5b21-4a37-ad75-a034c9e46742',
                     'Content-Type' => 'application/json',
-                ])->post('https://sandbox-affiliateapisecure.agoda.com/api/v4/postBooking/cancel', [
-                    'bookingId' => (int) $agodaBooking->agoda_booking_id,
+                ])->post('https://sandbox-affiliateapisecure.agoda.com/api/v4/postbooking/confirmcancel', [
+                    'bookingId'  => (int) $agodaBooking->agoda_booking_id,
+                    'reference'  => (int) $agodaBooking->itinerary_id,
+                    'cancelReason' => 0,
+                    'refundRate' => [
+                        'currency'  => $booking->currency,
+                        'inclusive' => 0.0,
+                    ],
                 ]);
 
             $result = $response->json();
 
             Log::info('Agoda cancel response', ['booking_id' => $booking->id, 'response' => $result]);
 
+            // Check for Agoda-level error in the response body first
+            if (!empty($result['errorMessage']['message'])) {
+                $errorMsg = $result['errorMessage']['message'];
+                return back()->with('error', 'Agoda cancellation failed: ' . $errorMsg);
+            }
+
             if ($response->successful()) {
-                $booking->update([
-                    'status' => 'cancelled',
-                ]);
-                $agodaBooking->update([
-                    'status' => 'Cancelled',
-                ]);
+                $booking->update(['status' => 'cancelled']);
+                $agodaBooking->update(['status' => 'Cancelled']);
 
                 return back()->with('success', 'Booking #' . $agodaBooking->agoda_booking_id . ' has been cancelled successfully.');
             }
 
+            // Fallback error from HTTP-level failure
             $errorMsg = $result['message'] ?? $result['error'] ?? 'Unknown error from Agoda.';
             return back()->with('error', 'Agoda cancellation failed: ' . $errorMsg);
 
@@ -478,6 +487,105 @@ class BookingController extends Controller
             return back()->with('error', 'Failed to cancel booking. Please try again later.');
         }
     }
+
+    public function editAmendment(Booking $booking)
+    {
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $agodaBooking = $booking->agodaBooking;
+
+        if (!$agodaBooking) {
+            return response()->json([
+                'error' => 'No Agoda booking linked.',
+            ], 404);
+        }
+
+        return response()->json([
+            'booking' => $booking->toArray(),
+            'agoda_booking_id' => (int) $agodaBooking->agoda_booking_id,
+        ]);
+    }
+
+    public function submitAmendment(Request $request, Booking $booking)
+    {
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'check_in' => 'required|date|after_or_equal:today',
+            'check_out' => 'required|date|after:check_in',
+        ]);
+
+        $agodaBooking = $booking->agodaBooking;
+
+        if (!$agodaBooking) {
+            return response()->json([
+                'error' => 'No Agoda booking linked to amend.',
+            ], 404);
+        }
+
+        try {
+            $response = Http::withoutVerifying()
+                ->timeout(120)
+                ->withHeaders([
+                    'Authorization' => '1952979:97af8aba-5b21-4a37-ad75-a034c9e46742',
+                    'Content-Type' => 'application/json',
+                ])->post('https://sandbox-affiliateapisecure.agoda.com/api/v4/postBooking/amendment', [
+                    'bookingId' => (int) $agodaBooking->agoda_booking_id,
+                    'amendmentDetails' => [
+                        'amendmentType' => 1,
+                        'bookingPeriod' => [
+                            'checkIn' => $request->check_in,
+                            'checkOut' => $request->check_out,
+                        ],
+                    ],
+                ]);
+
+            $result = $response->json();
+
+            Log::info('Agoda amendment response', ['booking_id' => $booking->id, 'response' => $result]);
+
+            if ($response->successful() && ($result['status'] ?? '') === '200') {
+                $booking->update([
+                    'check_in' => $request->check_in,
+                    'check_out' => $request->check_out,
+                    'amendments' => array_merge($booking->amendments ?? [], [[
+                        'type' => 'date_change',
+                        'old_check_in' => $booking->getOriginal('check_in'),
+                        'old_check_out' => $booking->getOriginal('check_out'),
+                        'new_check_in' => $request->check_in,
+                        'new_check_out' => $request->check_out,
+                        'amendment_identifier' => $result['amendmentIdentifier'] ?? null,
+                        'amended_at' => now()->toIso8601String(),
+                    ]]),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Booking amended successfully.',
+                    'data' => $result,
+                ]);
+            }
+
+            $errorMsg = $result['errorMessage']['message'] ?? $result['message'] ?? $result['error'] ?? 'Unknown error from Agoda.';
+            return response()->json([
+                'success' => false,
+                'error' => $errorMsg,
+                'data' => $result,
+            ], $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('Agoda amendment failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to amend booking. Please try again later.',
+            ], 500);
+        }
+    }
+
     public function confirmation(Booking $booking)
     {
         if ($booking->user_id !== Auth::id()) {

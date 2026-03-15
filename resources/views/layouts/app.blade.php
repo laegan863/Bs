@@ -80,74 +80,11 @@
     <!-- ============================
          Hero Section
          ============================ -->
-    <section class="hero-section">
-        <!-- Decorative floating shapes -->
-        <div class="hero-shape hero-shape-1"></div>
-        <div class="hero-shape hero-shape-2"></div>
-        <div class="hero-shape hero-shape-3"></div>
-
+    <section class="hero-section" style="background: url('{{ asset('img1.jpeg') }}') center/cover no-repeat; position: relative;">
         <div class="container position-relative" style="z-index: 2;">
-            <div class="row align-items-center py-5">
-                <!-- Left Content -->
-                <div class="col-lg-6 hero-content">
-                    <div class="hero-badge mb-3">
-                        <span class="hero-badge-dot"></span>
-                        2,200,000+ Hotels Worldwide
-                    </div>
-                    <h1 class="hero-title fw-bold mb-3">Find your perfect stay & <span class="hero-title-highlight">save up to 60%</span></h1>
-                    <p class="hero-subtitle mb-4">Book hotels, resorts, and apartments worldwide.<br>Best prices guaranteed. Pay with crypto or card.</p>
-                    <div class="d-flex flex-wrap gap-3 mb-4">
-                        @if(!Auth::user())
-                        <a href="{{ route('login') }}" class="btn hero-btn-primary px-4 py-2 fw-semibold">
-                            Sign in or Register
-                        </a>
-                        @else
-                        <a href="{{ route('dashboard') }}" class="btn hero-btn-primary px-4 py-2 fw-semibold">
-                            My Dashboard
-                        </a>
-                        @endif
-                        <a href="#" class="btn hero-btn-outline px-4 py-2 fw-medium">
-                            Explore Deals <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                    </div>
-                    <!-- Trust indicators -->
-                    <div class="hero-trust d-flex flex-wrap align-items-center gap-3">
-                        <div class="hero-trust-item">
-                            <i class="bi bi-shield-check"></i>
-                            <span>Secure Payments</span>
-                        </div>
-                        <div class="hero-trust-item">
-                            <i class="bi bi-currency-bitcoin"></i>
-                            <span>100+ Cryptos</span>
-                        </div>
-                        <div class="hero-trust-item">
-                            <i class="bi bi-star-fill"></i>
-                            <span>4.8/5 Rating</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Floating Dots -->
-                <div class="col-lg-6 d-none d-lg-block">
-                    <div class="hero-dots-wrapper">
-                        <div class="hero-dot hero-dot-1"></div>
-                        <div class="hero-dot hero-dot-2"></div>
-                        <div class="hero-dot hero-dot-3"></div>
-                        <div class="hero-dot hero-dot-4"></div>
-                        <div class="hero-dot hero-dot-5"></div>
-                        <div class="hero-dot hero-dot-6"></div>
-                        <div class="hero-dot hero-dot-7"></div>
-                        <div class="hero-dot hero-dot-8"></div>
-                        <div class="hero-dot hero-dot-9"></div>
-                        <div class="hero-dot hero-dot-10"></div>
-                        <div class="hero-dot hero-dot-11"></div>
-                        <div class="hero-dot hero-dot-12"></div>
-                        <!-- Glowing ring accents -->
-                        <div class="hero-ring hero-ring-1"></div>
-                        <div class="hero-ring hero-ring-2"></div>
-                        <div class="hero-ring hero-ring-3"></div>
-                    </div>
-                </div>
+            <div class="text-center py-5">
+                <h1 class="fw-bold mb-2" style="color: #1a1a2e; font-size: 2.5rem; letter-spacing: 0.5px;">BOOK HOST WITH CRYPTO &amp; SAVE UP TO 60%</h1>
+                <p class="mb-4" style="color: #1a1a2e; font-size: 1.1rem;">Pay With Crypto for 2,200,000+ Hotels Worldwide. Best Prices Guaranteed</p>
             </div>
 
             <!-- Search Bar -->
