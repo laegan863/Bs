@@ -95,11 +95,22 @@
             <div class="hero-search-bar">
                 <form method="GET" action="{{ route('search') }}" class="row g-0 align-items-center">
                     <div class="col-lg-3">
-                        <div class="search-field">
+                        <div class="search-field" style="position: relative;">
                             <div class="search-field-icon"><i class="bi bi-geo-alt-fill"></i></div>
-                            <div>
+                            <div class="flex-grow-1">
                                 <span class="search-field-label">DESTINATION</span>
-                                <input type="text" value="2256959" name="property" class="form-control border-0 p-0 shadow-none search-field-input" placeholder="Where are you going?">
+                                <input type="text" id="citySearchInput" autocomplete="off" class="form-control border-0 p-0 shadow-none search-field-input" placeholder="Where are you going?">
+                                <input type="hidden" name="property" id="cityIdInput" value="">
+                            </div>
+                            <div id="cityDropdown" class="city-search-dropdown" style="display: none;">
+                                <div id="cityDropdownLoading" class="city-search-loading" style="display: none;">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                    <span class="ms-2 small text-muted">Searching cities...</span>
+                                </div>
+                                <div id="cityDropdownResults"></div>
+                                <div id="cityDropdownEmpty" class="city-search-empty" style="display: none;">
+                                    <i class="bi bi-search me-1"></i> No cities found
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -978,5 +989,101 @@
         });
     </script>
     <script src="{{ asset('assets/js/landing.js') }}"></script>
+    <script>
+    (function() {
+        const input = document.getElementById('citySearchInput');
+        const hiddenInput = document.getElementById('cityIdInput');
+        const dropdown = document.getElementById('cityDropdown');
+        const loading = document.getElementById('cityDropdownLoading');
+        const results = document.getElementById('cityDropdownResults');
+        const empty = document.getElementById('cityDropdownEmpty');
+        let debounceTimer = null;
+        let currentRequest = null;
+
+        input.addEventListener('input', function() {
+            const query = this.value.trim();
+            clearTimeout(debounceTimer);
+
+            if (query.length < 2) {
+                dropdown.style.display = 'none';
+                hiddenInput.value = '';
+                return;
+            }
+
+            debounceTimer = setTimeout(function() {
+                searchCities(query);
+            }, 350);
+        });
+
+        function searchCities(query) {
+            dropdown.style.display = 'block';
+            loading.style.display = 'flex';
+            results.innerHTML = '';
+            empty.style.display = 'none';
+
+            if (currentRequest) currentRequest.abort();
+
+            currentRequest = $.ajax({
+                url: '{{ route("search.cities") }}',
+                data: { q: query },
+                dataType: 'json',
+                success: function(data) {
+                    loading.style.display = 'none';
+                    if (!data || data.length === 0) {
+                        empty.style.display = 'block';
+                        return;
+                    }
+                    renderResults(data);
+                },
+                error: function(xhr, status) {
+                    if (status !== 'abort') {
+                        loading.style.display = 'none';
+                        empty.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        function renderResults(cities) {
+            results.innerHTML = '';
+            cities.forEach(function(city) {
+                const item = document.createElement('div');
+                item.className = 'city-search-item';
+                item.innerHTML =
+                    '<div class="city-search-item-icon"><i class="bi bi-geo-alt"></i></div>' +
+                    '<div class="city-search-item-info">' +
+                        '<div class="city-search-item-name">' + escapeHtml(city.city_name) + '</div>' +
+                        '<div class="city-search-item-meta">' + escapeHtml(city.active_hotels) + ' hotels</div>' +
+                    '</div>';
+                item.addEventListener('click', function() {
+                    input.value = city.city_name;
+                    hiddenInput.value = city.city_id;
+                    dropdown.style.display = 'none';
+                });
+                results.appendChild(item);
+            });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Reopen on focus if there's text
+        input.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2 && results.children.length > 0) {
+                dropdown.style.display = 'block';
+            }
+        });
+    })();
+    </script>
 </body>
 </html>

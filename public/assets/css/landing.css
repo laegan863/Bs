@@ -1546,3 +1546,137 @@ a.hotel-card {
         right: -10px;
     }
 }
+
+/* City Search Dropdown */
+.city-search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+    z-index: 1060;
+    max-height: 340px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.city-search-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.city-search-empty {
+    padding: 1rem;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.city-search-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.city-search-item:hover {
+    background: #f1f5f9;
+}
+
+.city-search-item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 0.5rem;
+    background: #f0f2f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-navy);
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.city-search-item-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #1e293b;
+}
+
+.city-search-item-meta {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+/* Hotel Listing Cards */
+.hotel-listing-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.hotel-listing-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.hotel-listing-img {
+    position: relative;
+    height: 100%;
+    min-height: 200px;
+}
+
+.hotel-listing-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hotel-listing-type {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hotel-listing-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.hotel-listing-stars i {
+    font-size: 0.8rem;
+}
+
+.hotel-listing-rating {
+    display: inline-block;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    min-width: 36px;
+    text-align: center;
+}
+
+.hotel-listing-remark {
+    line-height: 1.45;
+    color: #64748b !important;
+}

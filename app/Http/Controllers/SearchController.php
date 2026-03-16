@@ -53,9 +53,14 @@ class SearchController extends Controller
         ])->post($api, $payload);
 
         $searchedContentController = new SearchedContentController();
-        $searchedData = $searchedContentController->index(2256959);
+        $searchedData = $searchedContentController->index($propertyId);
 
         $data = $response->json();
+
+        if($data['errorMessage'] ?? null) {
+            return response()->json($data);
+        }
+
         $property = $data['properties'][0] ?? null;
         $searchedId = $data['searchId'] ?? null;
 

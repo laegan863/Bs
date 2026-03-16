@@ -35,6 +35,9 @@ Route::middleware('guest')->group(function () {
 // Authenticated routes
 // Search (public)
 Route::get('search', [SearchController::class, 'search'])->name('search');
+Route::get('search/cities', [SearchedContentController::class, 'getCities'])->name('search.cities');
+Route::get('search/hotels/{id}', [SearchedContentController::class, 'getHotel'])->name('search.hotels');
+Route::get('hotels/{id}', [SearchedContentController::class, 'getHotelById'])->name('search.hotel.detail');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
