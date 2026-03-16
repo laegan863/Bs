@@ -49,7 +49,7 @@
                             <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3Crect width='60' height='30' fill='%23012169'/%3E%3Cpath d='M0,0 L60,30 M60,0 L0,30' stroke='%23fff' stroke-width='6'/%3E%3Cpath d='M0,0 L60,30 M60,0 L0,30' stroke='%23C8102E' stroke-width='4'/%3E%3Cpath d='M30,0 V30 M0,15 H60' stroke='%23fff' stroke-width='10'/%3E%3Cpath d='M30,0 V30 M0,15 H60' stroke='%23C8102E' stroke-width='6'/%3E%3C/svg%3E" alt="Flag" class="flag-icon">
                         </div>
                     </li>
-                    <li class="nav-item"><a href="#" class="nav-link text-dark">Support</a></li>
+                    <li class="nav-item"><a href="{{ route('support') }}" class="nav-link text-dark">Support</a></li>
                     <li class="nav-item"><a href="#" class="nav-link text-dark">Trips</a></li>
                     <li class="nav-item"><a href="#" class="nav-link text-dark"><i class="bi bi-chat-dots"></i></a></li>
                     @if(!Auth::user())
@@ -194,43 +194,43 @@
                 <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#wellness"><i class="bi bi-heart-pulse me-1"></i> Wellness</a></li>
             </ul>
 
-            <!-- Hotel Cards Carousel -->
-            @php
-                $hotels = [
-                    ['name' => 'Santorini Blue Horizon', 'loc' => 'Oia, Greece', 'price' => 189, 'rating' => 4.9, 'reviews' => 2341, 'tag' => 'Popular', 'tagClass' => 'tag-popular'],
-                    ['name' => 'Maldives Paradise Resort', 'loc' => 'Malé, Maldives', 'price' => 425, 'rating' => 4.8, 'reviews' => 1879, 'tag' => 'Best Deal', 'tagClass' => 'tag-deal'],
-                    ['name' => 'Bali Ocean Breeze Villa', 'loc' => 'Seminyak, Bali', 'price' => 156, 'rating' => 4.7, 'reviews' => 3102, 'tag' => 'Trending', 'tagClass' => 'tag-trending'],
-                    ['name' => 'Cancún Riviera Suites', 'loc' => 'Cancún, Mexico', 'price' => 210, 'rating' => 4.6, 'reviews' => 1456, 'tag' => '', 'tagClass' => ''],
-                    ['name' => 'Amalfi Coast Retreat', 'loc' => 'Positano, Italy', 'price' => 340, 'rating' => 4.9, 'reviews' => 987, 'tag' => 'Luxury', 'tagClass' => 'tag-luxury'],
-                    ['name' => 'Phuket Sunset Resort', 'loc' => 'Phuket, Thailand', 'price' => 120, 'rating' => 4.5, 'reviews' => 2678, 'tag' => 'Best Deal', 'tagClass' => 'tag-deal'],
+            <!-- City Cards Carousel -->
+            {{-- @php
+                $cities = [
+                    ['name' => 'Barcelona', 'country' => 'Spain', 'price' => 189, 'rating' => 4.9, 'reviews' => 2341, 'tag' => 'Popular', 'tagClass' => 'tag-popular', 'property' => '2256959'],
+                    ['name' => 'Rome', 'country' => 'Italy', 'price' => 425, 'rating' => 4.8, 'reviews' => 1879, 'tag' => 'Best Deal', 'tagClass' => 'tag-deal', 'property' => '2256959'],
+                    ['name' => 'New York', 'country' => 'United States', 'price' => 156, 'rating' => 4.7, 'reviews' => 3102, 'tag' => 'Trending', 'tagClass' => 'tag-trending', 'property' => '2256959'],
+                    ['name' => 'Singapore', 'country' => 'Singapore', 'price' => 210, 'rating' => 4.6, 'reviews' => 1456, 'tag' => '', 'tagClass' => '', 'property' => '2256959'],
+                    ['name' => 'Paris', 'country' => 'France', 'price' => 340, 'rating' => 4.9, 'reviews' => 987, 'tag' => 'Luxury', 'tagClass' => 'tag-luxury', 'property' => '2256959'],
+                    ['name' => 'Tokyo', 'country' => 'Japan', 'price' => 120, 'rating' => 4.5, 'reviews' => 2678, 'tag' => 'Best Deal', 'tagClass' => 'tag-deal', 'property' => '2256959'],
                 ];
             @endphp
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="beach">
                     <div class="position-relative">
                         <div class="hotel-carousel" id="hotelCarousel">
-                            @foreach($hotels as $hotel)
-                            <div class="hotel-card">
+                            @foreach($cities as $city)
+                            <a href="{{ route('search', ['property' => $city['property'], 'checkin' => now()->format('Y-m-d'), 'checkout' => now()->addDay()->format('Y-m-d'), 'adults' => 2, 'children' => 0, 'rooms' => 1]) }}" class="hotel-card text-decoration-none text-dark">
                                 <div class="hotel-card-img">
-                                    <img src="{{ asset('assets/images/login-1.jpg') }}" alt="{{ $hotel['name'] }}">
-                                    <button class="hotel-card-fav" aria-label="Add to favorites"><i class="bi bi-heart"></i></button>
-                                    @if($hotel['tag'])
-                                    <span class="hotel-card-tag {{ $hotel['tagClass'] }}">{{ $hotel['tag'] }}</span>
+                                    <img src="{{ asset('assets/images/login-1.jpg') }}" alt="{{ $city['name'] }}">
+                                    <span class="hotel-card-fav"><i class="bi bi-heart"></i></span>
+                                    @if($city['tag'])
+                                    <span class="hotel-card-tag {{ $city['tagClass'] }}">{{ $city['tag'] }}</span>
                                     @endif
                                 </div>
                                 <div class="hotel-card-body">
                                     <div class="d-flex align-items-center gap-1 mb-1">
-                                        <span class="hotel-card-rating"><i class="bi bi-star-fill"></i> {{ $hotel['rating'] }}</span>
-                                        <small class="text-muted">({{ number_format($hotel['reviews']) }})</small>
+                                        <span class="hotel-card-rating"><i class="bi bi-star-fill"></i> {{ $city['rating'] }}</span>
+                                        <small class="text-muted">({{ number_format($city['reviews']) }})</small>
                                     </div>
-                                    <h6 class="fw-bold mb-1">{{ $hotel['name'] }}</h6>
-                                    <p class="small text-muted mb-2"><i class="bi bi-geo-alt-fill me-1"></i>{{ $hotel['loc'] }}</p>
+                                    <h6 class="fw-bold mb-1">{{ $city['name'] }}</h6>
+                                    <p class="small text-muted mb-2"><i class="bi bi-geo-alt-fill me-1"></i>{{ $city['country'] }}</p>
                                     <div class="d-flex align-items-baseline gap-1">
-                                        <span class="hotel-card-price">${{ $hotel['price'] }}</span>
+                                        <span class="hotel-card-price">${{ $city['price'] }}</span>
                                         <small class="text-muted">/ night</small>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                             @endforeach
                         </div>
                         <button class="carousel-nav-btn carousel-prev" onclick="scrollCarousel('hotelCarousel', -300)">
@@ -241,6 +241,30 @@
                         </button>
                     </div>
                 </div>
+            </div> --}}
+
+            <!-- Destination Cards Grid -->
+            @php
+                $destinations = [
+                    ['name' => 'Destin', 'img' => '1.jpg', 'region' => 'Florida, United States of America', 'label' => 'Coastal bliss', 'property' => '2256959'],
+                    ['name' => 'Punta Cana', 'img' => '2.jpg', 'region' => 'La Altagracia, Dominican Republic', 'label' => 'Serene beaches', 'property' => '2256959'],
+                    ['name' => 'Port Aransas', 'img' => '3.webp', 'region' => 'Texas, United States of America', 'label' => 'Relaxed beaches', 'property' => '2256959'],
+                    ['name' => 'Riviera Maya', 'img' => '4.jpg', 'region' => 'Mexico', 'label' => 'Beach paradise', 'property' => '2256959'],
+                ];
+            @endphp
+            <div class="destination-grid mt-4">
+                @foreach($destinations as $dest)
+                <a href="{{ route('search', ['property' => $dest['property'], 'checkin' => now()->format('Y-m-d'), 'checkout' => now()->addDay()->format('Y-m-d'), 'adults' => 2, 'children' => 0, 'rooms' => 1]) }}" class="destination-grid-card text-decoration-none">
+                    <div class="destination-grid-img">
+                        <img src="{{ asset($dest['img']) }}" alt="{{ $dest['name'] }}">
+                        <span class="destination-grid-label">{{ $dest['label'] }}</span>
+                    </div>
+                    <div class="destination-grid-info">
+                        <h6 class="fw-bold mb-0">{{ $dest['name'] }}</h6>
+                        <small class="text-muted">{{ $dest['region'] }}</small>
+                    </div>
+                </a>
+                @endforeach
             </div>
 
             <div class="text-center mt-4">
@@ -316,7 +340,7 @@
                 [
                     'name' => 'Sarah Mitchell',
                     'location' => 'New York, USA',
-                    'avatar' => 'SM',
+                    'image' => 'avatars/1.svg',
                     'color' => '#3b82f6',
                     'rating' => 5,
                     'title' => 'Absolutely stunning!',
@@ -328,7 +352,7 @@
                 [
                     'name' => 'James Rodriguez',
                     'location' => 'Madrid, Spain',
-                    'avatar' => 'JR',
+                    'image' => 'avatars/2.svg',
                     'color' => '#8b5cf6',
                     'rating' => 5,
                     'title' => 'Best crypto booking experience',
@@ -340,7 +364,7 @@
                 [
                     'name' => 'Emily Chen',
                     'location' => 'Singapore',
-                    'avatar' => 'EC',
+                    'image' => 'avatars/3.svg',
                     'color' => '#ec4899',
                     'rating' => 4,
                     'title' => 'Perfect family getaway',
@@ -352,7 +376,7 @@
                 [
                     'name' => 'Marcus Weber',
                     'location' => 'Berlin, Germany',
-                    'avatar' => 'MW',
+                    'image' => 'avatars/4.svg',
                     'color' => '#f59e0b',
                     'rating' => 5,
                     'title' => 'Incredible value!',
@@ -364,7 +388,7 @@
                 [
                     'name' => 'Aisha Patel',
                     'location' => 'Mumbai, India',
-                    'avatar' => 'AP',
+                    'image' => 'avatars/5.svg',
                     'color' => '#10b981',
                     'rating' => 5,
                     'title' => 'Honeymoon dream come true',
@@ -376,7 +400,7 @@
                 [
                     'name' => 'Lucas Ferreira',
                     'location' => 'São Paulo, Brazil',
-                    'avatar' => 'LF',
+                    'image' => 'avatars/6.svg',
                     'color' => '#ef4444',
                     'rating' => 5,
                     'title' => 'Smooth and easy',
@@ -388,7 +412,7 @@
                 [
                     'name' => 'Sophie Laurent',
                     'location' => 'Paris, France',
-                    'avatar' => 'SL',
+                    'image' => 'avatars/7.svg',
                     'color' => '#6366f1',
                     'rating' => 5,
                     'title' => 'Magnifique!',
@@ -400,7 +424,7 @@
                 [
                     'name' => 'Yuki Tanaka',
                     'location' => 'Tokyo, Japan',
-                    'avatar' => 'YT',
+                    'image' => 'avatars/8.svg',
                     'color' => '#0ea5e9',
                     'rating' => 4,
                     'title' => 'Great for solo travelers',
@@ -419,8 +443,8 @@
                     @foreach($reviews as $review)
                     <div class="review-card-v2">
                         <div class="review-card-v2-header">
-                            <div class="review-avatar" style="background: {{ $review['color'] }};">
-                                {{ $review['avatar'] }}
+                            <div class="review-avatar">
+                                <img src="{{ asset('assets/images/' . $review['image']) }}" alt="{{ $review['name'] }}">
                             </div>
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-center gap-1">
@@ -455,86 +479,8 @@
                     @foreach($reviews as $review)
                     <div class="review-card-v2">
                         <div class="review-card-v2-header">
-                            <div class="review-avatar" style="background: {{ $review['color'] }};">
-                                {{ $review['avatar'] }}
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex align-items-center gap-1">
-                                    <span class="fw-bold small">{{ $review['name'] }}</span>
-                                    @if($review['verified'])
-                                    <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.75rem;"></i>
-                                    @endif
-                                </div>
-                                <small class="text-muted d-block" style="font-size: 0.7rem;"><i class="bi bi-geo-alt me-1"></i>{{ $review['location'] }}</small>
-                            </div>
-                            <div class="review-quote-icon">
-                                <i class="bi bi-quote"></i>
-                            </div>
-                        </div>
-                        <div class="review-card-v2-stars mb-1">
-                            @for($s = 0; $s < $review['rating']; $s++)
-                            <i class="bi bi-star-fill"></i>
-                            @endfor
-                            @for($s = $review['rating']; $s < 5; $s++)
-                            <i class="bi bi-star"></i>
-                            @endfor
-                        </div>
-                        <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">{{ $review['title'] }}</h6>
-                        <p class="review-card-v2-text">{{ $review['text'] }}</p>
-                        <div class="review-card-v2-footer">
-                            <span class="review-hotel-tag"><i class="bi bi-building me-1"></i>{{ $review['hotel'] }}</span>
-                            <small class="text-muted">{{ $review['time'] }}</small>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-
-        <!-- Marquee Row 2 (scrolls right, slower) -->
-        <div class="review-marquee-wrapper">
-            <div class="review-marquee review-marquee-right">
-                <div class="review-marquee-track">
-                    @foreach(array_reverse($reviews) as $review)
-                    <div class="review-card-v2">
-                        <div class="review-card-v2-header">
-                            <div class="review-avatar" style="background: {{ $review['color'] }};">
-                                {{ $review['avatar'] }}
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex align-items-center gap-1">
-                                    <span class="fw-bold small">{{ $review['name'] }}</span>
-                                    @if($review['verified'])
-                                    <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.75rem;"></i>
-                                    @endif
-                                </div>
-                                <small class="text-muted d-block" style="font-size: 0.7rem;"><i class="bi bi-geo-alt me-1"></i>{{ $review['location'] }}</small>
-                            </div>
-                            <div class="review-quote-icon">
-                                <i class="bi bi-quote"></i>
-                            </div>
-                        </div>
-                        <div class="review-card-v2-stars mb-1">
-                            @for($s = 0; $s < $review['rating']; $s++)
-                            <i class="bi bi-star-fill"></i>
-                            @endfor
-                            @for($s = $review['rating']; $s < 5; $s++)
-                            <i class="bi bi-star"></i>
-                            @endfor
-                        </div>
-                        <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">{{ $review['title'] }}</h6>
-                        <p class="review-card-v2-text">{{ $review['text'] }}</p>
-                        <div class="review-card-v2-footer">
-                            <span class="review-hotel-tag"><i class="bi bi-building me-1"></i>{{ $review['hotel'] }}</span>
-                            <small class="text-muted">{{ $review['time'] }}</small>
-                        </div>
-                    </div>
-                    @endforeach
-                    @foreach(array_reverse($reviews) as $review)
-                    <div class="review-card-v2">
-                        <div class="review-card-v2-header">
-                            <div class="review-avatar" style="background: {{ $review['color'] }};">
-                                {{ $review['avatar'] }}
+                            <div class="review-avatar">
+                                <img src="{{ asset('assets/images/' . $review['image']) }}" alt="{{ $review['name'] }}">
                             </div>
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-center gap-1">
@@ -571,7 +517,6 @@
 
         <!-- Fade edges -->
         <div class="review-marquee-fade-left"></div>
-        <div class="review-marquee-fade-right"></div>
     </section>
 
     <!-- ============================
@@ -606,11 +551,11 @@
                 </div>
             </div>
 
-            <div class="row align-items-center justify-content-between">
-                <div class="col-lg-6 text-lg-start">
+            <div class="row align-items-center justify-content-center gap-4">
+                <div class="col-lg-3 text-lg-start">
                     <p class="text-white-50 small">We're proud to be the leading crypto-native travel platform, enabling you to book trips worldwide using over 100+ <strong class="text-white">cryptocurrencies</strong> or traditional payment methods—quickly and seamlessly.</p>
                 </div>
-                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="col-lg-3 text-lg-end mt-3 mt-lg-0">
                     <a href="#" class="btn btn-outline-light px-4 py-2 fw-medium">See All Payment Options <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>

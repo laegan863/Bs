@@ -452,12 +452,238 @@
     overflow: hidden;
 }
 
+.promo-bar-cell-high {
+    background: #2674d9;
+    border-radius: 0 1.6rem 1.6rem 0;
+    overflow: hidden;
+    padding: 2rem;
+}
+
 .promo-bar-cell {
     padding: 2rem;
 }
 
-.promo-bar-divider {
+/* .promo-bar-divider {
     border-left: 1px solid rgba(255, 255, 255, 0.2);
+} */
+
+/* ============================
+   Member Deals Banner
+   ============================ */
+
+.member-deals-banner {
+    background: #fde68a;
+    border-radius: 1.25rem;
+    padding: 2rem;
+}
+
+.member-deals-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.member-deals-header h3 {
+    font-size: 1.35rem;
+    color: #1a1a1a;
+}
+
+.member-deals-header .text-muted-dark {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.member-deals-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.member-deal-card {
+    background: white;
+    border-radius: 0.85rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.member-deal-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.member-deal-img {
+    height: 170px;
+    overflow: hidden;
+    position: relative;
+}
+
+.member-deal-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.member-deal-card:hover .member-deal-img img {
+    transform: scale(1.05);
+}
+
+.member-deal-fav {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: #ef4444;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.2s;
+}
+
+.member-deal-fav:hover {
+    background: #ef4444;
+    color: white;
+    transform: scale(1.1);
+}
+
+.member-deal-vip-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(34, 197, 94, 0.92);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    border-radius: 0.35rem;
+    letter-spacing: 0.3px;
+    z-index: 2;
+}
+
+.member-deal-img-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0.5rem 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.member-deal-card:hover .member-deal-img-nav {
+    opacity: 1;
+}
+
+.member-deal-nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.member-deal-nav-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+.member-deal-body {
+    padding: 0.85rem 1rem;
+}
+
+.member-deal-body h6 {
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+.member-deal-score {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 0.4rem 0.4rem 0.4rem 0;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.member-deal-member-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 1rem;
+}
+
+.member-deal-member-badge i {
+    font-size: 0.65rem;
+}
+
+.member-deal-pricing {
+    margin-top: 0.25rem;
+}
+
+.member-deal-original {
+    text-decoration: line-through;
+    color: #9ca3af;
+    font-weight: 400;
+    font-size: 0.85rem;
+    margin-left: 0.25rem;
+}
+
+.member-deal-tax {
+    font-size: 0.7rem;
+    color: #16a34a;
+    margin-top: 0.15rem;
+}
+
+.member-deal-tax i {
+    font-size: 0.6rem;
+}
+
+@media (max-width: 991.98px) {
+    .member-deals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .member-deals-grid {
+        grid-template-columns: 1fr;
+    }
+    .member-deals-banner {
+        padding: 1.25rem;
+    }
+    .member-deals-header h3 {
+        font-size: 1.15rem;
+    }
 }
 
 /* ============================
@@ -611,6 +837,84 @@
     background: var(--primary-navy);
     color: white;
     border-color: var(--primary-navy);
+}
+
+/* Destination Grid */
+.destination-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+}
+
+.destination-grid-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: inherit;
+}
+
+.destination-grid-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.destination-grid-img {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    border-radius: 1rem;
+}
+
+.destination-grid-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.destination-grid-card:hover .destination-grid-img img {
+    transform: scale(1.05);
+}
+
+.destination-grid-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(22, 163, 74, 0.9);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.35rem;
+    text-transform: capitalize;
+}
+
+.destination-grid-info {
+    padding: 0.75rem 0.25rem;
+}
+
+.destination-grid-info h6 {
+    font-size: 0.95rem;
+}
+
+.destination-grid-info small {
+    font-size: 0.8rem;
+}
+
+a.hotel-card {
+    display: block;
+}
+
+@media (max-width: 991.98px) {
+    .destination-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .destination-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Carousel Nav Buttons */
@@ -841,14 +1145,15 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: white;
     flex-shrink: 0;
-    letter-spacing: 0.5px;
+    overflow: hidden;
+}
+
+.review-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .review-quote-icon {

@@ -15,7 +15,7 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link text-dark">Support</a>
+                    <a href="{{ route('support') }}" class="nav-link text-dark">Support</a>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link text-dark">Trips</a>

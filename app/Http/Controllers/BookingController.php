@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Client;
 
 class BookingController extends Controller
 {
@@ -88,23 +89,49 @@ class BookingController extends Controller
         return redirect()->route('booking.checkout');
     }
 
-    public function processPayment(Request $request)
+    public function boomfiApi($method = null, $url = null, $payload = [])
     {
-        $validated = $request->validate([
-            'guest_first_name' => 'required|string|max:255',
-            'guest_last_name' => 'required|string|max:255',
-            'guest_email' => 'required|email|max:255',
-            'guest_phone' => 'nullable|string|max:20',
-            'special_requests' => 'nullable|string|max:1000',
-            'payment_method' => 'required|in:bitpay,card,pay_at_hotel',
+        $client = new Client();
+        $response = $client->request($method, $url ?? 'https://mapi.boomfi.xyz/v1/paylinks', [
+            'body' => json_encode($payload),
+            'headers' => [
+                'X-API-KEY' => 'mailan-H1FX1saaEpBPGMqzAzbXU',
+                'accept' => 'application/json',
+                'content-type' => 'application/json',
+            ],
         ]);
+        return json_decode($response->getBody()->getContents(), true);
+    }
 
-        $bookingData = session('booking_data');
+    public function processBookingPayment(Request $request, $bookingId)
+    {
 
-        if (!$bookingData) {
-            return redirect()->route('landing')->with('error', 'Session expired. Please select a room again.');
+        $session = session('booking_data');
+
+        if(!$session) {
+            return response()->json(['error' => 'No booking data in session. Please start the booking process again.'], 400);
         }
 
+        $client = new Client();
+        $payload = [
+            'name' => 'Solana Travels Payment -' . ($session['property_name'] ?? 'Unknown Property') . ' - ' . \Carbon\Carbon::now()->toDateTimeString(),
+            'amount' => $session['total_price'],
+            'currency' => $session['rate_currency'] ?? 'USD',
+            'reference' => 'booking_' . uniqid(),
+            'description' => 'Payment for hotel booking - ' . ($session['property_name'] ?? 'Unknown Property') . ' - ' . ($session['room_name'] ?? 'Unknown Room'),
+        ];
+        $createdPaylink = $this->boomfiApi('POST', null, $payload);
+
+        dd($createdPaylink);
+
+        $enablePaylink = $this->boomfiApi('PATCH', 'https://mapi.boomfi.xyz/v1/paylinks/'.$createdPaylink['data']['id'] , ['enabled' => true]);
+        $createVariantPaylink = $this->boomfiApi('GET', 'https://mapi.boomfi.xyz/v1/paylinks/generate-variant/'. $createdPaylink['data']['id'] , ['redirect_to' => 'https://cryptedia.com/success?id='. $bookingId]);
+        return redirect()->away($createVariantPaylink['data']['url']);
+    }
+
+    public function processPayment(Request $request)
+    {
+        $bookingData = session('booking_data');
         $agodaPayload = [
             'waitTime' => 120,
             'bookingDetails' => [
@@ -131,8 +158,8 @@ class BookingController extends Controller
                             'guestDetails' => [
                                 [
                                     'title' => 'Mr.',
-                                    'firstName' => $validated['guest_first_name'],
-                                    'lastName' => $validated['guest_last_name'],
+                                    'firstName' => $bookingData['guest_first_name'],
+                                    'lastName' => $bookingData['guest_last_name'],
                                     'countryOfResidence' => 'US',
                                     'gender' => 'Male',
                                     'age' => 30,
@@ -144,7 +171,7 @@ class BookingController extends Controller
                             'count' => (int) $bookingData['rooms'],
                             'adults' => (int) $bookingData['adults'],
                             'children' => (int) ($bookingData['children'] ?? 0),
-                            'specialRequest' => !empty($validated['special_requests']) ? $validated['special_requests'] : 'None',
+                            'specialRequest' => !empty($bookingData['special_requests']) ? $bookingData['special_requests'] : 'None',
                         ],
                     ],
                 ],
@@ -152,13 +179,13 @@ class BookingController extends Controller
             'customerDetail' => [
                 'language' => 'en-us',
                 'title' => 'Mr.',
-                'firstName' => $validated['guest_first_name'],
-                'lastName' => $validated['guest_last_name'],
-                'email' => $validated['guest_email'],
+                'firstName' => $bookingData['guest_first_name'],
+                'lastName' => $bookingData['guest_last_name'],
+                'email' => $bookingData['guest_email'],
                 'phone' => [
                     'countryCode' => '1',
                     'areaCode' => '',
-                    'number' => $validated['guest_phone'] ?? '09762016124',
+                    'number' => $bookingData['guest_phone'] ?? '09762016124',
                 ],
                 'newsletter' => false,
             ],
@@ -168,7 +195,7 @@ class BookingController extends Controller
                     'number' => '4111111111111111',
                     'expiryDate' => '032029',
                     'cvc' => '543',
-                    'holderName' => strtoupper($validated['guest_first_name'] . ' ' . $validated['guest_last_name']),
+                    'holderName' => strtoupper($bookingData['guest_first_name'] . ' ' . $bookingData['guest_last_name']),
                     'countryOfIssue' => 'US',
                     'issuingBank' => 'BankName',
                 ],
@@ -219,23 +246,18 @@ class BookingController extends Controller
             'tax_amount' => $bookingData['rate_tax'] ?? 0,
             'fees_amount' => $bookingData['rate_fees'] ?? 0,
             'currency' => $bookingData['rate_currency'] ?? 'USD',
-            'guest_first_name' => $validated['guest_first_name'],
-            'guest_last_name' => $validated['guest_last_name'],
-            'guest_email' => $validated['guest_email'],
-            'guest_phone' => $validated['guest_phone'],
-            'special_requests' => $validated['special_requests'],
-            'payment_method' => $validated['payment_method'],
+            'guest_first_name' => $bookingData['guest_first_name'],
+            'guest_last_name' => $bookingData['guest_last_name'],
+            'guest_email' => $bookingData['guest_email'],
+            'guest_phone' => $bookingData['guest_phone'],
+            'special_requests' => $bookingData['special_requests'],
+            'payment_method' => $bookingData['payment_method'],
             'payment_status' => 'pending',
             'transaction_reference' => $reference,
             'status' => 'pending',
             'free_cancellation' => $bookingData['free_cancellation'] ?? false,
             'cancellation_deadline' => $bookingData['cancellation_deadline'] ?? null,
         ]);
-
-        // return response()->json([
-        //     'booking' => $booking,
-        //     'agoda_result' => $agodaResult,
-        // ]);
 
         if ($agodaResult && ($agodaResult['status'] ?? '') === '200') {
             $agodaDetails = $agodaResult['bookingDetails'][0] ?? null;
@@ -251,146 +273,16 @@ class BookingController extends Controller
             }
         }
 
-        if ($validated['payment_method'] === 'bitpay') {
-            return $this->processBitPayPayment($booking);
-        } elseif ($validated['payment_method'] === 'pay_at_hotel') {
-            $booking->update([
-                'payment_status' => 'pending',
-                'status' => 'confirmed',
-            ]);
-            session()->forget('booking_data');
-            return redirect()->route('booking.confirmation', $booking->id);
-        }
+        return $this->processBookingPayment($request, $booking->id);
 
-        $booking->update([
-            'payment_status' => 'paid',
-            'status' => 'confirmed',
-        ]);
-        session()->forget('booking_data');
-        return redirect()->route('booking.confirmation', $booking->id);
+        // $booking->update([
+        //     'payment_status' => 'paid',
+        //     'status' => 'confirmed',
+        // ]);
+        // session()->forget('booking_data');
+        // return redirect()->route('booking.confirmation', $booking->id);
     }
 
-    private function processBitPayPayment(Booking $booking)
-    {
-        try {
-            $bitpayApiUrl = env('BITPAY_API_URL', 'https://test.bitpay.com/invoices');
-            $bitpayToken = env('BITPAY_API_TOKEN', 'test_token_placeholder');
-
-            $invoiceData = [
-                'price' => (float) $booking->total_price,
-                'currency' => $booking->currency,
-                'orderId' => $booking->transaction_reference,
-                'itemDesc' => "Hotel Booking - {$booking->property_name} ({$booking->room_name})",
-                'buyer' => [
-                    'name' => "{$booking->guest_first_name} {$booking->guest_last_name}",
-                    'email' => $booking->guest_email,
-                    'phone' => $booking->guest_phone,
-                ],
-                'redirectURL' => route('booking.confirmation', $booking->id),
-                'notificationURL' => route('booking.bitpay.callback'),
-                'posData' => json_encode(['booking_id' => $booking->id]),
-                'token' => $bitpayToken,
-            ];
-
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'X-Accept-Version' => '2.0.0',
-            ])->post($bitpayApiUrl, $invoiceData);
-
-            if ($response->successful()) {
-                $invoiceResult = $response->json();
-                $invoiceId = $invoiceResult['data']['id'] ?? $invoiceResult['id'] ?? null;
-                $invoiceUrl = $invoiceResult['data']['url'] ?? $invoiceResult['url'] ?? null;
-
-                $booking->update([
-                    'bitpay_invoice_id' => $invoiceId,
-                ]);
-
-                session()->forget('booking_data');
-
-                if ($invoiceUrl) {
-                    return redirect()->away($invoiceUrl);
-                }
-            }
-
-            Log::warning('BitPay API call failed or in test mode, simulating payment', [
-                'booking_id' => $booking->id,
-                'response' => $response->json() ?? 'No response',
-            ]);
-
-            $booking->update([
-                'bitpay_invoice_id' => 'test_' . uniqid(),
-                'payment_status' => 'paid',
-                'status' => 'confirmed',
-            ]);
-
-            session()->forget('booking_data');
-            return redirect()->route('booking.confirmation', $booking->id);
-
-        } catch (\Exception $e) {
-            Log::error('BitPay payment error: ' . $e->getMessage(), [
-                'booking_id' => $booking->id,
-            ]);
-
-            $booking->update([
-                'bitpay_invoice_id' => 'test_fallback_' . uniqid(),
-                'payment_status' => 'paid',
-                'status' => 'confirmed',
-            ]);
-
-            session()->forget('booking_data');
-            return redirect()->route('booking.confirmation', $booking->id);
-        }
-    }
-
-    public function bitpayCallback(Request $request)
-    {
-        $payload = $request->all();
-
-        Log::info('BitPay IPN received', $payload);
-
-        $posData = json_decode($payload['posData'] ?? '{}', true);
-        $bookingId = $posData['booking_id'] ?? null;
-
-        if (!$bookingId) {
-            return response()->json(['error' => 'Invalid callback'], 400);
-        }
-
-        $booking = Booking::find($bookingId);
-
-        if (!$booking) {
-            return response()->json(['error' => 'Booking not found'], 404);
-        }
-
-        $status = $payload['status'] ?? '';
-
-        switch ($status) {
-            case 'confirmed':
-            case 'complete':
-                $booking->update([
-                    'payment_status' => 'paid',
-                    'status' => 'confirmed',
-                ]);
-                break;
-
-            case 'expired':
-            case 'invalid':
-                $booking->update([
-                    'payment_status' => 'failed',
-                    'status' => 'cancelled',
-                ]);
-                break;
-
-            case 'refunded':
-                $booking->update([
-                    'payment_status' => 'refunded',
-                    'status' => 'cancelled',
-                ]);
-                break;
-        }
-
-        return response()->json(['status' => 'ok']);
-    }
 
     public function fetchAgodaDetail(Booking $booking)
     {

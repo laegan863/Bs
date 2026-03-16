@@ -91,7 +91,7 @@
                                 <div class="checkout-payment-tabs mb-3">
                                     <button type="button" class="checkout-pay-tab active" data-method="bitpay" onclick="selectCheckoutPayment('bitpay')">
                                         <i class="bi bi-currency-bitcoin"></i>
-                                        <span>Crypto (BitPay)</span>
+                                        <span>Crypto (BoomFi)</span>
                                     </button>
                                     <button type="button" class="checkout-pay-tab" data-method="card" onclick="selectCheckoutPayment('card')">
                                         <i class="bi bi-credit-card"></i>
@@ -110,7 +110,7 @@
                                             </div>
                                             <div>
                                                 <h6 class="fw-bold mb-0">Pay with Cryptocurrency</h6>
-                                                <p class="small text-muted mb-0">Bitcoin, Ethereum, and 100+ cryptos accepted via BitPay</p>
+                                                <p class="small text-muted mb-0">Bitcoin, Ethereum, and 100+ cryptos accepted via BoomFi</p>
                                             </div>
                                         </div>
                                         <div class="crypto-features">

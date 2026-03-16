@@ -15,6 +15,10 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
+Route::get('/support', function () {
+    return view('support');
+})->name('support');
+
 // Guest routes (only accessible when not logged in)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -73,7 +77,7 @@ Route::middleware('auth')->group(function () {
     // Booking & Checkout
     // Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store');
     Route::get('/booking/checkout', [BookingController::class, 'checkout'])->name('booking.checkout');
-    Route::post('/booking/process', [BookingController::class, 'processPayment'])->name('booking.process');
+    Route::post('/booking/process', [BookingController::class, 'processBookingPayment'])->name('booking.process');
     Route::get('/booking/confirmation/{booking}', [BookingController::class, 'confirmation'])->name('booking.confirmation');
 });
 
