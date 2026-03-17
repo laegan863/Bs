@@ -33,7 +33,7 @@ class BookingController extends Controller
         $upcomingBookings = Booking::where('user_id', Auth::id())
             ->with('agodaBooking')
             ->where('check_out', '>=', now()->toDateString())
-            ->whereNotIn('status', ['cancelled'])
+            ->where('payment_status', 'paid')
             ->orderBy('check_in', 'asc')
             ->get();
 
@@ -41,7 +41,7 @@ class BookingController extends Controller
             ->with('agodaBooking')
             ->where(function ($q) {
                 $q->where('check_out', '<', now()->toDateString())
-                  ->orWhereIn('status', ['cancelled', 'completed']);
+                  ->orWhere('payment_status','paid');
             })
             ->orderBy('check_out', 'desc')
             ->get();
@@ -84,6 +84,10 @@ class BookingController extends Controller
             'payment_model' => 'required|string',
         ]);
 
+        // return response()->json([
+        //     'data' => $request->all()
+        // ]);
+
         session(['booking_data' => $validated]);
 
         return redirect()->route('booking.checkout');
@@ -103,7 +107,7 @@ class BookingController extends Controller
         return json_decode($response->getBody()->getContents(), true);
     }
 
-    public function processBookingPayment(Request $request, $bookingId)
+    public function processBookingPayment($request, $bookingId)
     {
 
         $session = session('booking_data');
@@ -121,22 +125,72 @@ class BookingController extends Controller
             'description' => 'Payment for hotel booking - ' . ($session['property_name'] ?? 'Unknown Property') . ' - ' . ($session['room_name'] ?? 'Unknown Room'),
         ];
         $createdPaylink = $this->boomfiApi('POST', null, $payload);
-
-        dd($createdPaylink);
-
         $enablePaylink = $this->boomfiApi('PATCH', 'https://mapi.boomfi.xyz/v1/paylinks/'.$createdPaylink['data']['id'] , ['enabled' => true]);
-        $createVariantPaylink = $this->boomfiApi('GET', 'https://mapi.boomfi.xyz/v1/paylinks/generate-variant/'. $createdPaylink['data']['id'] , ['redirect_to' => 'https://cryptedia.com/success?id='. $bookingId]);
+        $createVariantPaylink = $this->boomfiApi('GET', 'https://mapi.boomfi.xyz/v1/paylinks/generate-variant/'. $createdPaylink['data']['id'] , ['redirect_to' => url('/booking/receipt/' . $bookingId)]);
         return redirect()->away($createVariantPaylink['data']['url']);
     }
 
     public function processPayment(Request $request)
     {
         $bookingData = session('booking_data');
+
+        $reference = Booking::generateReference();
+
+        $booking = Booking::create([
+            'user_id' => Auth::id(),
+            'agoda_booking_id' => null,
+            'property_id' => $bookingData['property_id'],
+            'property_name' => $bookingData['property_name'],
+            'property_image' => $bookingData['property_image'],
+            'room_id' => $bookingData['room_id'],
+            'room_name' => $bookingData['room_name'],
+            'room_type' => $bookingData['room_type'] ?? null,
+            'bed_type' => $bookingData['bed_type'] ?? null,
+            'check_in' => $bookingData['check_in'],
+            'check_out' => $bookingData['check_out'],
+            'rooms' => $bookingData['rooms'],
+            'adults' => $bookingData['adults'],
+            'children' => $bookingData['children'] ?? 0,
+            'price_per_night' => $bookingData['price_per_night'],
+            'total_price' => $bookingData['total_price'],
+            'tax_amount' => $bookingData['rate_tax'] ?? 0,
+            'fees_amount' => $bookingData['rate_fees'] ?? 0,
+            'currency' => $bookingData['rate_currency'] ?? 'USD',
+            'guest_first_name' => $request->input('guest_first_name'),
+            'guest_last_name' => $request->input('guest_last_name'),
+            'guest_email' => $request->input('guest_email'),
+            'guest_phone' => $request->input('guest_phone'),
+            'special_requests' => $request->input('special_requests') ?? null,
+            'payment_method' => $request->input('payment_method'),
+            'payment_status' => 'pending',
+            'transaction_reference' => $reference,
+            'status' => 'pending',
+            'free_cancellation' => $bookingData['free_cancellation'] ?? false,
+            'cancellation_deadline' => $bookingData['cancellation_deadline'] ?? null,
+        ]);
+
+        return $this->processBookingPayment($request, $booking->id);
+    }
+
+    public function confirmBooking($id)
+    {
+        $bookingData = \App\Models\Booking::findOrFail($id);
+
+        if ($bookingData->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $sessionData = session('booking_data');
+
+        if (!$sessionData) {
+            return redirect()->route('landing')->with('error', 'Session expired. Please start the booking process again.');
+        }
+
         $agodaPayload = [
             'waitTime' => 120,
             'bookingDetails' => [
                 'userCountry' => 'US',
-                'searchId' => (int) $bookingData['searched_id'],
+                'searchId' => (int) $sessionData['searched_id'],
                 'tag' => 'test-tag',
                 'allowDuplication' => true,
                 'checkIn' => $bookingData['check_in'],
@@ -145,14 +199,14 @@ class BookingController extends Controller
                     'propertyId' => (int) $bookingData['property_id'],
                     'rooms' => [
                         [
-                            'blockId' => $bookingData['block_id'],
+                            'blockId' => $sessionData['block_id'],
                             'rate' => [
-                                'currency' => $bookingData['rate_currency'],
-                                'exclusive' => (float) $bookingData['rate_exclusive'],
+                                'currency' => $sessionData['rate_currency'],
+                                'exclusive' => (float) $sessionData['rate_exclusive'],
                                 'inclusive' => (float) $bookingData['price_per_night'],
-                                'tax' => (float) $bookingData['rate_tax'],
-                                'fees' => (float) $bookingData['rate_fees'],
-                                'method' => $bookingData['rate_method'],
+                                'tax' => (float) $sessionData['rate_tax'],
+                                'fees' => (float) $sessionData['rate_fees'],
+                                'method' => $sessionData['rate_method'],
                             ],
                             'surcharges' => [],
                             'guestDetails' => [
@@ -166,8 +220,8 @@ class BookingController extends Controller
                                     'primary' => true,
                                 ],
                             ],
-                            'currency' => $bookingData['rate_currency'],
-                            'paymentModel' => $bookingData['payment_model'],
+                            'currency' => $sessionData['rate_currency'],
+                            'paymentModel' => $sessionData['payment_model'],
                             'count' => (int) $bookingData['rooms'],
                             'adults' => (int) $bookingData['adults'],
                             'children' => (int) ($bookingData['children'] ?? 0),
@@ -224,46 +278,11 @@ class BookingController extends Controller
             Log::error('Agoda Book API call failed: ' . $e->getMessage());
         }
 
-        $reference = Booking::generateReference();
-
-        $booking = Booking::create([
-            'user_id' => Auth::id(),
-            'agoda_booking_id' => $agodaBookingId,
-            'property_id' => $bookingData['property_id'],
-            'property_name' => $bookingData['property_name'],
-            'property_image' => $bookingData['property_image'],
-            'room_id' => $bookingData['room_id'],
-            'room_name' => $bookingData['room_name'],
-            'room_type' => $bookingData['room_type'] ?? null,
-            'bed_type' => $bookingData['bed_type'] ?? null,
-            'check_in' => $bookingData['check_in'],
-            'check_out' => $bookingData['check_out'],
-            'rooms' => $bookingData['rooms'],
-            'adults' => $bookingData['adults'],
-            'children' => $bookingData['children'] ?? 0,
-            'price_per_night' => $bookingData['price_per_night'],
-            'total_price' => $bookingData['total_price'],
-            'tax_amount' => $bookingData['rate_tax'] ?? 0,
-            'fees_amount' => $bookingData['rate_fees'] ?? 0,
-            'currency' => $bookingData['rate_currency'] ?? 'USD',
-            'guest_first_name' => $bookingData['guest_first_name'],
-            'guest_last_name' => $bookingData['guest_last_name'],
-            'guest_email' => $bookingData['guest_email'],
-            'guest_phone' => $bookingData['guest_phone'],
-            'special_requests' => $bookingData['special_requests'],
-            'payment_method' => $bookingData['payment_method'],
-            'payment_status' => 'pending',
-            'transaction_reference' => $reference,
-            'status' => 'pending',
-            'free_cancellation' => $bookingData['free_cancellation'] ?? false,
-            'cancellation_deadline' => $bookingData['cancellation_deadline'] ?? null,
-        ]);
-
         if ($agodaResult && ($agodaResult['status'] ?? '') === '200') {
             $agodaDetails = $agodaResult['bookingDetails'][0] ?? null;
             if ($agodaDetails) {
                 AgodaBooking::create([
-                    'booking_id' => $booking->id,
+                    'booking_id' => $bookingData->id,
                     'agoda_booking_id' => $agodaDetails['id'],
                     'itinerary_id' => $agodaDetails['itineraryID'],
                     'self_service_url' => $agodaDetails['selfService'],
@@ -273,14 +292,12 @@ class BookingController extends Controller
             }
         }
 
-        return $this->processBookingPayment($request, $booking->id);
-
-        // $booking->update([
-        //     'payment_status' => 'paid',
-        //     'status' => 'confirmed',
-        // ]);
-        // session()->forget('booking_data');
-        // return redirect()->route('booking.confirmation', $booking->id);
+        $bookingData->update([
+            'payment_status' => 'paid',
+            'status' => 'confirmed',
+        ]);
+        session()->forget('booking_data');
+        return redirect()->route('booking.confirmation', $bookingData->id);
     }
 
 

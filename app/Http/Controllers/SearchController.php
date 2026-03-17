@@ -10,7 +10,7 @@ class SearchController extends Controller
 {
     public function search(Request $request)
     {
-        $propertyId = $request->input('property', 2256959);
+        $propertyId = $request->query('property', 2256959);
         $checkIn = $request->input('checkin', now()->format('Y-m-d'));
         $checkOut = $request->input('checkout', now()->addDay()->format('Y-m-d'));
         $rooms = $request->input('rooms', 1);
