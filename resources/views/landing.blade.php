@@ -104,7 +104,7 @@
             <div class="member-deals-banner">
                 <div class="member-deals-header">
                     <div>
-                        <h3 class="fw-bold mb-1">Members save up to 40% on select stays</h3>
+                        <h3 class="fw-bold mb-1">Members save up to 75% on select stays</h3>
                         <p class="mb-0 text-muted-dark">Showing deals for: <strong>Mar 15 - Mar 20</strong></p>
                     </div>
                     <a href="#" class="btn btn-outline-dark rounded-pill px-4 fw-medium">See more deals</a>

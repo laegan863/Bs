@@ -84,7 +84,7 @@
     <!-- ============================
          Hero Section
          ============================ -->
-    <section class="hero-section" style="background: url('{{ asset('img1.jpeg') }}') center/cover no-repeat; position: relative;">
+    <section class="hero-section" style="background: url('{{ asset('banner.jpeg') }}') center/cover no-repeat; position: relative;">
         <div class="container position-relative" style="z-index: 2;">
             <div class="text-center py-4 py-md-5">
                 <h1 class="fw-bold mb-2 hero-main-title" style="color: #1a1a2e; letter-spacing: 0.5px;">Book Hotels with Crypto. Save Up to 75%</h1>
@@ -116,7 +116,9 @@
                     </div>
                     <div class="col-6 col-lg-2">
                         <div class="search-field search-field-border" id="checkinField" style="cursor: pointer;">
-                            <div class="search-field-icon"><i class="bi bi-calendar-event"></i></div>
+                            <div class="search-field-icon">
+                                <img src="{{ asset('calendar.png') }}" height="20px" alt="">
+                            </div>
                             <div class="flex-grow-1">
                                 <span class="search-field-label">CHECK-IN</span>
                                 <span class="fw-bold small d-block" id="checkinDisplay">{{ now()->format('d M Y') }}</span>
@@ -126,7 +128,9 @@
                     </div>
                     <div class="col-6 col-lg-2">
                         <div class="search-field search-field-border" onclick="$('#checkinField').click();" style="cursor: pointer;">
-                            <div class="search-field-icon"><i class="bi bi-calendar-event"></i></div>
+                            <div class="search-field-icon">
+                                <img src="{{ asset('calendar.png') }}" height="20px"  alt="">
+                            </div>
                             <div class="flex-grow-1">
                                 <span class="search-field-label">CHECK-OUT</span>
                                 <span class="fw-bold small d-block" id="checkoutDisplay">{{ now()->addDay()->format('d M Y') }}</span>
@@ -136,7 +140,7 @@
                     </div>
                     <div class="col-12 col-lg-3">
                         <div class="search-field search-field-border" style="cursor: pointer; position: relative;">
-                            <div class="search-field-icon"><i class="bi bi-people-fill"></i></div>
+                            <div class="search-field-icon"><i class="bi bi-people"></i></div>
                             <div class="flex-grow-1" id="guestDropdownToggle" style="cursor: pointer;">
                                 <span class="search-field-label">GUESTS & ROOMS</span>
                                 <span class="fw-bold small" id="guestDisplayBold">2 Adults</span>
@@ -533,17 +537,20 @@
     <!-- ============================
          Crypto Section
          ============================ -->
-    <section class="crypto-section py-5">
+    
+    <img src="{{ asset('icon.png') }}" alt="" width="100%" height="auto">
+    
+    <section class="py-5 crypto-section">
         <div class="container text-center">
             <span class="section-subtitle text-white-50">Crypto-friendly Bookings</span>
             <h2 class="fw-bold text-white mb-5">Your money is valued here.</h2>
 
             <div class="position-relative mb-5">
-                <div class="crypto-carousel d-flex align-items-center justify-content-center gap-3" id="cryptoCarousel">
-                    <button class="carousel-nav-btn carousel-prev" onclick="scrollCarousel('cryptoLogos', -200)" style="position:relative;left:0;">
+                <div class="crypto-carousel d-flex align-items-center justify-content-center gap-4" id="cryptoCarousel">
+                    <button class="carousel-nav-btn carousel-prev" onclick="scrollCarousel('cryptoLogos', -200)">
                         <i class="bi bi-arrow-left"></i>
                     </button>
-                    <div class="crypto-logos d-flex gap-3 overflow-hidden" id="cryptoLogos">
+                    <div class="crypto-logos d-flex gap-4 overflow-hidden" id="cryptoLogos">
                         @php
                             $cryptoColors = ['#9945FF', '#F7931A', '#3CC68A', '#F0B90B', '#E6007A', '#627EEA', '#00D4AA', '#345D9D', '#0033AD', '#14F195'];
                             $cryptoNames = ['SOL', 'BTC', 'USDT', 'BNB', 'DOT', 'ETH', 'AVA', 'ALGO', 'ADA', 'SOL'];
@@ -556,7 +563,7 @@
                         </div>
                         @endfor
                     </div>
-                    <button class="carousel-nav-btn carousel-next" onclick="scrollCarousel('cryptoLogos', 200)" style="position:relative;right:0;">
+                    <button class="carousel-nav-btn carousel-next" onclick="scrollCarousel('cryptoLogos', 200)">
                         <i class="bi bi-arrow-right"></i>
                     </button>
                 </div>
@@ -564,7 +571,7 @@
 
             <div class="row align-items-center justify-content-center gap-4">
                 <div class="col-lg-3 text-lg-start">
-                    <p class="text-white-50 small">We're proud to be the leading crypto-native travel platform, enabling you to book trips worldwide using over 100+ <strong class="text-white">cryptocurrencies</strong> or traditional payment methods—quickly and seamlessly.</p>
+                    <p style="color:#c2a082" class="small">We're proud to be the leading crypto-native travel platform, enabling you to book trips worldwide using over 100+ <strong class="text-white">cryptocurrencies</strong> or traditional payment methods—quickly and seamlessly.</p>
                 </div>
                 <div class="col-lg-3 text-lg-end mt-3 mt-lg-0">
                     <a href="#" class="btn btn-outline-light px-4 py-2 fw-medium">See All Payment Options <i class="bi bi-arrow-right ms-1"></i></a>

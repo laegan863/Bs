@@ -34,7 +34,7 @@
             <div class="col-lg-4 col-12">
                 <h4 class="fw-bold mb-2" style="color: var(--primary-navy);">SolanaTravels</h4>
                 <p class="text-muted small">We accept Credit Card, Debit Card<br>and Cryptocurrency payments.</p>
-                <img src="{{ asset('footer.png') }}" alt="" class="img-fluid">
+                <img src="{{ asset('footer.jpeg') }}" alt="" class="img-fluid">
             </div>
             <div class="col-lg-2 col-md-4 col-6">
                 <h6 class="fw-bold text-uppercase mb-3">Solana Travels</h6>
