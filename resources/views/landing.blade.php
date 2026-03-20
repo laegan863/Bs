@@ -5,8 +5,8 @@
          ============================ -->
     <section class="py-5">
         <div class="container">
-            <div class="row g-4">
-                <div class="col-md-3">
+            <div class="row g-3 g-md-4">
+                <div class="col-6 col-md-3">
                     <div class="feature-card text-center">
                         <div class="feature-icon-wrapper mx-auto mb-3">
                             <i class="bi bi-headphones"></i>
@@ -15,7 +15,7 @@
                         <p class="small text-muted mb-0">Contact our team anytime via live chat, phone, or email.</p>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-6 col-md-3">
                     <div class="feature-card text-center">
                         <div class="feature-icon-wrapper mx-auto mb-3">
                             <i class="bi bi-wallet2"></i>
@@ -24,7 +24,7 @@
                         <p class="small text-muted mb-0">Book with credit/debit cards or top cryptocurrencies.</p>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-6 col-md-3">
                     <div class="feature-card text-center">
                         <div class="feature-icon-wrapper mx-auto mb-3">
                             <i class="bi bi-gift-fill"></i>
@@ -33,7 +33,7 @@
                         <p class="small text-muted mb-0">Earn discounts and cashback sent straight to your OKX/Base wallet.</p>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-6 col-md-3">
                     <div class="feature-card text-center">
                         <div class="feature-icon-wrapper mx-auto mb-3">
                             <i class="bi bi-tag-fill"></i>
@@ -56,7 +56,7 @@
                     <div class="col-lg-5">
                         <div class="promo-bar-cell-high h-100">
                             <div class="row align-items-center h-100">
-                                <div class="col-7 d-flex flex-column justify-content-center">
+                                <div class="col-8 col-sm-7 d-flex flex-column justify-content-center">
                                     <h4 class="fw-bold text-white mb-2" style="font-size: 1.4rem; line-height: 1.3;">Join OKX Today</h4>
                                     <p class="small mb-3" style="color: rgba(255,255,255,0.65);">
                                         Claim $200 in OKX Crypto to trade or spend, and earn up to 10% back
@@ -66,7 +66,7 @@
                                         <a href="#" class="text-white small fw-semibold text-decoration-underline">Get started</a>
                                     </div>
                                 </div>
-                                <div class="col-5 text-center">
+                                <div class="col-4 col-sm-5 text-center">
                                     <img src="{{ asset('img.png') }}" alt="Promo" class="img-fluid" style="max-height: 140px; object-fit: contain; border-radius: 0.5rem;">
                                 </div>
                             </div>

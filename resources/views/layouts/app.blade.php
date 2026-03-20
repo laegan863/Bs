@@ -86,15 +86,15 @@
          ============================ -->
     <section class="hero-section" style="background: url('{{ asset('img1.jpeg') }}') center/cover no-repeat; position: relative;">
         <div class="container position-relative" style="z-index: 2;">
-            <div class="text-center py-5">
-                <h1 class="fw-bold mb-2" style="color: #1a1a2e; font-size: 2.5rem; letter-spacing: 0.5px;">Book Hotels with Crypto. Save Up to 75%</h1>
+            <div class="text-center py-4 py-md-5">
+                <h1 class="fw-bold mb-2 hero-main-title" style="color: #1a1a2e; letter-spacing: 0.5px;">Book Hotels with Crypto. Save Up to 75%</h1>
                 <p class="mb-4" style="color: #1a1a2e; font-size: 1.1rem;">Pay with crypto at 1,800,000+ hotels worldwide. Best prices guaranteed</p>
             </div>
 
             <!-- Search Bar -->
             <div class="hero-search-bar">
-                <form method="GET" action="{{ route('search') }}" class="row g-0 align-items-center">
-                    <div class="col-lg-3">
+                <form method="GET" action="{{ route('search') }}" class="row g-2 g-lg-0 align-items-center">
+                    <div class="col-12 col-lg-3">
                         <div class="search-field" style="position: relative;">
                             <div class="search-field-icon"><i class="bi bi-geo-alt-fill"></i></div>
                             <div class="flex-grow-1">
@@ -114,7 +114,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-6 col-lg-2">
                         <div class="search-field search-field-border" id="checkinField" style="cursor: pointer;">
                             <div class="search-field-icon"><i class="bi bi-calendar-event"></i></div>
                             <div class="flex-grow-1">
@@ -124,7 +124,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-6 col-lg-2">
                         <div class="search-field search-field-border" onclick="$('#checkinField').click();" style="cursor: pointer;">
                             <div class="search-field-icon"><i class="bi bi-calendar-event"></i></div>
                             <div class="flex-grow-1">
@@ -134,7 +134,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-12 col-lg-3">
                         <div class="search-field search-field-border" style="cursor: pointer; position: relative;">
                             <div class="search-field-icon"><i class="bi bi-people-fill"></i></div>
                             <div class="flex-grow-1" id="guestDropdownToggle" style="cursor: pointer;">
@@ -173,7 +173,7 @@
                     <input type="hidden" name="adults" value="2">
                     <input type="hidden" name="children" value="0">
                     <input type="hidden" name="rooms" value="1">
-                    <div class="col-lg-2 text-end pe-2">
+                    <div class="col-12 col-lg-2 text-end pe-2">
                         <button type="submit" class="btn hero-search-btn">
                             <i class="bi bi-search me-1"></i> SEARCH
                         </button>
@@ -816,82 +816,10 @@
         </div>
     </section>
 
-    <!-- ============================
-         Newsletter
-         ============================ -->
-    <section class="py-4">
-        <div class="container">
-            <div class="newsletter-bar">
-                <div class="row align-items-center">
-                    <div class="col-lg-5 d-flex align-items-center gap-3">
-                        <div class="newsletter-icon">
-                            <i class="bi bi-envelope-open-heart-fill"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold text-white mb-0">Join our newsletter</h5>
-                            <p class="text-white-50 small mb-0">Sign up and we'll send the best deals to you</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-7">
-                        <form class="newsletter-form d-flex gap-2 mt-3 mt-lg-0">
-                            <input type="email" class="form-control bg-white" placeholder="Your Email">
-                            <button type="submit" class="btn btn-outline-light px-4 fw-medium text-nowrap">Subscribe</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================
-         Footer
-         ============================ -->
-    <footer class="landing-footer py-5">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-4">
-                    <h4 class="fw-bold mb-2" style="color: var(--primary-navy);">SolanaTravels</h4>
-                    <p class="text-muted small">We accept Credit Card, Debit Card<br>and Cryptocurrency payments.</p>
-                    <img src="{{ asset('footer.png') }}" alt="" class="img-fluid">
-                </div>
-                <div class="col-lg-2 col-md-4">
-                    <h6 class="fw-bold text-uppercase mb-3">Solana Travels</h6>
-                    <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Feedback</a></li>
-                        <li><a href="#">FAQs</a></li>
-                        <li><a href="#">Price Guarantee</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-2 col-md-4">
-                    <h6 class="fw-bold text-uppercase mb-3">Support</h6>
-                    <ul class="footer-links">
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Payment Options</a></li>
-                        <li><a href="#">Terms & Conditions</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Media Contact</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-2 col-md-4">
-                    <h6 class="fw-bold text-uppercase mb-3">Community</h6>
-                    <ul class="footer-links">
-                        <li><a href="#">Twitter</a></li>
-                        <li><a href="#">Facebook</a></li>
-                        <li><a href="#">Telegram</a></li>
-                        <li><a href="#">Instagram</a></li>
-                        <li><a href="#">LinkedIn</a></li>
-                        <li><a href="#">Discord</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
+    @include('partials.footer')
 
     <!-- Bottom color bar -->
-    <div style="height: 6px; background: linear-gradient(90deg, var(--primary-navy), #3949ab, #5c6bc0);"></div>
+    {{-- <div style="height: 6px; background: linear-gradient(90deg, var(--primary-navy), #3949ab, #5c6bc0);"></div> --}}
 
     <!-- Guest Selection Modal -->
     <div class="modal fade" id="guestModal" tabindex="-1" aria-labelledby="guestModalLabel" aria-hidden="true">
@@ -932,6 +860,7 @@
                 </div>
             </div>
         </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -1083,6 +1012,40 @@
                 dropdown.style.display = 'block';
             }
         });
+    })();
+    </script>
+
+    {{-- Search Loading Overlay (hidden by default, shown on form submit) --}}
+    <div id="searchLoader" style="position:fixed;inset:0;z-index:9999;background:rgba(255,255,255,0.97);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;">
+        <style>
+            @keyframes slPulse { 0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.7} }
+            @keyframes slDots { 0%,80%,100%{transform:scale(0)}40%{transform:scale(1)} }
+            .sl-icon{width:64px;height:64px;background:linear-gradient(135deg,#1a237e,#4267B2);border-radius:1rem;display:flex;align-items:center;justify-content:center;animation:slPulse 1.6s ease-in-out infinite;box-shadow:0 8px 32px rgba(26,35,126,.25)}
+            .sl-icon i{font-size:1.8rem;color:#fff}
+            .sl-text{font-family:'Inter',sans-serif;font-weight:600;font-size:1rem;color:#1a237e}
+            .sl-dots{display:flex;gap:6px}
+            .sl-dots span{width:8px;height:8px;background:#1a237e;border-radius:50%;animation:slDots 1.2s infinite ease-in-out}
+            .sl-dots span:nth-child(2){animation-delay:.15s}
+            .sl-dots span:nth-child(3){animation-delay:.3s}
+            .sl-sub{font-family:'Inter',sans-serif;font-size:.82rem;color:#94a3b8}
+        </style>
+        <div class="sl-icon"><i class="bi bi-building"></i></div>
+        <div class="sl-text">Finding the best hotels for you</div>
+        <div class="sl-dots"><span></span><span></span><span></span></div>
+        <div class="sl-sub">Searching across 1,800,000+ properties worldwide</div>
+    </div>
+    <script>
+    (function() {
+        var form = document.querySelector('.hero-search-bar form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var loader = document.getElementById('searchLoader');
+                if (loader) loader.style.display = 'flex';
+                var self = this;
+                setTimeout(function() { self.submit(); }, 50);
+            });
+        }
     })();
     </script>
 </body>

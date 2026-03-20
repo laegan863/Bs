@@ -14,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -344,31 +345,103 @@
         </div>
     </div>
 </section>
+<!-- Payment Iframe Modal -->
+<div class="modal fade" id="paymentIframeModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="paymentIframeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 95%; height: 90vh;">
+        <div class="modal-content" style="height: 90vh;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="paymentIframeModalLabel">
+                    <i class="bi bi-shield-check text-success me-2"></i>Complete Your Payment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 position-relative" style="flex: 1; overflow: hidden;">
+                <div id="content" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function selectCheckoutPayment(method) {
-        // Update tabs
         document.querySelectorAll('.checkout-pay-tab').forEach(tab => {
             tab.classList.toggle('active', tab.dataset.method === method);
         });
-
-        // Update sections
         document.querySelectorAll('.checkout-payment-section').forEach(section => {
             section.classList.add('d-none');
         });
         const section = document.getElementById('paySection_' + method);
         if (section) section.classList.remove('d-none');
-
-        // Update hidden input
         const input = document.getElementById('checkoutPaymentMethod');
         if (input) input.value = method;
     }
-
-    // Form submission loading state
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
         const btn = document.getElementById('completeBookingBtn');
+        const content = document.getElementById('content');
+        content.innerHTML = `
+            <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100">
+                <div class="spinner-border text-primary mb-3" role="status"></div>
+                <p class="text-muted
+                    <i class="bi bi-info-circle me-1"></i>Processing your payment, please wait...</p>
+            </div>
+        `;
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: this.action,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'Accept': 'application/json'
+            },
+            success: function(response) {
+                console.log('Payment URL response:', response);
+                if (response.url) {
+                    // const iframe = document.getElementById('paymentIframe');
+                    // const loader = document.getElementById('iframeLoader');
+
+                    // // Reset loader visibility
+                    // loader.style.display = 'flex';
+
+                    // iframe.src = response.url;
+                    // iframe.onload = function() {
+                    //     loader.style.display = 'none';
+                    // };
+
+                    // // Fallback: hide loader after 5 seconds in case onload doesn't fire
+                    // setTimeout(function() {
+                    //     loader.style.display = 'none';
+                    // }, 5000);
+
+                    content.innerHTML = `<iframe id="paymentIframe" src="${response.url}" style="width: 100%; height: 100%; border: none;"></iframe>`;
+                    const modal = new bootstrap.Modal(document.getElementById('paymentIframeModal'));
+                    modal.show();
+
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-lock me-2"></i>Complete Booking';
+                }
+            },
+            error: function(xhr) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-lock me-2"></i>Complete Booking';
+                let msg = 'Something went wrong. Please try again.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    msg = xhr.responseJSON.error;
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                alert(msg);
+            }
+        });
     });
 </script>
 </body>

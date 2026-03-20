@@ -127,7 +127,14 @@ class BookingController extends Controller
         $createdPaylink = $this->boomfiApi('POST', null, $payload);
         $enablePaylink = $this->boomfiApi('PATCH', 'https://mapi.boomfi.xyz/v1/paylinks/'.$createdPaylink['data']['id'] , ['enabled' => true]);
         $createVariantPaylink = $this->boomfiApi('GET', 'https://mapi.boomfi.xyz/v1/paylinks/generate-variant/'. $createdPaylink['data']['id'] , ['redirect_to' => url('/booking/receipt/' . $bookingId)]);
-        return redirect()->away($createVariantPaylink['data']['url']);
+
+        $paymentUrl = $createVariantPaylink['data']['url'];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['url' => $paymentUrl]);
+        }
+
+        return redirect()->away($paymentUrl);
     }
 
     public function processPayment(Request $request)

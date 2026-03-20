@@ -21,7 +21,7 @@
     position: relative;
     background: linear-gradient(160deg, #b4e4f7 0%, #a8ddf0 20%, #8fd4ec 40%, #b0e0f5 60%, #c8ecfa 80%, #d6f0fc 100%);
     min-height: 500px;
-    overflow: hidden;
+    overflow: visible;
     padding-bottom: 2rem;
 }
 
@@ -235,6 +235,11 @@
 @keyframes ringPulse {
     0%, 100% { transform: scale(1); opacity: 0.4; }
     50%  { transform: scale(1.15); opacity: 0.8; }
+}
+
+/* Hero Main Title */
+.hero-main-title {
+    font-size: 2.5rem;
 }
 
 /* Hero Search Bar */
@@ -913,7 +918,8 @@ a.hotel-card {
 
 @media (max-width: 575.98px) {
     .destination-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
     }
 }
 
@@ -1472,6 +1478,10 @@ a.hotel-card {
         text-align: center;
     }
 
+    .hero-main-title {
+        font-size: 1.8rem;
+    }
+
     .hero-content {
         text-align: center;
     }
@@ -1514,6 +1524,10 @@ a.hotel-card {
 
     .hero-title {
         font-size: 1.5rem;
+    }
+
+    .hero-main-title {
+        font-size: 1.4rem;
     }
 
     .hero-subtitle {
@@ -1679,4 +1693,150 @@ a.hotel-card {
 .hotel-listing-remark {
     line-height: 1.45;
     color: #64748b !important;
+}
+
+/* ============================
+   Mobile Responsive Fixes
+   ============================ */
+
+@media (max-width: 767px) {
+    /* Promo top banner */
+    .promo-banner .container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem !important;
+        text-align: center;
+    }
+
+    .promo-banner .small.fw-medium {
+        font-size: 0.7rem;
+        width: 100%;
+    }
+
+    /* Hero heading on mobile */
+    .hero-section h1 {
+        font-size: 1.4rem !important;
+        line-height: 1.3;
+    }
+
+    .hero-section p {
+        font-size: 0.9rem !important;
+    }
+
+    /* Hero search bar stacking */
+    .hero-search-bar .row {
+        flex-direction: column;
+    }
+
+    .hero-search-bar .row > [class*="col-"] {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .search-field-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+
+    /* Feature cards 2 columns on mobile */
+    .feature-card {
+        padding: 1rem 0.75rem;
+    }
+
+    .feature-icon-wrapper {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+
+    /* Promo bar full width stack */
+    .promo-bar .row > [class*="col-"] {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .promo-bar-cell-high {
+        border-radius: 0;
+        padding: 1.5rem;
+    }
+
+    .promo-bar-cell {
+        padding: 1.25rem;
+        border-top: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* Newsletter bar responsive */
+    .newsletter-bar {
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .newsletter-bar .d-flex {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    /* Destination grid and tabs */
+    .destination-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 0.5rem;
+    }
+
+    .destination-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .destination-tabs .nav-link {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.85rem;
+        white-space: nowrap;
+    }
+
+    /* Region cards */
+    .region-card {
+        margin-bottom: 1rem;
+    }
+
+    /* Continent tabs scroll */
+    .continent-tab {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.85rem;
+        white-space: nowrap;
+    }
+
+    /* FAQ layout stack */
+    .faq-tabs-sidebar .nav {
+        flex-direction: row !important;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .faq-tabs-sidebar .nav-link {
+        white-space: nowrap;
+        font-size: 0.78rem;
+        padding: 0.5rem 0.85rem;
+    }
+
+    /* Review cards */
+    .review-card-v2 {
+        min-width: 260px;
+        max-width: 260px;
+    }
+
+    /* Crypto section */
+    .crypto-section {
+        padding: 2rem 0 !important;
+    }
+
+    .crypto-section h2 {
+        font-size: 1.3rem !important;
+    }
 }

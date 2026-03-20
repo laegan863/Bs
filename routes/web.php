@@ -10,7 +10,6 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SearchedContentController;
 use Illuminate\Support\Facades\Route;
 
-// Landing page (public)
 Route::get('/', function () {
     return view('landing');
 })->name('landing');
@@ -19,42 +18,48 @@ Route::get('/support', function () {
     return view('support');
 })->name('support');
 
-// Guest routes (only accessible when not logged in)
+Route::get('city', function () {
+    $path = public_path('city.json');
+    if (!file_exists($path)) {
+        return response()->json(['error' => 'File not found'], 404);
+    }
+    $json = file_get_contents($path);
+    $cities = json_decode($json, true);
+    return response()->json($cities);
+})->name('city');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
-
-    // Google SSO
     Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 });
 
-// Authenticated routes
-// Search (public)
 Route::get('search', [SearchController::class, 'search'])->name('search');
 Route::get('search/cities', [SearchedContentController::class, 'getCities'])->name('search.cities');
+Route::get('search/test', [SearchedContentController::class, 'getCityByIdTest'])->name('search.test');
+Route::get('search/city/{id}', [SearchedContentController::class, 'getCityById'])->name('search.city');
 Route::get('search/hotels/{id}', [SearchedContentController::class, 'getHotel'])->name('search.hotels');
-Route::get('hotels/{id}', [SearchedContentController::class, 'getHotelById'])->name('search.hotel.detail');
+Route::get('search/hotels/images/{id}', [SearchedContentController::class, 'getHotelImage'])->name('search.hotel.images');
+Route::get('search/hotels-more', [SearchedContentController::class, 'getHotelsPaginated'])->name('search.hotels.more');
+Route::get('search/hotel/{id}', [SearchedContentController::class, 'getHotelFullInfoByHotelId'])->name('search.hotel.detail');
+Route::get('hotels/{id}', [SearchedContentController::class, 'getHotelById'])->name('search.hotel.info');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
-    // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    // Payment Methods
     Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name('payment.index');
     Route::post('/payment-methods', [PaymentMethodController::class, 'store'])->name('payment.store');
     Route::delete('/payment-methods/{paymentMethod}', [PaymentMethodController::class, 'destroy'])->name('payment.destroy');
 
-    // Security & Settings
     Route::get('/settings', [SecurityController::class, 'index'])->name('settings.index');
     Route::get('/settings/email', [SecurityController::class, 'editEmail'])->name('settings.email');
     Route::put('/settings/email', [SecurityController::class, 'updateEmail'])->name('settings.email.update');
@@ -68,8 +73,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
-
-    // Bookings Management (Current & Previous)
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}/detail', [BookingController::class, 'fetchAgodaDetail'])->name('bookings.detail');
     Route::post('/bookings/sync', [BookingController::class, 'storeAgodaBooking'])->name('bookings.sync');
@@ -77,8 +80,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookings/{booking}/amend', [BookingController::class, 'editAmendment'])->name('bookings.amend');
     Route::patch('/bookings/{booking}/amend', [BookingController::class, 'submitAmendment'])->name('bookings.amend.submit');
 
-    // Booking & Checkout
-    // Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store');
     Route::get('/booking/checkout', [BookingController::class, 'checkout'])->name('booking.checkout');
     Route::post('/booking/process', [BookingController::class, 'processPayment'])->name('booking.process');
     Route::get('/booking/confirmation/{booking}', [BookingController::class, 'confirmation'])->name('booking.confirmation');
@@ -89,6 +90,4 @@ Route::controller(SearchedContentController::class)->group(function () {
     Route::get('/searched', 'index')->name('searched.index');
     Route::post('/searched', 'store')->name('searched.store');
 });
-
-// BitPay IPN Callback (no auth required)
 Route::post('/booking/bitpay/callback', [BookingController::class, 'bitpayCallback'])->name('booking.bitpay.callback');
