@@ -155,28 +155,27 @@
                             @endif
 
                             <div class="mt-3">
-                                @if($booking->isCancellable())
                                     <form action="{{ route('bookings.cancel', $booking) }}" method="POST"
                                           onsubmit="return confirm('Are you sure you want to cancel this booking?');">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="btn btn-sm btn-danger w-100">
+                                        <button type="submit" class="btn btn-sm btn-danger w-100 fw-bold py-2">
                                             <i class="bi bi-x-circle me-1"></i>Cancel Booking
                                         </button>
                                     </form>
-                                @else
-                                    <div class="text-center py-2 px-3 rounded-3" style="background: #fff3f3;">
-                                        <small class="text-danger fw-medium">
-                                            <i class="bi bi-lock me-1"></i>Non-refundable — cancellation not available
-                                        </small>
-                                    </div>
-                                @endif
 
 
                                 {{-- View Details Button --}}
                                 <button class="btn btn-primary fw-semibold w-100 mt-2"
                                     onclick="fetchBookingDetail({{ $booking->id }})">
                                     <i class="bi bi-eye me-1"></i>View Details
+                                </button>
+
+
+                                {{-- Add Amendment Button --}}
+                                <button class="btn btn-secondary fw-semibold w-100 mt-2"
+                                    onclick="fetchBookingAmendment({{ $booking->id }})">
+                                    <i class="bi bi-pencil-square me-1"></i>Amend Booking
                                 </button>
                             </div>
                         </div>
@@ -432,6 +431,140 @@
     </div>
 </div>
 
+{{-- Amendment Modal --}}
+<div class="modal fade" id="amendmentModal" tabindex="-1" aria-labelledby="amendmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+
+            {{-- Header --}}
+            <div class="modal-header border-0 text-white px-4 py-3" style="background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);">
+                <div>
+                    <h5 class="modal-title fw-bold mb-0" id="amendmentModalLabel">
+                        <i class="bi bi-pencil-square me-2"></i>Amend Booking
+                    </h5>
+                    <small class="opacity-75" id="amHeaderSubtext">Change your booking dates</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body px-4 py-4">
+                {{-- Loading --}}
+                <div id="amendLoading" class="text-center py-4">
+                    <div class="spinner-grow text-primary" role="status" style="width: 2.5rem; height: 2.5rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted fw-medium">Loading booking info...</p>
+                </div>
+
+                {{-- Error --}}
+                <div id="amendError" class="d-none text-center py-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; background: #fff0f0;">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h6 class="fw-bold">Something went wrong</h6>
+                    <p class="text-muted small" id="amendErrorMsg">Failed to load booking info.</p>
+                </div>
+
+                {{-- Form --}}
+                <div id="amendFormWrap" class="d-none">
+                    <div class="card p-2 shadow-sm mb-3 bg-light border-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-info-circle-fill text-primary" style="font-size: 1.2rem;"></i>
+                            <span class="small text-muted">Amendments are subject to availability and may incur additional charges based on the new dates.</span>   
+                            <p id="isAvailable"></p>
+                        </div>
+                    </div> 
+                    <div class="dt-section-card mb-3" style="background: #f8f9ff; border: 1px solid #e0e7ff;">
+                        <h6 class="fw-bold mb-1" id="amPropName">-</h6>
+                        <p class="small text-muted mb-2" id="amRoomName">-</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small text-muted">
+                                <i class="bi bi-calendar3 me-1"></i>Current: <span id="amCurrentDates">-</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <form id="amendForm">
+                        <input type="hidden" id="amBookingId" value="">
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label for="amCheckIn" class="form-label small fw-semibold">New Check-in</label>
+                                <input type="date" class="form-control" id="amCheckIn" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="amCheckOut" class="form-label small fw-semibold">New Check-out</label>
+                                <input type="date" class="form-control" id="amCheckOut" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-secondary fw-semibold w-100" id="amSubmitBtn">
+                            <i class="bi bi-pencil-square me-1"></i>Submit Amendment
+                        </button>
+                    </form>
+                </div>
+
+                {{-- Result --}}
+                <div id="amendResult" class="d-none">
+                    {{-- Success --}}
+                    <div id="amendSuccess" class="d-none text-center mb-3">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; background: #f0fdf4;">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h6 class="fw-bold">Amendment Successful</h6>
+                        <p class="text-muted small">Your booking dates have been updated.</p>
+                    </div>
+                    {{-- Fail --}}
+                    <div id="amendFail" class="d-none text-center mb-3">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; background: #fff0f0;">
+                            <i class="bi bi-x-circle-fill text-danger" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h6 class="fw-bold">Amendment Failed</h6>
+                        <p class="text-muted small" id="amendFailMsg">-</p>
+                    </div>
+
+                    {{-- Payment Details --}}
+                    <div id="amendPaymentWrap" class="d-none">
+                        <div class="dt-section-card" style="background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%); border: 1px solid #e0e7ff;">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <div class="dt-section-icon-sm" style="background: #e8eaf6;">
+                                    <i class="bi bi-wallet2" style="color: var(--primary-navy, #1a1a5e);"></i>
+                                </div>
+                                <span class="fw-semibold small" style="color: var(--primary-navy, #1a1a5e);">Payment Summary</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small">Original Booking Value</span>
+                                <span class="fw-medium" id="amOriginalValue">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small">New Total</span>
+                                <span class="fw-medium" id="amNewTotal">-</span>
+                            </div>
+                            <hr style="border-style: dashed; border-color: #c5cae9;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold">Refund</span>
+                                <span class="fw-bold text-success" id="amRefundTotal">-</span>
+                            </div>
+                            <div id="amRefundsList" class="mt-2"></div>
+                            <div id="amPaymentInfo" class="mt-3 d-none">
+                                <hr style="border-style: dashed; border-color: #c5cae9;">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-muted small">Charge Option</span>
+                                    <span class="small fw-medium" id="amChargeOption">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 px-4 py-3" style="background: #fafbfc;">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-medium" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('styles')
 <style>
     .booking-card {
@@ -671,6 +804,151 @@ function fetchBookingDetail(bookingId) {
         document.getElementById('detailErrorMsg').textContent = 'Failed to load booking details. ' + err.message;
     });
 }
+</script>
+<script>
+function fetchBookingAmendment(bookingId) {
+    const modal = new bootstrap.Modal(document.getElementById('amendmentModal'));
+    document.getElementById('amendLoading').classList.remove('d-none');
+    document.getElementById('amendError').classList.add('d-none');
+    document.getElementById('amendFormWrap').classList.add('d-none');
+    document.getElementById('amendResult').classList.add('d-none');
+    document.getElementById('amendSuccess').classList.add('d-none');
+    document.getElementById('amendFail').classList.add('d-none');
+    document.getElementById('amendPaymentWrap').classList.add('d-none');
+    modal.show();
+
+    fetch(`/bookings/${bookingId}/amend`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => { if (!r.ok) throw new Error('Request failed'); return r.json(); })
+    .then(data => {
+        document.getElementById('amendLoading').classList.add('d-none');
+        document.getElementById('amendFormWrap').classList.remove('d-none');
+
+        const b = data.booking;
+        document.getElementById('amBookingId').value = bookingId;
+        document.getElementById('amPropName').textContent = b.property_name || '-';
+        document.getElementById('amRoomName').textContent = b.room_name || '-';
+
+        const checkIn = b.check_in ? b.check_in.split('T')[0] : '';
+        const checkOut = b.check_out ? b.check_out.split('T')[0] : '';
+        document.getElementById('amCurrentDates').textContent = (checkIn || '-') + ' to ' + (checkOut || '-');
+
+        // Set min date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('amCheckIn').min = today;
+        document.getElementById('amCheckOut').min = today;
+        document.getElementById('amCheckIn').value = '';
+        document.getElementById('amCheckOut').value = '';
+    })
+    .catch(err => {
+        document.getElementById('amendLoading').classList.add('d-none');
+        document.getElementById('amendError').classList.remove('d-none');
+        document.getElementById('amendErrorMsg').textContent = 'Failed to load booking info. ' + err.message;
+    });
+}
+
+// Auto-adjust check-out min when check-in changes
+document.getElementById('amCheckIn').addEventListener('change', function() {
+    const checkOutInput = document.getElementById('amCheckOut');
+    if (this.value) {
+        const nextDay = new Date(this.value);
+        nextDay.setDate(nextDay.getDate() + 1);
+        checkOutInput.min = nextDay.toISOString().split('T')[0];
+        if (checkOutInput.value && checkOutInput.value <= this.value) {
+            checkOutInput.value = '';
+        }
+    }
+});
+
+// Submit amendment form
+document.getElementById('amendForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const bookingId = document.getElementById('amBookingId').value;
+    const checkIn = document.getElementById('amCheckIn').value;
+    const checkOut = document.getElementById('amCheckOut').value;
+    const submitBtn = document.getElementById('amSubmitBtn');
+
+    if (!checkIn || !checkOut) return;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Submitting...';
+
+    fetch(`/bookings/${bookingId}/amend`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ check_in: checkIn, check_out: checkOut })
+    })
+    .then(r => r.json().then(data => ({ status: r.status, ok: r.ok, data })))
+    .then(({ ok, data }) => {
+        document.getElementById('amendFormWrap').classList.add('d-none');
+        document.getElementById('amendResult').classList.remove('d-none');
+
+        if (ok && data.success) {
+            document.getElementById('amendSuccess').classList.remove('d-none');
+
+            // Show payment details if available
+            const pd = data.data?.paymentDetails;
+            if (pd) {
+                document.getElementById('amendPaymentWrap').classList.remove('d-none');
+                const orig = pd.originalBookingValue;
+                const newT = pd.newTotal;
+                const refund = pd.refundTotal;
+
+                document.getElementById('amOriginalValue').textContent =
+                    (orig?.currency || '') + ' ' + (parseFloat(orig?.amount) || 0).toFixed(2);
+                document.getElementById('amNewTotal').textContent =
+                    (newT?.currency || '') + ' ' + (parseFloat(newT?.amount) || 0).toFixed(2);
+                document.getElementById('amRefundTotal').textContent =
+                    (refund?.currency || '') + ' ' + (parseFloat(refund?.amount) || 0).toFixed(2);
+
+                // Refund line items
+                const refundsList = document.getElementById('amRefundsList');
+                refundsList.innerHTML = '';
+                if (pd.refunds && pd.refunds.length) {
+                    pd.refunds.forEach(r => {
+                        const div = document.createElement('div');
+                        div.className = 'd-flex justify-content-between align-items-center mb-1';
+                        div.innerHTML = `<span class="text-muted small">${r.description || r.note || 'Refund'}</span>` +
+                            `<span class="small text-success">${r.refundAmount?.currency || ''} ${(parseFloat(r.refundAmount?.amount) || 0).toFixed(2)}</span>`;
+                        refundsList.appendChild(div);
+                    });
+                }
+
+                // Payment info
+                const ap = pd.amendmentPayment;
+                if (ap) {
+                    document.getElementById('amPaymentInfo').classList.remove('d-none');
+                    document.getElementById('amChargeOption').textContent =
+                        (ap.originalChargeOption || '') + ' → ' + (ap.newChargeOption || '');
+                }
+            }
+
+            // Reload page after short delay to reflect changes
+            setTimeout(() => location.reload(), 3000);
+        } else {
+            document.getElementById('amendFail').classList.remove('d-none');
+            document.getElementById('amendFailMsg').textContent = data.error || 'Amendment failed. Please try again.';
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-pencil-square me-1"></i>Submit Amendment';
+    })
+    .catch(err => {
+        document.getElementById('amendFormWrap').classList.add('d-none');
+        document.getElementById('amendResult').classList.remove('d-none');
+        document.getElementById('amendFail').classList.remove('d-none');
+        document.getElementById('amendFailMsg').textContent = 'Request failed. ' + err.message;
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-pencil-square me-1"></i>Submit Amendment';
+    });
+});
 </script>
 @endpush
 @endsection

@@ -19,26 +19,6 @@
                 </div>
             @endif
 
-            <!-- Avatar Upload -->
-            <div class="text-center mb-4">
-                <div class="sidebar-avatar mx-auto mb-2" style="width: 100px; height: 100px;">
-                    @if($user->avatar && file_exists(public_path('storage/' . $user->avatar)))
-                        <img src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" id="avatarPreview">
-                    @else
-                        <div class="sidebar-avatar-placeholder" id="avatarPlaceholder" style="width: 100px; height: 100px; font-size: 2rem;">
-                            {{ strtoupper(substr($user->first_name, 0, 1)) }}{{ strtoupper(substr($user->last_name, 0, 1)) }}
-                        </div>
-                        <img src="" alt="Avatar" id="avatarPreview" class="d-none" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
-                    @endif
-                </div>
-                <label for="avatarUpload" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-camera me-1"></i> Change Photo
-                </label>
-                <input type="file" id="avatarUpload" name="avatar" class="d-none" accept="image/*">
-            </div>
-
-            <hr>
-
             <!-- Basic Information -->
             <h6 class="fw-bold mb-3">Basic Information</h6>
             <div class="row g-3 mb-4">
@@ -65,11 +45,6 @@
                         <option value="Female" {{ old('gender', $user->gender) === 'Female' ? 'selected' : '' }}>Female</option>
                         <option value="Other" {{ old('gender', $user->gender) === 'Other' ? 'selected' : '' }}>Other</option>
                     </select>
-                </div>
-                <div class="col-12">
-                    <label for="bio" class="form-label small text-muted">Bio</label>
-                    <textarea class="form-control" id="bio" name="bio" rows="3"
-                              placeholder="Tell us about yourself...">{{ old('bio', $user->bio) }}</textarea>
                 </div>
             </div>
 
@@ -105,22 +80,3 @@
         </form>
     </div>
 @endsection
-
-@push('scripts')
-<script>
-    document.getElementById('avatarUpload').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('avatarPreview');
-                const placeholder = document.getElementById('avatarPlaceholder');
-                preview.src = e.target.result;
-                preview.classList.remove('d-none');
-                if (placeholder) placeholder.classList.add('d-none');
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
-@endpush

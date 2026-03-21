@@ -197,8 +197,9 @@
         <div class="container">
             <div class="amenity-strip d-flex gap-2 overflow-auto pb-2">
                 @foreach($highlightFacilities as $facility)
-                <div class="amenity-thumb" title="{{ $facility['property_translated_name'] }}">
+                <div class="amenity-chip" title="{{ $facility['property_translated_name'] }}" data-facility-name="{{ $facility['property_name'] }}" data-facility-group="{{ $facility['property_group_description'] }}" onclick="toggleAmenityFilter(this)">
                     <i class="bi {{ $iconMap[$facility['property_name']] ?? 'bi-check-circle' }}"></i>
+                    <span class="amenity-chip-label">{{ $facility['property_translated_name'] }}</span>
                 </div>
                 @endforeach
             </div>
@@ -214,18 +215,15 @@
                 <h4 class="fw-bold" style="color: var(--primary-navy);">
                     {{ $roomTypeCount }} room types | {{ $totalDeals }} room deals available
                 </h4>
-                <div class="room-filters d-flex flex-wrap gap-2 mt-3">
-                    <button class="room-filter-pill active">
+                {{-- <div class="room-filters d-flex flex-wrap gap-2 mt-3">
+                    <button class="room-filter-pill" data-filter="breakfast" onclick="toggleRoomFilter(this)">
                         <i class="bi bi-cup-hot-fill me-1"></i> Breakfast Included
                     </button>
-                    <button class="room-filter-pill">Free Cancellation</button>
-                    <button class="room-filter-pill">Non-smoking</button>
-                    <button class="room-filter-pill">Twin</button>
-                    <button class="room-filter-pill">Premium</button>
-                    <button class="room-filter-pill">
-                        <i class="bi bi-sliders me-1"></i> Advanced Filters
-                    </button>
-                </div>
+                    <button class="room-filter-pill" data-filter="cancellation" onclick="toggleRoomFilter(this)">Free Cancellation</button>
+                    <button class="room-filter-pill" data-filter="non-smoking" onclick="toggleRoomFilter(this)">Non-smoking</button>
+                    <button class="room-filter-pill" data-filter="twin" onclick="toggleRoomFilter(this)">Twin</button>
+                    <button class="room-filter-pill" data-filter="premium" onclick="toggleRoomFilter(this)">Premium</button>
+                </div> --}}
             </div>
 
             <!-- Room Type Groups -->
@@ -252,8 +250,16 @@
                 $maxOccupancy = $matchedRoomType['max_occupancy_per_room'] ?? null;
                 $views = $matchedRoomType['views'] ?? null;
                 $roomImageCount = count($roomImages);
+
+                // Collect all benefit names from all rooms in this group (lowercased for matching)
+                $allBenefitNames = collect($group['rooms'])
+                    ->flatMap(fn($r) => collect($r['benefits'] ?? [])->pluck('translatedBenefitName'))
+                    ->map(fn($b) => strtolower($b))
+                    ->unique()
+                    ->values()
+                    ->toArray();
             @endphp
-            <div class="room-type-card mb-4">
+            <div class="room-type-card mb-4" data-room-benefits='@json($allBenefitNames)'>
                 <h5 class="fw-bold room-type-title" style="color: var(--primary-navy);">{{ $groupName }}</h5>
 
                 <div class="row g-0">
@@ -319,7 +325,10 @@
                     <div class="col-lg-9">
                         <div class="room-rates-section">
                             @foreach($group['rooms'] as $room)
-                            <div class="rate-option-row">
+                            <div class="rate-option-row"
+                                data-has-breakfast="{{ $room['freeBreakfast'] ? '1' : '0' }}"
+                                data-has-cancellation="{{ $room['freeCancellation'] ? '1' : '0' }}"
+                                data-room-name="{{ strtolower($room['roomName'] ?? $groupName) }}">
                                 <div class="row align-items-start g-0">
                                     <!-- Rate Info -->
                                     <div class="col-md-5">
@@ -412,6 +421,16 @@
                 </div>
             </div>
             @endforeach
+
+            <!-- No rooms match message -->
+            <div class="no-rooms-message d-none" id="noRoomsMessage">
+                <div class="text-center py-5">
+                    <i class="bi bi-search" style="font-size: 2.5rem; color: #ccc;"></i>
+                    <h5 class="mt-3 text-muted">No rooms available for this filter</h5>
+                    <p class="text-muted small">Try removing some filters to see more rooms</p>
+                    <button class="btn btn-outline-primary mt-2" onclick="clearAllFilters()">Clear All Filters</button>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -422,7 +441,7 @@
     <!-- ============================
          Hotel Facilities
          ============================ -->
-    <section class="py-5 bg-light">
+    <section class="py-5 bg-light" id="facilities-section">
         <div class="container">
             <div class="section-heading-row d-flex align-items-center gap-3 mb-4">
                 <div class="section-heading-icon">
@@ -490,7 +509,7 @@ leisure and sports' => 'bi-trophy',
             @endphp
             <div class="row g-3">
                 @foreach($facilityGroups as $groupName => $facilities)
-                <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="col-md-6 col-lg-4 col-xl-3 facility-group-col" data-group-name="{{ $groupName }}">
                     <div class="facility-card h-100">
                         <div class="facility-card-header">
                             <div class="facility-icon-badge" style="background: {{ $facilityGroupColors[$groupName] ?? '#64748b' }}15; color: {{ $facilityGroupColors[$groupName] ?? '#64748b' }};">
@@ -501,7 +520,7 @@ leisure and sports' => 'bi-trophy',
                         </div>
                         <div class="facility-list">
                             @foreach($facilities as $fac)
-                            <div class="facility-item">
+                            <div class="facility-item" data-facility-name="{{ $fac['property_name'] }}">
                                 <i class="bi bi-check2" style="color: {{ $facilityGroupColors[$groupName] ?? '#10b981' }};"></i>
                                 <span>{{ $fac['property_translated_name'] }}</span>
                             </div>
@@ -654,6 +673,218 @@ leisure and sports' => 'bi-trophy',
 
     <!-- Gallery & Lightbox JS -->
     <script>
+        // ========================
+        // Amenity Filter Logic
+        // ========================
+        let activeFilters = new Set();
+
+        function toggleAmenityFilter(el) {
+            const facilityName = el.getAttribute('data-facility-name');
+            const facilityGroup = el.getAttribute('data-facility-group');
+
+            el.classList.toggle('active');
+
+            if (activeFilters.has(facilityName)) {
+                activeFilters.delete(facilityName);
+            } else {
+                activeFilters.add(facilityName);
+            }
+
+            applyAllFilters();
+
+            // Scroll to rooms section when first filter is activated
+            if (activeFilters.size === 1 && el.classList.contains('active')) {
+                const section = document.getElementById('rooms-section');
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        }
+
+        function applyFacilityFilter() {
+            const allCols = document.querySelectorAll('.facility-group-col');
+            const allItems = document.querySelectorAll('.facility-item');
+
+            // Clear all highlights and dims
+            allItems.forEach(item => item.classList.remove('highlighted'));
+            allCols.forEach(col => col.classList.remove('dimmed'));
+
+            // Room filtering
+            const roomCards = document.querySelectorAll('.room-type-card');
+
+            if (activeFilters.size === 0) {
+                // No amenity filters active — show all room cards
+                roomCards.forEach(card => card.style.display = '');
+                return;
+            }
+
+            // Find which groups contain at least one matching facility
+            const matchingGroups = new Set();
+            allItems.forEach(item => {
+                const name = item.getAttribute('data-facility-name');
+                if (activeFilters.has(name)) {
+                    item.classList.add('highlighted');
+                    const col = item.closest('.facility-group-col');
+                    if (col) matchingGroups.add(col);
+                }
+            });
+
+            // Dim non-matching groups
+            allCols.forEach(col => {
+                if (!matchingGroups.has(col)) {
+                    col.classList.add('dimmed');
+                }
+            });
+
+            // Filter room cards: show only rooms whose benefits match ALL active amenity filters
+            const facilityKeywords = {
+                'Free Wi-Fi in all rooms!': ['wifi', 'wi-fi'],
+                'Wi-Fi in public areas': ['wifi', 'wi-fi'],
+                'Internet': ['internet', 'wifi', 'wi-fi'],
+                'Swimming pool': ['pool', 'swimming'],
+                'Swimming pool [outdoor]': ['pool', 'swimming'],
+                'Fitness center': ['fitness', 'gym'],
+                'Gym/fitness': ['fitness', 'gym'],
+                'Bar': ['bar'],
+                'Restaurants': ['restaurant'],
+                'Elevator': ['elevator', 'lift'],
+                'Laundry service': ['laundry'],
+                'Air conditioning': ['air conditioning', 'aircon', 'a/c'],
+                'Parking': ['parking', 'car park'],
+                'Car park [on-site]': ['parking', 'car park'],
+                'Security [24-hour]': ['security'],
+                'Front desk [24-hour]': ['front desk', 'reception'],
+                'Breakfast [buffet]': ['breakfast'],
+                'Breakfast [continental]': ['breakfast'],
+                'Concierge': ['concierge'],
+                'Luggage storage': ['luggage'],
+                'Wheelchair accessible': ['wheelchair', 'accessible'],
+                'Family room': ['family'],
+                'Smoke-free property': ['smoke-free', 'non-smoking'],
+                'Taxi service': ['taxi'],
+                'Currency exchange': ['currency'],
+                'Computer station': ['computer'],
+                'Poolside bar': ['pool', 'bar'],
+                'Vending machine': ['vending'],
+                'Contactless check-in/out': ['contactless', 'check-in'],
+                'CCTV in common areas': ['cctv'],
+                'Shower': ['shower'],
+                'Hair dryer': ['hair dryer', 'hairdryer'],
+                'Coffee/tea maker': ['coffee', 'tea'],
+                'Telephone': ['telephone', 'phone'],
+                'Desk': ['desk'],
+                'In-room safe box': ['safe'],
+                'Private bathroom': ['bathroom', 'bath'],
+                'Satellite/cable channels': ['satellite', 'cable', 'tv'],
+                'Non-smoking rooms': ['non-smoking', 'smoke-free'],
+            };
+
+            roomCards.forEach(card => {
+                const benefits = JSON.parse(card.getAttribute('data-room-benefits') || '[]');
+                const hasAll = [...activeFilters].every(facilityName => {
+                    const keywords = facilityKeywords[facilityName] || [facilityName.toLowerCase()];
+                    return keywords.some(kw => benefits.some(b => b.includes(kw)));
+                });
+                card.style.display = hasAll ? '' : 'none';
+            });
+        }
+
+        function clearAllAmenityFilters() {
+            activeFilters.clear();
+            document.querySelectorAll('.amenity-chip.active').forEach(el => el.classList.remove('active'));
+            applyAllFilters();
+        }
+
+        // ========================
+        // Room Filter Pill Logic
+        // ========================
+        let activeRoomFilters = new Set();
+
+        function toggleRoomFilter(el) {
+            const filter = el.getAttribute('data-filter');
+            el.classList.toggle('active');
+
+            if (activeRoomFilters.has(filter)) {
+                activeRoomFilters.delete(filter);
+            } else {
+                activeRoomFilters.add(filter);
+            }
+
+            applyAllFilters();
+        }
+
+        function clearAllFilters() {
+            activeFilters.clear();
+            activeRoomFilters.clear();
+            document.querySelectorAll('.amenity-chip.active').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.room-filter-pill.active').forEach(el => el.classList.remove('active'));
+            applyAllFilters();
+        }
+
+        function applyAllFilters() {
+            // First apply amenity chip filters (facility section highlighting)
+            applyFacilityFilter();
+
+            // Then apply room filter pills on top
+            const roomCards = document.querySelectorAll('.room-type-card');
+            const noRoomsMsg = document.getElementById('noRoomsMessage');
+
+            if (activeRoomFilters.size === 0 && activeFilters.size === 0) {
+                // No filters — show all rates
+                document.querySelectorAll('.rate-option-row').forEach(row => row.style.display = '');
+                roomCards.forEach(card => card.style.display = '');
+                if (noRoomsMsg) noRoomsMsg.classList.add('d-none');
+                return;
+            }
+
+            // Filter individual rate rows by room filter pills
+            if (activeRoomFilters.size > 0) {
+                document.querySelectorAll('.rate-option-row').forEach(row => {
+                    let visible = true;
+                    const roomName = row.getAttribute('data-room-name') || '';
+
+                    if (activeRoomFilters.has('breakfast') && row.getAttribute('data-has-breakfast') !== '1') {
+                        visible = false;
+                    }
+                    if (activeRoomFilters.has('cancellation') && row.getAttribute('data-has-cancellation') !== '1') {
+                        visible = false;
+                    }
+                    if (activeRoomFilters.has('non-smoking') && !roomName.includes('non-smoking') && !roomName.includes('nonsmoking')) {
+                        visible = false;
+                    }
+                    if (activeRoomFilters.has('twin') && !roomName.includes('twin')) {
+                        visible = false;
+                    }
+                    if (activeRoomFilters.has('premium') && !roomName.includes('premium')) {
+                        visible = false;
+                    }
+
+                    row.style.display = visible ? '' : 'none';
+                });
+            } else {
+                document.querySelectorAll('.rate-option-row').forEach(row => row.style.display = '');
+            }
+
+            // Hide room cards that have no visible rate rows (or were hidden by amenity filter)
+            let visibleCardCount = 0;
+            roomCards.forEach(card => {
+                if (card.style.display === 'none') {
+                    // Already hidden by amenity filter
+                    return;
+                }
+                const visibleRates = card.querySelectorAll('.rate-option-row:not([style*="display: none"])');
+                if (visibleRates.length === 0 && activeRoomFilters.size > 0) {
+                    card.style.display = 'none';
+                } else {
+                    visibleCardCount++;
+                }
+            });
+
+            if (noRoomsMsg) {
+                noRoomsMsg.classList.toggle('d-none', visibleCardCount > 0);
+            }
+        }
+
         // All pictures data for the main gallery lightbox
         const allPictures = @json($pictures);
         let currentLightboxIndex = 0;

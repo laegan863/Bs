@@ -7,10 +7,43 @@ use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\SearchedContentController;
 
 class SearchController extends Controller
-{
+{   
     public function search(Request $request)
     {
-        $propertyId = $request->input('property', 2256959);
+        $controller = new SearchedContentController();
+        $data = $controller->getHotel($request->property ?? null);
+
+        $hotels = $data['hotels']['hotel'] ?? [];
+        $totalProperties = $data['hotels']['total_count'] ?? count($hotels);
+        $hasMore = $data['hotels']['has_more'] ?? false;
+        $loadedCount = $data['hotels']['loaded_count'] ?? count($hotels);
+
+        return view('hotel-listing', [
+            'hotels' => $hotels,
+            'totalProperties' => $totalProperties,
+            'loadedCount' => $loadedCount,
+            'hasMore' => $hasMore,
+            'checkin' => $request->input('checkin', now()->format('Y-m-d')),
+            'checkout' => $request->input('checkout', now()->addDay()->format('Y-m-d')),
+            'adults' => $request->input('adults', 2),
+            'children' => $request->input('children', 0),
+            'rooms' => $request->input('rooms', 1),
+            'property' => $request->input('property', ''),
+        ]);
+    }
+
+    public function search_old(Request $request)
+    {
+
+        return response()->json([
+            'message' => 'Search endpoint is working',
+            'query' => $request->all(),
+        ]);
+
+        
+
+
+        $propertyId = $request->query('property', 2256959);
         $checkIn = $request->input('checkin', now()->format('Y-m-d'));
         $checkOut = $request->input('checkout', now()->addDay()->format('Y-m-d'));
         $rooms = $request->input('rooms', 1);
@@ -53,9 +86,14 @@ class SearchController extends Controller
         ])->post($api, $payload);
 
         $searchedContentController = new SearchedContentController();
-        $searchedData = $searchedContentController->index(2256959);
+        $searchedData = $searchedContentController->index($propertyId);
 
         $data = $response->json();
+
+        if($data['errorMessage'] ?? null) {
+            return response()->json($data);
+        }
+
         $property = $data['properties'][0] ?? null;
         $searchedId = $data['searchId'] ?? null;
 

@@ -338,6 +338,78 @@
     box-shadow: 0 4px 12px var(--glow-color);
 }
 
+/* Amenity Chip (interactive filter) */
+.amenity-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    min-width: 48px;
+    height: 48px;
+    padding: 0 0.75rem;
+    border-radius: 2rem;
+    background: white;
+    border: 1px solid #e9ecef;
+    font-size: 1.15rem;
+    color: var(--primary-navy);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.amenity-chip .amenity-chip-label {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    font-size: 0.78rem;
+    font-weight: 500;
+    transition: max-width 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+    margin-left: 0;
+}
+
+.amenity-chip:hover {
+    background: #f0f4ff;
+    border-color: var(--primary-navy);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px var(--glow-color);
+}
+
+.amenity-chip:hover .amenity-chip-label {
+    max-width: 200px;
+    opacity: 1;
+    margin-left: 0.5rem;
+}
+
+.amenity-chip.active {
+    background: var(--primary-navy);
+    color: white;
+    border-color: var(--primary-navy);
+    box-shadow: 0 4px 12px var(--glow-color);
+}
+
+.amenity-chip.active .amenity-chip-label {
+    max-width: 200px;
+    opacity: 1;
+    margin-left: 0.5rem;
+}
+
+/* Facility highlight effect */
+.facility-group-col.dimmed {
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+}
+
+.facility-group-col {
+    transition: opacity 0.3s ease;
+}
+
+.facility-item.highlighted {
+    background: #e8f5e9;
+    border-radius: 0.5rem;
+    padding: 0.15rem 0.4rem;
+    font-weight: 600;
+}
+
 /* ============================
    Room Listings
    ============================ */
@@ -1446,5 +1518,137 @@
         width: 64px;
         height: 64px;
         font-size: 2rem;
+    }
+
+    /* Gallery mobile: make it single column scrollable */
+    .photo-gallery .row {
+        flex-direction: column;
+    }
+
+    .photo-gallery .row > [class*="col-"] {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .gallery-hero {
+        height: 200px;
+    }
+
+    .gallery-sm {
+        height: 100px;
+    }
+
+    .gallery-xs {
+        height: 100px;
+    }
+
+    /* Property info card */
+    .property-info-card {
+        padding: 1rem;
+    }
+
+    .property-info-card .row > [class*="col-"] {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .property-info-card .text-lg-end {
+        text-align: left !important;
+    }
+
+    .property-price-block {
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .property-price-block .btn {
+        width: 100%;
+    }
+
+    .property-name {
+        font-size: 1.15rem;
+    }
+
+    .property-price {
+        font-size: 1.3rem;
+    }
+
+    /* Room type card mobile */
+    .room-type-card .row > [class*="col-"] {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .room-image-section {
+        padding-right: 0;
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .room-rates-section {
+        padding-left: 0;
+    }
+
+    /* Rate option rows stack */
+    .rate-option-row .row > [class*="col-"] {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .rate-price {
+        text-align: left !important;
+    }
+
+    .rate-action {
+        text-align: left !important;
+    }
+
+    .rate-action .btn {
+        width: 100%;
+    }
+
+    /* Amenity strip */
+    .amenity-strip {
+        padding-bottom: 0.5rem;
+    }
+
+    .amenity-chip {
+        height: 40px;
+        padding: 0 0.6rem;
+        font-size: 1rem;
+    }
+
+    /* Section headings */
+    .section-heading-row h3 {
+        font-size: 1.15rem;
+    }
+
+    /* Facility groups */
+    .facility-group-col {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    /* Search strip on property page */
+    .property-search-strip .d-flex {
+        flex-direction: column;
+    }
+
+    .search-strip-field {
+        padding: 0.35rem 0.5rem;
+    }
+
+    .search-strip-border {
+        border-left: none;
+        border-top: 1px solid #e9ecef;
     }
 }

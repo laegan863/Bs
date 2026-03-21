@@ -3,16 +3,16 @@
     <button class="social-login-btn btn-apple">
         <i class="bi bi-apple"></i>
     </button>
-    <button class="social-login-btn btn-pix">
+    {{-- <button class="social-login-btn btn-pix">
         <i class="bi bi-grid-3x3-gap"></i>
     </button>
     <button class="social-login-btn btn-facebook">
         <i class="bi bi-facebook"></i>
-    </button>
+    </button> --}}
     <a href="{{ route('auth.google') }}" class="social-login-btn btn-google">
         <i class="bi bi-google"></i>
     </a>
-    <button class="social-login-btn btn-wechat">
+    {{-- <button class="social-login-btn btn-wechat">
         <i class="bi bi-wechat"></i>
-    </button>
+    </button> --}}
 </div>
