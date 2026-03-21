@@ -21,7 +21,7 @@
     position: relative;
     background: linear-gradient(160deg, #b4e4f7 0%, #a8ddf0 20%, #8fd4ec 40%, #b0e0f5 60%, #c8ecfa 80%, #d6f0fc 100%);
     min-height: 500px;
-    overflow: hidden;
+    overflow: visible;
     padding-bottom: 2rem;
 }
 
@@ -235,6 +235,11 @@
 @keyframes ringPulse {
     0%, 100% { transform: scale(1); opacity: 0.4; }
     50%  { transform: scale(1.15); opacity: 0.8; }
+}
+
+/* Hero Main Title */
+.hero-main-title {
+    font-size: 2.5rem;
 }
 
 /* Hero Search Bar */
@@ -452,12 +457,246 @@
     overflow: hidden;
 }
 
+<<<<<<< HEAD
+=======
+.promo-bar-cell-high {
+    background: #2674d9;
+    border-radius: 0 1.6rem 1.6rem 0;
+    overflow: hidden;
+    padding: 2rem;
+}
+
+>>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
 .promo-bar-cell {
     padding: 2rem;
 }
 
+<<<<<<< HEAD
 .promo-bar-divider {
     border-left: 1px solid rgba(255, 255, 255, 0.2);
+=======
+/* .promo-bar-divider {
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+} */
+
+/* ============================
+   Member Deals Banner
+   ============================ */
+
+.member-deals-banner {
+    background: #c2a082;
+    border-radius: 1.25rem;
+    padding: 2rem;
+}
+
+.member-deals-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.member-deals-header h3 {
+    font-size: 1.35rem;
+    color: #1a1a1a;
+}
+
+.member-deals-header .text-muted-dark {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.member-deals-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.member-deal-card {
+    background: white;
+    border-radius: 0.85rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.member-deal-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.member-deal-img {
+    height: 170px;
+    overflow: hidden;
+    position: relative;
+}
+
+.member-deal-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.member-deal-card:hover .member-deal-img img {
+    transform: scale(1.05);
+}
+
+.member-deal-fav {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: #ef4444;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.2s;
+}
+
+.member-deal-fav:hover {
+    background: #ef4444;
+    color: white;
+    transform: scale(1.1);
+}
+
+.member-deal-vip-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(34, 197, 94, 0.92);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    border-radius: 0.35rem;
+    letter-spacing: 0.3px;
+    z-index: 2;
+}
+
+.member-deal-img-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0.5rem 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.member-deal-card:hover .member-deal-img-nav {
+    opacity: 1;
+}
+
+.member-deal-nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.member-deal-nav-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+.member-deal-body {
+    padding: 0.85rem 1rem;
+}
+
+.member-deal-body h6 {
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+.member-deal-score {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 0.4rem 0.4rem 0.4rem 0;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.member-deal-member-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 1rem;
+}
+
+.member-deal-member-badge i {
+    font-size: 0.65rem;
+}
+
+.member-deal-pricing {
+    margin-top: 0.25rem;
+}
+
+.member-deal-original {
+    text-decoration: line-through;
+    color: #9ca3af;
+    font-weight: 400;
+    font-size: 0.85rem;
+    margin-left: 0.25rem;
+}
+
+.member-deal-tax {
+    font-size: 0.7rem;
+    color: #16a34a;
+    margin-top: 0.15rem;
+}
+
+.member-deal-tax i {
+    font-size: 0.6rem;
+}
+
+@media (max-width: 991.98px) {
+    .member-deals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .member-deals-grid {
+        grid-template-columns: 1fr;
+    }
+    .member-deals-banner {
+        padding: 1.25rem;
+    }
+    .member-deals-header h3 {
+        font-size: 1.15rem;
+    }
+>>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
 }
 
 /* ============================
@@ -611,6 +850,85 @@
     background: var(--primary-navy);
     color: white;
     border-color: var(--primary-navy);
+}
+
+/* Destination Grid */
+.destination-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+}
+
+.destination-grid-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: inherit;
+}
+
+.destination-grid-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.destination-grid-img {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    border-radius: 1rem;
+}
+
+.destination-grid-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.destination-grid-card:hover .destination-grid-img img {
+    transform: scale(1.05);
+}
+
+.destination-grid-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(22, 163, 74, 0.9);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.35rem;
+    text-transform: capitalize;
+}
+
+.destination-grid-info {
+    padding: 0.75rem 0.25rem;
+}
+
+.destination-grid-info h6 {
+    font-size: 0.95rem;
+}
+
+.destination-grid-info small {
+    font-size: 0.8rem;
+}
+
+a.hotel-card {
+    display: block;
+}
+
+@media (max-width: 991.98px) {
+    .destination-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .destination-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
 }
 
 /* Carousel Nav Buttons */
@@ -841,14 +1159,15 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: white;
     flex-shrink: 0;
-    letter-spacing: 0.5px;
+    overflow: hidden;
+}
+
+.review-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .review-quote-icon {
@@ -905,7 +1224,7 @@
    ============================ */
 
 .crypto-section {
-    background: linear-gradient(135deg, #1a1a3e 0%, #2c2c54 50%, #1a237e 100%);
+    background: #394E85;
     position: relative;
     overflow: hidden;
 }
@@ -921,8 +1240,8 @@
 }
 
 .crypto-logo-item {
-    width: 56px;
-    height: 56px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -932,8 +1251,37 @@
     transition: transform 0.2s;
 }
 
+.crypto-logo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
 .crypto-logo-item:hover {
     transform: scale(1.15);
+}
+
+.crypto-section .carousel-nav-btn {
+    position: relative;
+    top: auto;
+    transform: none;
+    width: auto;
+    height: auto;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    box-shadow: none;
+    flex-shrink: 0;
+    font-size: 1.5rem;
+    padding: 0;
+}
+
+.crypto-section .carousel-nav-btn:hover {
+    background: none;
+    transform: none;
+    box-shadow: none;
+    color: white;
 }
 
 /* ============================
@@ -1167,6 +1515,10 @@
         text-align: center;
     }
 
+    .hero-main-title {
+        font-size: 1.8rem;
+    }
+
     .hero-content {
         text-align: center;
     }
@@ -1211,6 +1563,10 @@
         font-size: 1.5rem;
     }
 
+    .hero-main-title {
+        font-size: 1.4rem;
+    }
+
     .hero-subtitle {
         font-size: 0.9rem;
     }
@@ -1239,5 +1595,285 @@
 
     .carousel-next {
         right: -10px;
+    }
+}
+
+/* City Search Dropdown */
+.city-search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+    z-index: 1060;
+    max-height: 340px;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.city-search-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.city-search-empty {
+    padding: 1rem;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.city-search-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.city-search-item:hover {
+    background: #f1f5f9;
+}
+
+.city-search-item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 0.5rem;
+    background: #f0f2f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-navy);
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.city-search-item-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #1e293b;
+}
+
+.city-search-item-meta {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+/* Hotel Listing Cards */
+.hotel-listing-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.hotel-listing-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.hotel-listing-img {
+    position: relative;
+    height: 100%;
+    min-height: 200px;
+}
+
+.hotel-listing-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hotel-listing-type {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hotel-listing-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.hotel-listing-stars i {
+    font-size: 0.8rem;
+}
+
+.hotel-listing-rating {
+    display: inline-block;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    min-width: 36px;
+    text-align: center;
+}
+
+.hotel-listing-remark {
+    line-height: 1.45;
+    color: #64748b !important;
+}
+
+/* ============================
+   Mobile Responsive Fixes
+   ============================ */
+
+@media (max-width: 767px) {
+    /* Promo top banner */
+    .promo-banner .container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem !important;
+        text-align: center;
+    }
+
+    .promo-banner .small.fw-medium {
+        font-size: 0.7rem;
+        width: 100%;
+    }
+
+    /* Hero heading on mobile */
+    .hero-section h1 {
+        font-size: 1.4rem !important;
+        line-height: 1.3;
+    }
+
+    .hero-section p {
+        font-size: 0.9rem !important;
+    }
+
+    /* Hero search bar stacking */
+    .hero-search-bar .row {
+        flex-direction: column;
+    }
+
+    .hero-search-bar .row > [class*="col-"] {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .search-field-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+
+    /* Feature cards 2 columns on mobile */
+    .feature-card {
+        padding: 1rem 0.75rem;
+    }
+
+    .feature-icon-wrapper {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+
+    /* Promo bar full width stack */
+    .promo-bar .row > [class*="col-"] {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .promo-bar-cell-high {
+        border-radius: 0;
+        padding: 1.5rem;
+    }
+
+    .promo-bar-cell {
+        padding: 1.25rem;
+        border-top: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* Newsletter bar responsive */
+    .newsletter-bar {
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .newsletter-bar .d-flex {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    /* Destination grid and tabs */
+    .destination-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 0.5rem;
+    }
+
+    .destination-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .destination-tabs .nav-link {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.85rem;
+        white-space: nowrap;
+    }
+
+    /* Region cards */
+    .region-card {
+        margin-bottom: 1rem;
+    }
+
+    /* Continent tabs scroll */
+    .continent-tab {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.85rem;
+        white-space: nowrap;
+    }
+
+    /* FAQ layout stack */
+    .faq-tabs-sidebar .nav {
+        flex-direction: row !important;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .faq-tabs-sidebar .nav-link {
+        white-space: nowrap;
+        font-size: 0.78rem;
+        padding: 0.5rem 0.85rem;
+    }
+
+    /* Review cards */
+    .review-card-v2 {
+        min-width: 260px;
+        max-width: 260px;
+    }
+
+    /* Crypto section */
+    .crypto-section {
+        padding: 2rem 0 !important;
+    }
+
+    .crypto-section h2 {
+        font-size: 1.3rem !important;
     }
 }

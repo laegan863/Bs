@@ -49,7 +49,7 @@
                             <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3Crect width='60' height='30' fill='%23012169'/%3E%3Cpath d='M0,0 L60,30 M60,0 L0,30' stroke='%23fff' stroke-width='6'/%3E%3Cpath d='M0,0 L60,30 M60,0 L0,30' stroke='%23C8102E' stroke-width='4'/%3E%3Cpath d='M30,0 V30 M0,15 H60' stroke='%23fff' stroke-width='10'/%3E%3Cpath d='M30,0 V30 M0,15 H60' stroke='%23C8102E' stroke-width='6'/%3E%3C/svg%3E" alt="Flag" class="flag-icon">
                         </div>
                     </li>
-                    <li class="nav-item"><a href="#" class="nav-link text-dark">Support</a></li>
+                    <li class="nav-item"><a href="{{ route('support') }}" class="nav-link text-dark">Support</a></li>
                     <li class="nav-item"><a href="#" class="nav-link text-dark">Trips</a></li>
                     <li class="nav-item"><a href="#" class="nav-link text-dark"><i class="bi bi-chat-dots"></i></a></li>
                     @if(!Auth::user())
@@ -84,28 +84,52 @@
     <!-- ============================
          Hero Section
          ============================ -->
-    <section class="hero-section" style="background: url('{{ asset('img1.jpeg') }}') center/cover no-repeat; position: relative;">
+    <section class="hero-section" style="background: url('{{ asset('banner.jpeg') }}') center/cover no-repeat; position: relative;">
         <div class="container position-relative" style="z-index: 2;">
+<<<<<<< HEAD
             <div class="text-center py-5">
                 <h1 class="fw-bold mb-2" style="color: #1a1a2e; font-size: 2.5rem; letter-spacing: 0.5px;">Book Hotels with Crypto. Save Up to 75%</h1>
+=======
+            <div class="text-center py-4 py-md-5">
+                <h1 class="fw-bold mb-2 hero-main-title" style="color: #1a1a2e; letter-spacing: 0.5px;">Book Hotels with Crypto. Save Up to 75%</h1>
+>>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
                 <p class="mb-4" style="color: #1a1a2e; font-size: 1.1rem;">Pay with crypto at 1,800,000+ hotels worldwide. Best prices guaranteed</p>
             </div>
 
             <!-- Search Bar -->
             <div class="hero-search-bar">
-                <form method="GET" action="{{ route('search') }}" class="row g-0 align-items-center">
-                    <div class="col-lg-3">
-                        <div class="search-field">
+                <form method="GET" action="{{ route('search') }}" class="row g-2 g-lg-0 align-items-center">
+                    <div class="col-12 col-lg-3">
+                        <div class="search-field" style="position: relative;">
                             <div class="search-field-icon"><i class="bi bi-geo-alt-fill"></i></div>
-                            <div>
+                            <div class="flex-grow-1">
                                 <span class="search-field-label">DESTINATION</span>
-                                <input type="text" value="2256959" name="property" class="form-control border-0 p-0 shadow-none search-field-input" placeholder="Where are you going?">
+                                <input type="text" id="citySearchInput" autocomplete="off" class="form-control border-0 p-0 shadow-none search-field-input" placeholder="Where are you going?">
+                                <input type="hidden" name="property" id="cityIdInput" value="">
+                            </div>
+                            <div id="cityDropdown" class="city-search-dropdown" style="display: none;">
+                                <div id="cityDropdownLoading" class="city-search-loading" style="display: none;">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                    <span class="ms-2 small text-muted">Searching cities...</span>
+                                </div>
+                                <div id="cityDropdownResults"></div>
+                                <div id="cityDropdownEmpty" class="city-search-empty" style="display: none;">
+                                    <i class="bi bi-search me-1"></i> No cities found
+                                </div>
                             </div>
                         </div>
                     </div>
+<<<<<<< HEAD
                     <div class="col-lg-2">
                         <div class="search-field search-field-border" id="checkinField" style="cursor: pointer;">
                             <div class="search-field-icon"><i class="bi bi-calendar-event"></i></div>
+=======
+                    <div class="col-6 col-lg-2">
+                        <div class="search-field search-field-border" id="checkinField" style="cursor: pointer;">
+                            <div class="search-field-icon">
+                                <img src="{{ asset('calendar.png') }}" height="20px" alt="">
+                            </div>
+>>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
                             <div class="flex-grow-1">
                                 <span class="search-field-label">CHECK-IN</span>
                                 <span class="fw-bold small d-block" id="checkinDisplay">{{ now()->format('d M Y') }}</span>
@@ -113,9 +137,17 @@
                             </div>
                         </div>
                     </div>
+<<<<<<< HEAD
                     <div class="col-lg-2">
                         <div class="search-field search-field-border" onclick="$('#checkinField').click();" style="cursor: pointer;">
                             <div class="search-field-icon"><i class="bi bi-calendar-event"></i></div>
+=======
+                    <div class="col-6 col-lg-2">
+                        <div class="search-field search-field-border" onclick="$('#checkinField').click();" style="cursor: pointer;">
+                            <div class="search-field-icon">
+                                <img src="{{ asset('calendar.png') }}" height="20px"  alt="">
+                            </div>
+>>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
                             <div class="flex-grow-1">
                                 <span class="search-field-label">CHECK-OUT</span>
                                 <span class="fw-bold small d-block" id="checkoutDisplay">{{ now()->addDay()->format('d M Y') }}</span>
@@ -123,9 +155,15 @@
                             </div>
                         </div>
                     </div>
+<<<<<<< HEAD
                     <div class="col-lg-3">
                         <div class="search-field search-field-border" style="cursor: pointer; position: relative;">
                             <div class="search-field-icon"><i class="bi bi-people-fill"></i></div>
+=======
+                    <div class="col-12 col-lg-3">
+                        <div class="search-field search-field-border" style="cursor: pointer; position: relative;">
+                            <div class="search-field-icon"><i class="bi bi-people"></i></div>
+>>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
                             <div class="flex-grow-1" id="guestDropdownToggle" style="cursor: pointer;">
                                 <span class="search-field-label">GUESTS & ROOMS</span>
                                 <span class="fw-bold small" id="guestDisplayBold">2 Adults</span>
@@ -162,7 +200,11 @@
                     <input type="hidden" name="adults" value="2">
                     <input type="hidden" name="children" value="0">
                     <input type="hidden" name="rooms" value="1">
+<<<<<<< HEAD
                     <div class="col-lg-2 text-end pe-2">
+=======
+                    <div class="col-12 col-lg-2 text-end pe-2">
+>>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
                         <button type="submit" class="btn hero-search-btn">
                             <i class="bi bi-search me-1"></i> SEARCH
                         </button>
@@ -194,43 +236,43 @@
                 <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#wellness"><i class="bi bi-heart-pulse me-1"></i> Wellness</a></li>
             </ul>
 
-            <!-- Hotel Cards Carousel -->
-            @php
-                $hotels = [
-                    ['name' => 'Santorini Blue Horizon', 'loc' => 'Oia, Greece', 'price' => 189, 'rating' => 4.9, 'reviews' => 2341, 'tag' => 'Popular', 'tagClass' => 'tag-popular'],
-                    ['name' => 'Maldives Paradise Resort', 'loc' => 'Malé, Maldives', 'price' => 425, 'rating' => 4.8, 'reviews' => 1879, 'tag' => 'Best Deal', 'tagClass' => 'tag-deal'],
-                    ['name' => 'Bali Ocean Breeze Villa', 'loc' => 'Seminyak, Bali', 'price' => 156, 'rating' => 4.7, 'reviews' => 3102, 'tag' => 'Trending', 'tagClass' => 'tag-trending'],
-                    ['name' => 'Cancún Riviera Suites', 'loc' => 'Cancún, Mexico', 'price' => 210, 'rating' => 4.6, 'reviews' => 1456, 'tag' => '', 'tagClass' => ''],
-                    ['name' => 'Amalfi Coast Retreat', 'loc' => 'Positano, Italy', 'price' => 340, 'rating' => 4.9, 'reviews' => 987, 'tag' => 'Luxury', 'tagClass' => 'tag-luxury'],
-                    ['name' => 'Phuket Sunset Resort', 'loc' => 'Phuket, Thailand', 'price' => 120, 'rating' => 4.5, 'reviews' => 2678, 'tag' => 'Best Deal', 'tagClass' => 'tag-deal'],
+            <!-- City Cards Carousel -->
+            {{-- @php
+                $cities = [
+                    ['name' => 'Barcelona', 'country' => 'Spain', 'price' => 189, 'rating' => 4.9, 'reviews' => 2341, 'tag' => 'Popular', 'tagClass' => 'tag-popular', 'property' => '2256959'],
+                    ['name' => 'Rome', 'country' => 'Italy', 'price' => 425, 'rating' => 4.8, 'reviews' => 1879, 'tag' => 'Best Deal', 'tagClass' => 'tag-deal', 'property' => '2256959'],
+                    ['name' => 'New York', 'country' => 'United States', 'price' => 156, 'rating' => 4.7, 'reviews' => 3102, 'tag' => 'Trending', 'tagClass' => 'tag-trending', 'property' => '2256959'],
+                    ['name' => 'Singapore', 'country' => 'Singapore', 'price' => 210, 'rating' => 4.6, 'reviews' => 1456, 'tag' => '', 'tagClass' => '', 'property' => '2256959'],
+                    ['name' => 'Paris', 'country' => 'France', 'price' => 340, 'rating' => 4.9, 'reviews' => 987, 'tag' => 'Luxury', 'tagClass' => 'tag-luxury', 'property' => '2256959'],
+                    ['name' => 'Tokyo', 'country' => 'Japan', 'price' => 120, 'rating' => 4.5, 'reviews' => 2678, 'tag' => 'Best Deal', 'tagClass' => 'tag-deal', 'property' => '2256959'],
                 ];
             @endphp
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="beach">
                     <div class="position-relative">
                         <div class="hotel-carousel" id="hotelCarousel">
-                            @foreach($hotels as $hotel)
-                            <div class="hotel-card">
+                            @foreach($cities as $city)
+                            <a href="{{ route('search', ['property' => $city['property'], 'checkin' => now()->format('Y-m-d'), 'checkout' => now()->addDay()->format('Y-m-d'), 'adults' => 2, 'children' => 0, 'rooms' => 1]) }}" class="hotel-card text-decoration-none text-dark">
                                 <div class="hotel-card-img">
-                                    <img src="{{ asset('assets/images/login-1.jpg') }}" alt="{{ $hotel['name'] }}">
-                                    <button class="hotel-card-fav" aria-label="Add to favorites"><i class="bi bi-heart"></i></button>
-                                    @if($hotel['tag'])
-                                    <span class="hotel-card-tag {{ $hotel['tagClass'] }}">{{ $hotel['tag'] }}</span>
+                                    <img src="{{ asset('assets/images/login-1.jpg') }}" alt="{{ $city['name'] }}">
+                                    <span class="hotel-card-fav"><i class="bi bi-heart"></i></span>
+                                    @if($city['tag'])
+                                    <span class="hotel-card-tag {{ $city['tagClass'] }}">{{ $city['tag'] }}</span>
                                     @endif
                                 </div>
                                 <div class="hotel-card-body">
                                     <div class="d-flex align-items-center gap-1 mb-1">
-                                        <span class="hotel-card-rating"><i class="bi bi-star-fill"></i> {{ $hotel['rating'] }}</span>
-                                        <small class="text-muted">({{ number_format($hotel['reviews']) }})</small>
+                                        <span class="hotel-card-rating"><i class="bi bi-star-fill"></i> {{ $city['rating'] }}</span>
+                                        <small class="text-muted">({{ number_format($city['reviews']) }})</small>
                                     </div>
-                                    <h6 class="fw-bold mb-1">{{ $hotel['name'] }}</h6>
-                                    <p class="small text-muted mb-2"><i class="bi bi-geo-alt-fill me-1"></i>{{ $hotel['loc'] }}</p>
+                                    <h6 class="fw-bold mb-1">{{ $city['name'] }}</h6>
+                                    <p class="small text-muted mb-2"><i class="bi bi-geo-alt-fill me-1"></i>{{ $city['country'] }}</p>
                                     <div class="d-flex align-items-baseline gap-1">
-                                        <span class="hotel-card-price">${{ $hotel['price'] }}</span>
+                                        <span class="hotel-card-price">${{ $city['price'] }}</span>
                                         <small class="text-muted">/ night</small>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                             @endforeach
                         </div>
                         <button class="carousel-nav-btn carousel-prev" onclick="scrollCarousel('hotelCarousel', -300)">
@@ -241,6 +283,30 @@
                         </button>
                     </div>
                 </div>
+            </div> --}}
+
+            <!-- Destination Cards Grid -->
+            @php
+                $destinations = [
+                    ['name' => 'Destin', 'img' => '1.jpg', 'region' => 'Florida, United States of America', 'label' => 'Coastal bliss', 'property' => '2256959'],
+                    ['name' => 'Punta Cana', 'img' => '2.jpg', 'region' => 'La Altagracia, Dominican Republic', 'label' => 'Serene beaches', 'property' => '2256959'],
+                    ['name' => 'Port Aransas', 'img' => '3.webp', 'region' => 'Texas, United States of America', 'label' => 'Relaxed beaches', 'property' => '2256959'],
+                    ['name' => 'Riviera Maya', 'img' => '4.jpg', 'region' => 'Mexico', 'label' => 'Beach paradise', 'property' => '2256959'],
+                ];
+            @endphp
+            <div class="destination-grid mt-4">
+                @foreach($destinations as $dest)
+                <a href="{{ route('search', ['property' => $dest['property'], 'checkin' => now()->format('Y-m-d'), 'checkout' => now()->addDay()->format('Y-m-d'), 'adults' => 2, 'children' => 0, 'rooms' => 1]) }}" class="destination-grid-card text-decoration-none">
+                    <div class="destination-grid-img">
+                        <img src="{{ asset($dest['img']) }}" alt="{{ $dest['name'] }}">
+                        <span class="destination-grid-label">{{ $dest['label'] }}</span>
+                    </div>
+                    <div class="destination-grid-info">
+                        <h6 class="fw-bold mb-0">{{ $dest['name'] }}</h6>
+                        <small class="text-muted">{{ $dest['region'] }}</small>
+                    </div>
+                </a>
+                @endforeach
             </div>
 
             <div class="text-center mt-4">
@@ -316,7 +382,7 @@
                 [
                     'name' => 'Sarah Mitchell',
                     'location' => 'New York, USA',
-                    'avatar' => 'SM',
+                    'image' => 'avatars/1.svg',
                     'color' => '#3b82f6',
                     'rating' => 5,
                     'title' => 'Absolutely stunning!',
@@ -328,7 +394,7 @@
                 [
                     'name' => 'James Rodriguez',
                     'location' => 'Madrid, Spain',
-                    'avatar' => 'JR',
+                    'image' => 'avatars/2.svg',
                     'color' => '#8b5cf6',
                     'rating' => 5,
                     'title' => 'Best crypto booking experience',
@@ -340,7 +406,7 @@
                 [
                     'name' => 'Emily Chen',
                     'location' => 'Singapore',
-                    'avatar' => 'EC',
+                    'image' => 'avatars/3.svg',
                     'color' => '#ec4899',
                     'rating' => 4,
                     'title' => 'Perfect family getaway',
@@ -352,7 +418,7 @@
                 [
                     'name' => 'Marcus Weber',
                     'location' => 'Berlin, Germany',
-                    'avatar' => 'MW',
+                    'image' => 'avatars/4.svg',
                     'color' => '#f59e0b',
                     'rating' => 5,
                     'title' => 'Incredible value!',
@@ -364,7 +430,7 @@
                 [
                     'name' => 'Aisha Patel',
                     'location' => 'Mumbai, India',
-                    'avatar' => 'AP',
+                    'image' => 'avatars/5.svg',
                     'color' => '#10b981',
                     'rating' => 5,
                     'title' => 'Honeymoon dream come true',
@@ -376,7 +442,7 @@
                 [
                     'name' => 'Lucas Ferreira',
                     'location' => 'São Paulo, Brazil',
-                    'avatar' => 'LF',
+                    'image' => 'avatars/6.svg',
                     'color' => '#ef4444',
                     'rating' => 5,
                     'title' => 'Smooth and easy',
@@ -388,7 +454,7 @@
                 [
                     'name' => 'Sophie Laurent',
                     'location' => 'Paris, France',
-                    'avatar' => 'SL',
+                    'image' => 'avatars/7.svg',
                     'color' => '#6366f1',
                     'rating' => 5,
                     'title' => 'Magnifique!',
@@ -400,7 +466,7 @@
                 [
                     'name' => 'Yuki Tanaka',
                     'location' => 'Tokyo, Japan',
-                    'avatar' => 'YT',
+                    'image' => 'avatars/8.svg',
                     'color' => '#0ea5e9',
                     'rating' => 4,
                     'title' => 'Great for solo travelers',
@@ -419,8 +485,8 @@
                     @foreach($reviews as $review)
                     <div class="review-card-v2">
                         <div class="review-card-v2-header">
-                            <div class="review-avatar" style="background: {{ $review['color'] }};">
-                                {{ $review['avatar'] }}
+                            <div class="review-avatar">
+                                <img src="{{ asset('assets/images/' . $review['image']) }}" alt="{{ $review['name'] }}">
                             </div>
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-center gap-1">
@@ -455,86 +521,8 @@
                     @foreach($reviews as $review)
                     <div class="review-card-v2">
                         <div class="review-card-v2-header">
-                            <div class="review-avatar" style="background: {{ $review['color'] }};">
-                                {{ $review['avatar'] }}
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex align-items-center gap-1">
-                                    <span class="fw-bold small">{{ $review['name'] }}</span>
-                                    @if($review['verified'])
-                                    <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.75rem;"></i>
-                                    @endif
-                                </div>
-                                <small class="text-muted d-block" style="font-size: 0.7rem;"><i class="bi bi-geo-alt me-1"></i>{{ $review['location'] }}</small>
-                            </div>
-                            <div class="review-quote-icon">
-                                <i class="bi bi-quote"></i>
-                            </div>
-                        </div>
-                        <div class="review-card-v2-stars mb-1">
-                            @for($s = 0; $s < $review['rating']; $s++)
-                            <i class="bi bi-star-fill"></i>
-                            @endfor
-                            @for($s = $review['rating']; $s < 5; $s++)
-                            <i class="bi bi-star"></i>
-                            @endfor
-                        </div>
-                        <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">{{ $review['title'] }}</h6>
-                        <p class="review-card-v2-text">{{ $review['text'] }}</p>
-                        <div class="review-card-v2-footer">
-                            <span class="review-hotel-tag"><i class="bi bi-building me-1"></i>{{ $review['hotel'] }}</span>
-                            <small class="text-muted">{{ $review['time'] }}</small>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-
-        <!-- Marquee Row 2 (scrolls right, slower) -->
-        <div class="review-marquee-wrapper">
-            <div class="review-marquee review-marquee-right">
-                <div class="review-marquee-track">
-                    @foreach(array_reverse($reviews) as $review)
-                    <div class="review-card-v2">
-                        <div class="review-card-v2-header">
-                            <div class="review-avatar" style="background: {{ $review['color'] }};">
-                                {{ $review['avatar'] }}
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex align-items-center gap-1">
-                                    <span class="fw-bold small">{{ $review['name'] }}</span>
-                                    @if($review['verified'])
-                                    <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.75rem;"></i>
-                                    @endif
-                                </div>
-                                <small class="text-muted d-block" style="font-size: 0.7rem;"><i class="bi bi-geo-alt me-1"></i>{{ $review['location'] }}</small>
-                            </div>
-                            <div class="review-quote-icon">
-                                <i class="bi bi-quote"></i>
-                            </div>
-                        </div>
-                        <div class="review-card-v2-stars mb-1">
-                            @for($s = 0; $s < $review['rating']; $s++)
-                            <i class="bi bi-star-fill"></i>
-                            @endfor
-                            @for($s = $review['rating']; $s < 5; $s++)
-                            <i class="bi bi-star"></i>
-                            @endfor
-                        </div>
-                        <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">{{ $review['title'] }}</h6>
-                        <p class="review-card-v2-text">{{ $review['text'] }}</p>
-                        <div class="review-card-v2-footer">
-                            <span class="review-hotel-tag"><i class="bi bi-building me-1"></i>{{ $review['hotel'] }}</span>
-                            <small class="text-muted">{{ $review['time'] }}</small>
-                        </div>
-                    </div>
-                    @endforeach
-                    @foreach(array_reverse($reviews) as $review)
-                    <div class="review-card-v2">
-                        <div class="review-card-v2-header">
-                            <div class="review-avatar" style="background: {{ $review['color'] }};">
-                                {{ $review['avatar'] }}
+                            <div class="review-avatar">
+                                <img src="{{ asset('assets/images/' . $review['image']) }}" alt="{{ $review['name'] }}">
                             </div>
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-center gap-1">
@@ -571,23 +559,25 @@
 
         <!-- Fade edges -->
         <div class="review-marquee-fade-left"></div>
-        <div class="review-marquee-fade-right"></div>
     </section>
 
     <!-- ============================
          Crypto Section
          ============================ -->
-    <section class="crypto-section py-5">
+    
+    <img src="{{ asset('icon.png') }}" alt="" width="100%" height="auto">
+    
+    <section class="py-5 crypto-section">
         <div class="container text-center">
             <span class="section-subtitle text-white-50">Crypto-friendly Bookings</span>
             <h2 class="fw-bold text-white mb-5">Your money is valued here.</h2>
 
             <div class="position-relative mb-5">
-                <div class="crypto-carousel d-flex align-items-center justify-content-center gap-3" id="cryptoCarousel">
-                    <button class="carousel-nav-btn carousel-prev" onclick="scrollCarousel('cryptoLogos', -200)" style="position:relative;left:0;">
+                <div class="crypto-carousel d-flex align-items-center justify-content-center gap-4" id="cryptoCarousel">
+                    <button class="carousel-nav-btn carousel-prev" onclick="scrollCarousel('cryptoLogos', -200)">
                         <i class="bi bi-arrow-left"></i>
                     </button>
-                    <div class="crypto-logos d-flex gap-3 overflow-hidden" id="cryptoLogos">
+                    <div class="crypto-logos d-flex gap-4 overflow-hidden" id="cryptoLogos">
                         @php
                             $cryptoColors = ['#9945FF', '#F7931A', '#3CC68A', '#F0B90B', '#E6007A', '#627EEA', '#00D4AA', '#345D9D', '#0033AD', '#14F195'];
                             $cryptoNames = ['SOL', 'BTC', 'USDT', 'BNB', 'DOT', 'ETH', 'AVA', 'ALGO', 'ADA', 'SOL'];
@@ -600,17 +590,17 @@
                         </div>
                         @endfor
                     </div>
-                    <button class="carousel-nav-btn carousel-next" onclick="scrollCarousel('cryptoLogos', 200)" style="position:relative;right:0;">
+                    <button class="carousel-nav-btn carousel-next" onclick="scrollCarousel('cryptoLogos', 200)">
                         <i class="bi bi-arrow-right"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="row align-items-center justify-content-between">
-                <div class="col-lg-6 text-lg-start">
-                    <p class="text-white-50 small">We're proud to be the leading crypto-native travel platform, enabling you to book trips worldwide using over 100+ <strong class="text-white">cryptocurrencies</strong> or traditional payment methods—quickly and seamlessly.</p>
+            <div class="row align-items-center justify-content-center gap-4">
+                <div class="col-lg-3 text-lg-start">
+                    <p style="color:#c2a082" class="small">We're proud to be the leading crypto-native travel platform, enabling you to book trips worldwide using over 100+ <strong class="text-white">cryptocurrencies</strong> or traditional payment methods—quickly and seamlessly.</p>
                 </div>
-                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="col-lg-3 text-lg-end mt-3 mt-lg-0">
                     <a href="#" class="btn btn-outline-light px-4 py-2 fw-medium">See All Payment Options <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
@@ -860,6 +850,7 @@
         </div>
     </section>
 
+<<<<<<< HEAD
     <!-- ============================
          Newsletter
          ============================ -->
@@ -933,9 +924,12 @@
             </div>
         </div>
     </footer>
+=======
+    @include('partials.footer')
+>>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
 
     <!-- Bottom color bar -->
-    <div style="height: 6px; background: linear-gradient(90deg, var(--primary-navy), #3949ab, #5c6bc0);"></div>
+    {{-- <div style="height: 6px; background: linear-gradient(90deg, var(--primary-navy), #3949ab, #5c6bc0);"></div> --}}
 
     <!-- Guest Selection Modal -->
     <div class="modal fade" id="guestModal" tabindex="-1" aria-labelledby="guestModalLabel" aria-hidden="true">
@@ -976,6 +970,10 @@
                 </div>
             </div>
         </div>
+<<<<<<< HEAD
+=======
+    </div>
+>>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -1033,5 +1031,135 @@
         });
     </script>
     <script src="{{ asset('assets/js/landing.js') }}"></script>
+    <script>
+    (function() {
+        const input = document.getElementById('citySearchInput');
+        const hiddenInput = document.getElementById('cityIdInput');
+        const dropdown = document.getElementById('cityDropdown');
+        const loading = document.getElementById('cityDropdownLoading');
+        const results = document.getElementById('cityDropdownResults');
+        const empty = document.getElementById('cityDropdownEmpty');
+        let debounceTimer = null;
+        let currentRequest = null;
+
+        input.addEventListener('input', function() {
+            const query = this.value.trim();
+            clearTimeout(debounceTimer);
+
+            if (query.length < 2) {
+                dropdown.style.display = 'none';
+                hiddenInput.value = '';
+                return;
+            }
+
+            debounceTimer = setTimeout(function() {
+                searchCities(query);
+            }, 350);
+        });
+
+        function searchCities(query) {
+            dropdown.style.display = 'block';
+            loading.style.display = 'flex';
+            results.innerHTML = '';
+            empty.style.display = 'none';
+
+            if (currentRequest) currentRequest.abort();
+
+            currentRequest = $.ajax({
+                url: '{{ route("search.cities") }}',
+                data: { q: query },
+                dataType: 'json',
+                success: function(data) {
+                    loading.style.display = 'none';
+                    if (!data || data.length === 0) {
+                        empty.style.display = 'block';
+                        return;
+                    }
+                    renderResults(data);
+                },
+                error: function(xhr, status) {
+                    if (status !== 'abort') {
+                        loading.style.display = 'none';
+                        empty.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        function renderResults(cities) {
+            results.innerHTML = '';
+            cities.forEach(function(city) {
+                const item = document.createElement('div');
+                item.className = 'city-search-item';
+                item.innerHTML =
+                    '<div class="city-search-item-icon"><i class="bi bi-geo-alt"></i></div>' +
+                    '<div class="city-search-item-info">' +
+                        '<div class="city-search-item-name">' + escapeHtml(city.city_name) + '</div>' +
+                        '<div class="city-search-item-meta">' + escapeHtml(city.active_hotels) + ' hotels</div>' +
+                    '</div>';
+                item.addEventListener('click', function() {
+                    input.value = city.city_name;
+                    hiddenInput.value = city.city_id;
+                    dropdown.style.display = 'none';
+                });
+                results.appendChild(item);
+            });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Reopen on focus if there's text
+        input.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2 && results.children.length > 0) {
+                dropdown.style.display = 'block';
+            }
+        });
+    })();
+    </script>
+
+    {{-- Search Loading Overlay (hidden by default, shown on form submit) --}}
+    <div id="searchLoader" style="position:fixed;inset:0;z-index:9999;background:rgba(255,255,255,0.97);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;">
+        <style>
+            @keyframes slPulse { 0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.7} }
+            @keyframes slDots { 0%,80%,100%{transform:scale(0)}40%{transform:scale(1)} }
+            .sl-icon{width:64px;height:64px;background:linear-gradient(135deg,#1a237e,#4267B2);border-radius:1rem;display:flex;align-items:center;justify-content:center;animation:slPulse 1.6s ease-in-out infinite;box-shadow:0 8px 32px rgba(26,35,126,.25)}
+            .sl-icon i{font-size:1.8rem;color:#fff}
+            .sl-text{font-family:'Inter',sans-serif;font-weight:600;font-size:1rem;color:#1a237e}
+            .sl-dots{display:flex;gap:6px}
+            .sl-dots span{width:8px;height:8px;background:#1a237e;border-radius:50%;animation:slDots 1.2s infinite ease-in-out}
+            .sl-dots span:nth-child(2){animation-delay:.15s}
+            .sl-dots span:nth-child(3){animation-delay:.3s}
+            .sl-sub{font-family:'Inter',sans-serif;font-size:.82rem;color:#94a3b8}
+        </style>
+        <div class="sl-icon"><i class="bi bi-building"></i></div>
+        <div class="sl-text">Finding the best hotels for you</div>
+        <div class="sl-dots"><span></span><span></span><span></span></div>
+        <div class="sl-sub">Searching across 1,800,000+ properties worldwide</div>
+    </div>
+    <script>
+    (function() {
+        var form = document.querySelector('.hero-search-bar form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var loader = document.getElementById('searchLoader');
+                if (loader) loader.style.display = 'flex';
+                var self = this;
+                setTimeout(function() { self.submit(); }, 50);
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

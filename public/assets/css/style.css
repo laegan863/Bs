@@ -157,3 +157,32 @@ body {
         margin-bottom: 2rem;
     }
 }
+
+/* ============================
+   Global Mobile Fixes
+   ============================ */
+@media (max-width: 767px) {
+    /* Prevent horizontal overflow */
+    body {
+        overflow-x: hidden;
+    }
+
+    .container, .container-fluid {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    /* Nav avatar */
+    .nav-avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .nav-avatar img,
+    .nav-avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 0.7rem;
+    }
+}
