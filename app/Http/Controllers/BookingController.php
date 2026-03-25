@@ -130,6 +130,12 @@ class BookingController extends Controller
 
         $paymentUrl = $createVariantPaylink['data']['url'];
 
+        $paymentUrl = preg_replace('#(https://pay\.boomfi\.xyz)/(.*?)(\?.*)#', '$1/lite/$2', $paymentUrl);
+        $user = auth()->user();
+        if ($user) {
+            $paymentUrl .= '?name=' . urlencode($user->first_name . ' ' . $user->last_name) . '&email=' . urlencode($user->email);
+        }
+
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json(['url' => $paymentUrl]);
         }
