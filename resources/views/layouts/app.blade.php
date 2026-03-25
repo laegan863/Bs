@@ -260,25 +260,57 @@
 
             <!-- Destination Cards Grid -->
             @php
-                $destinations = [
-                    ['name' => 'Destin', 'img' => '1.jpg', 'region' => 'Florida, United States of America', 'label' => 'Coastal bliss', 'property' => '2256959'],
-                    ['name' => 'Punta Cana', 'img' => '2.jpg', 'region' => 'La Altagracia, Dominican Republic', 'label' => 'Serene beaches', 'property' => '2256959'],
-                    ['name' => 'Port Aransas', 'img' => '3.webp', 'region' => 'Texas, United States of America', 'label' => 'Relaxed beaches', 'property' => '2256959'],
-                    ['name' => 'Riviera Maya', 'img' => '4.jpg', 'region' => 'Mexico', 'label' => 'Beach paradise', 'property' => '2256959'],
+                $destinationsByTab = [
+                    'beach' => [
+                        ['name' => 'Destin', 'img' => '1.jpg', 'region' => 'Florida, United States of America', 'label' => 'Coastal Bliss', 'property' => '2256959'],
+                        ['name' => 'Punta Cana', 'img' => '2.jpg', 'region' => 'La Altagracia, Dominican Republic', 'label' => 'Serene Beaches', 'property' => '2256959'],
+                        ['name' => 'Port Aransas', 'img' => '3.webp', 'region' => 'Texas, United States of America', 'label' => 'Relaxed Beaches', 'property' => '2256959'],
+                        ['name' => 'Riviera Maya', 'img' => '4.jpg', 'region' => 'Mexico', 'label' => 'Beach Paradise', 'property' => '2256959'],
+                    ],
+                    'culture' => [
+                        ['name' => 'Rome', 'img' => '1.jpg', 'region' => 'Lazio, Italy', 'label' => 'Ancient Wonders', 'property' => '2256959'],
+                        ['name' => 'Kyoto', 'img' => '2.jpg', 'region' => 'Kansai, Japan', 'label' => 'Timeless Temples', 'property' => '2256959'],
+                        ['name' => 'Istanbul', 'img' => '3.webp', 'region' => 'Turkey', 'label' => 'East Meets West', 'property' => '2256959'],
+                        ['name' => 'Marrakech', 'img' => '4.jpg', 'region' => 'Morocco', 'label' => 'Vibrant Souks', 'property' => '2256959'],
+                    ],
+                    'ski' => [
+                        ['name' => 'Zermatt', 'img' => '1.jpg', 'region' => 'Valais, Switzerland', 'label' => 'Alpine Glory', 'property' => '2256959'],
+                        ['name' => 'Aspen', 'img' => '2.jpg', 'region' => 'Colorado, United States', 'label' => 'Powder Paradise', 'property' => '2256959'],
+                        ['name' => 'Chamonix', 'img' => '3.webp', 'region' => 'Haute-Savoie, France', 'label' => 'Mountain Magic', 'property' => '2256959'],
+                        ['name' => 'Niseko', 'img' => '4.jpg', 'region' => 'Hokkaido, Japan', 'label' => 'Snow Heaven', 'property' => '2256959'],
+                    ],
+                    'family' => [
+                        ['name' => 'Orlando', 'img' => '1.jpg', 'region' => 'Florida, United States of America', 'label' => 'Theme Park Fun', 'property' => '2256959'],
+                        ['name' => 'Cancun', 'img' => '2.jpg', 'region' => 'Quintana Roo, Mexico', 'label' => 'Family Friendly', 'property' => '2256959'],
+                        ['name' => 'Gold Coast', 'img' => '3.webp', 'region' => 'Queensland, Australia', 'label' => 'Endless Fun', 'property' => '2256959'],
+                        ['name' => 'Barcelona', 'img' => '4.jpg', 'region' => 'Catalonia, Spain', 'label' => 'City Adventures', 'property' => '2256959'],
+                    ],
+                    'wellness' => [
+                        ['name' => 'Bali', 'img' => '1.jpg', 'region' => 'Indonesia', 'label' => 'Tropical Retreat', 'property' => '2256959'],
+                        ['name' => 'Sedona', 'img' => '2.jpg', 'region' => 'Arizona, United States', 'label' => 'Desert Healing', 'property' => '2256959'],
+                        ['name' => 'Koh Samui', 'img' => '3.webp', 'region' => 'Surat Thani, Thailand', 'label' => 'Spa Escapes', 'property' => '2256959'],
+                        ['name' => 'Tuscany', 'img' => '4.jpg', 'region' => 'Italy', 'label' => 'Wellness Haven', 'property' => '2256959'],
+                    ],
                 ];
             @endphp
-            <div class="destination-grid mt-4">
-                @foreach($destinations as $dest)
-                <a href="{{ route('search', ['property' => $dest['property'], 'checkin' => now()->format('Y-m-d'), 'checkout' => now()->addDay()->format('Y-m-d'), 'adults' => 2, 'children' => 0, 'rooms' => 1]) }}" class="destination-grid-card text-decoration-none">
-                    <div class="destination-grid-img">
-                        <img src="{{ asset($dest['img']) }}" alt="{{ $dest['name'] }}">
-                        <span class="destination-grid-label">{{ $dest['label'] }}</span>
+            <div class="tab-content">
+                @foreach($destinationsByTab as $tabKey => $destinations)
+                <div class="tab-pane fade {{ $tabKey === 'beach' ? 'show active' : '' }}" id="{{ $tabKey }}">
+                    <div class="destination-grid mt-4">
+                        @foreach($destinations as $dest)
+                        <a href="{{ route('search', ['property' => $dest['property'], 'checkin' => now()->format('Y-m-d'), 'checkout' => now()->addDay()->format('Y-m-d'), 'adults' => 2, 'children' => 0, 'rooms' => 1]) }}" class="destination-grid-card text-decoration-none">
+                            <div class="destination-grid-img">
+                                <img src="{{ asset($dest['img']) }}" alt="{{ $dest['name'] }}">
+                                <span class="destination-grid-label">{{ $dest['label'] }}</span>
+                            </div>
+                            <div class="destination-grid-info">
+                                <h6 class="fw-bold mb-0">{{ $dest['name'] }}</h6>
+                                <small class="text-muted">{{ $dest['region'] }}</small>
+                            </div>
+                        </a>
+                        @endforeach
                     </div>
-                    <div class="destination-grid-info">
-                        <h6 class="fw-bold mb-0">{{ $dest['name'] }}</h6>
-                        <small class="text-muted">{{ $dest['region'] }}</small>
-                    </div>
-                </a>
+                </div>
                 @endforeach
             </div>
 
@@ -749,7 +781,7 @@
             </div>
 
             <!-- Region Cards -->
-            <div class="row g-4">
+            <div class="row g-4" id="continentContent">
                 <div class="col-md-4">
                     <div class="region-card">
                         <div class="region-card-header">
@@ -760,24 +792,7 @@
                             <i class="bi bi-arrow-right"></i>
                         </div>
                         <div class="region-card-body">
-                            <div class="row">
-                                <div class="col-6">
-                                    <ul class="region-list">
-                                        <li>Spain</li>
-                                        <li>Germany</li>
-                                        <li>Portugal</li>
-                                        <li>Switzerland</li>
-                                    </ul>
-                                </div>
-                                <div class="col-6">
-                                    <ul class="region-list">
-                                        <li>France</li>
-                                        <li>Italy</li>
-                                        <li>Poland</li>
-                                        <li>United Kingdom</li>
-                                    </ul>
-                                </div>
-                            </div>
+                            <ul class="region-list" id="countriesList"></ul>
                         </div>
                     </div>
                 </div>
@@ -791,12 +806,7 @@
                             <i class="bi bi-arrow-right"></i>
                         </div>
                         <div class="region-card-body">
-                            <ul class="region-list">
-                                <li>Catalonia</li>
-                                <li>Community of madrid</li>
-                                <li>Andalusia</li>
-                                <li>Balearic Island</li>
-                            </ul>
+                            <ul class="region-list" id="regionsList"></ul>
                         </div>
                     </div>
                 </div>
@@ -810,25 +820,86 @@
                             <i class="bi bi-arrow-right"></i>
                         </div>
                         <div class="region-card-body">
-                            <ul class="region-list">
-                                <li>Madrid</li>
-                                <li>Alcala de Henares</li>
-                                <li>Torrej&oacute;n de Ardoz</li>
-                                <li>Alcobendas</li>
-                            </ul>
+                            <ul class="region-list" id="citiesList"></ul>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <script>
+            (function() {
+                const continentData = {
+                    'europe': {
+                        countries: ['Spain', 'Germany', 'Portugal', 'Switzerland', 'France', 'Italy', 'Poland', 'United Kingdom'],
+                        regions: ['Catalonia', 'Community of Madrid', 'Andalusia', 'Balearic Island'],
+                        cities: ['Madrid', 'Alcala de Henares', 'Torrej\u00f3n de Ardoz', 'Alcobendas']
+                    },
+                    'north-america': {
+                        countries: ['United States', 'Canada', 'Mexico'],
+                        regions: ['California', 'New York State', 'Florida', 'Ontario'],
+                        cities: ['New York City', 'Los Angeles', 'Miami', 'Toronto']
+                    },
+                    'asia': {
+                        countries: ['Japan', 'Thailand', 'United Arab Emirates', 'Indonesia'],
+                        regions: ['Bali', 'Phuket', 'Tokyo Prefecture', 'Dubai'],
+                        cities: ['Tokyo', 'Bangkok', 'Dubai', 'Singapore']
+                    },
+                    'central-america': {
+                        countries: ['Costa Rica', 'Panama', 'Guatemala', 'Belize'],
+                        regions: ['Guanacaste', 'Bocas del Toro', 'Antigua Region', 'Ambergris Caye'],
+                        cities: ['San Jos\u00e9', 'Panama City', 'Antigua', 'Belize City']
+                    },
+                    'oceania': {
+                        countries: ['Australia', 'New Zealand', 'Fiji'],
+                        regions: ['New South Wales', 'Queensland', 'South Island', 'North Island'],
+                        cities: ['Sydney', 'Melbourne', 'Auckland', 'Brisbane']
+                    },
+                    'south-america': {
+                        countries: ['Brazil', 'Argentina', 'Colombia', 'Peru'],
+                        regions: ['Patagonia', 'Amazon Rainforest', 'Andes Region', 'Atacama Desert'],
+                        cities: ['Rio de Janeiro', 'Buenos Aires', 'Medell\u00edn', 'Lima']
+                    },
+                    'africa': {
+                        countries: ['South Africa', 'Morocco', 'Kenya', 'Egypt'],
+                        regions: ['Western Cape', 'Maasai Mara', 'Sahara Desert', 'Zanzibar'],
+                        cities: ['Cape Town', 'Marrakech', 'Nairobi', 'Cairo']
+                    },
+                    'middle-east': {
+                        countries: ['United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Jordan'],
+                        regions: ['Dubai', 'Abu Dhabi', 'Riyadh Region', 'Petra Region'],
+                        cities: ['Dubai', 'Doha', 'Riyadh', 'Amman']
+                    }
+                };
+
+                function renderContinent(continent) {
+                    const data = continentData[continent];
+                    if (!data) return;
+
+                    const countriesList = document.getElementById('countriesList');
+                    const regionsList = document.getElementById('regionsList');
+                    const citiesList = document.getElementById('citiesList');
+
+                    countriesList.innerHTML = data.countries.map(c => '<li>' + c + '</li>').join('');
+                    regionsList.innerHTML = data.regions.map(r => '<li>' + r + '</li>').join('');
+                    citiesList.innerHTML = data.cities.map(c => '<li>' + c + '</li>').join('');
+                }
+
+                document.querySelectorAll('.continent-tab').forEach(function(tab) {
+                    tab.addEventListener('click', function() {
+                        document.querySelectorAll('.continent-tab').forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        renderContinent(this.dataset.continent);
+                    });
+                });
+
+                // Initialize with Europe
+                renderContinent('europe');
+            })();
+            </script>
         </div>
     </section>
 
     @include('partials.footer')
-
-    <!-- Bottom color bar -->
-    {{-- <div style="height: 6px; background: linear-gradient(90deg, var(--primary-navy), #3949ab, #5c6bc0);"></div> --}}
-
-    <!-- Guest Selection Modal -->
     <div class="modal fade" id="guestModal" tabindex="-1" aria-labelledby="guestModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
