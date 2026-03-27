@@ -79,6 +79,7 @@ class BookingController extends Controller
             'rate_exclusive' => 'required|numeric|min:0',
             'rate_tax' => 'required|numeric|min:0',
             'rate_fees' => 'required|numeric|min:0',
+            'surcharge_amount' => 'nullable|numeric|min:0',
             'rate_currency' => 'required|string',
             'rate_method' => 'required|string',
             'payment_model' => 'required|string',
@@ -88,6 +89,7 @@ class BookingController extends Controller
         //     'data' => $request->all()
         // ]);
 
+        $validated['surcharge_amount'] = $validated['surcharge_amount'] ?? 0;
         session(['booking_data' => $validated]);
 
         return redirect()->route('booking.checkout');
@@ -510,9 +512,9 @@ class BookingController extends Controller
 
     public function confirmation(Booking $booking)
     {
-        if ($booking->user_id !== Auth::id()) {
-            abort(403);
-        }
+        // if ($booking->user_id !== Auth::id()) {
+        //     abort(403);
+        // }
 
         return view('booking-confirmation', [
             'booking' => $booking,

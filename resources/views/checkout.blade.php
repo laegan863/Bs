@@ -27,17 +27,31 @@
         <div class="my-3">
             <h3 style="color: darkblue;" class="fw-bold">Secure Booking</h3>
         </div>
+        @if($bookingData['free_cancellation'] ?? false)
         <div class="rounded-4 px-3 py-2 d-flex flex-row mb-4 justify-content-start align-items-start gap-3 bg-white card">
             <div class="fs-4 text-center">🗓️</div>
             <div>
                 <div class="fw-semibold text-dark">
-                    Fully refundable before Thu, Nov 20, 6:00pm (property local time)
+                    Fully refundable before {{ \Carbon\Carbon::parse($bookingData['cancellation_deadline'] ?? now())->format('D, M d, g:ia') }} (property local time)
                 </div>
                 <div class="text-secondary">
                     You can change or cancel this stay if plans change. Because flexibility matters.
                 </div>
             </div>
         </div>
+        @else
+        <div class="rounded-4 px-3 py-2 d-flex flex-row mb-4 justify-content-start align-items-start gap-3 bg-white card">
+            <div class="fs-4 text-center">⚠️</div>
+            <div>
+                <div class="fw-semibold text-dark">
+                    Non-refundable
+                </div>
+                <div class="text-secondary">
+                    This booking cannot be cancelled or modified once confirmed. No refund will be issued.
+                </div>
+            </div>
+        </div>
+        @endif
 
             <div class="row g-4">
                 
@@ -124,8 +138,16 @@
                                     <span class="small fw-medium">US${{ number_format($bookingData['price_per_night'], 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted small">Taxes & fees</span>
-                                    <span class="small text-success fw-medium">Included</span>
+                                    <span class="text-muted small">Taxes</span>
+                                    <span class="small fw-medium">US${{ number_format($bookingData['rate_tax'] ?? 0, 2) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Fees</span>
+                                    <span class="small fw-medium">US${{ number_format($bookingData['rate_fees'] ?? 0, 2) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Surcharges</span>
+                                    <span class="small fw-medium">US${{ number_format($bookingData['surcharge_amount'] ?? 0, 2) }}</span>
                                 </div>
                                 <hr>
                                 <div class="d-flex justify-content-between">
@@ -162,7 +184,6 @@
                 <div class="col-lg-7">
                     <form action="{{ route('booking.process') }}" method="POST" id="checkoutForm">
                         @csrf
-
                         <!-- Step 1: Guest Details -->
                         <div class="checkout-card mb-4">
                             <div class="checkout-card-header">
