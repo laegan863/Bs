@@ -574,6 +574,19 @@
                                                     return (float) ($s['amount'] ?? $s['value'] ?? 0);
                                                 });
                                             @endphp
+                                            @php
+                                                $roomBenefitsList = collect($room['benefits'] ?? [])->map(fn($b) => $b['translatedBenefitName'] ?? $b['benefitName'] ?? '')->filter()->values()->toArray();
+                                                $roomSurchargesList = collect($room['surcharges'] ?? [])->map(function($s) {
+                                                    return [
+                                                        'name' => $s['name'] ?? $s['description'] ?? 'Surcharge',
+                                                        'amount' => (float) ($s['amount'] ?? $s['value'] ?? 0),
+                                                        'type' => $s['chargeType'] ?? ($s['type'] ?? 'mandatory'),
+                                                    ];
+                                                })->toArray();
+                                                $roomCancellationText = $room['cancellationPolicy']['translatedCancellationText']
+                                                    ?? $room['cancellationPolicy']['cancellationText']
+                                                    ?? '';
+                                            @endphp
                                             <button class="btn btn-primary-custom btn-hover-glow text-white w-100 py-2 fw-semibold btn-book-now"
                                                 data-room-id="{{ $room['roomId'] ?? '' }}"
                                                 data-room-name="{{ $room['roomName'] ?? $groupName }}"
@@ -598,7 +611,12 @@
                                                 data-check-out="{{ $checkOut ?? '' }}"
                                                 data-rooms="{{ $rooms ?? 1 }}"
                                                 data-adults="{{ $adults ?? 2 }}"
-                                                data-children="{{ $children ?? 0 }}">
+                                                data-children="{{ $children ?? 0 }}"
+                                                data-benefits='@json($roomBenefitsList)'
+                                                data-surcharges='@json($roomSurchargesList)'
+                                                data-cancellation-policy="{{ $roomCancellationText }}"
+                                                data-hotel-remarks="{{ $hotelRemark ?? '' }}"
+                                                data-hotel-address="{{ $primaryAddress ? trim(($primaryAddress['address_line_1'] ?? '') . ', ' . ($primaryAddress['city'] ?? '') . ', ' . ($primaryAddress['country'] ?? '')) : '' }}">
                                                 Book Now <i class="bi bi-arrow-right ms-1"></i>
                                             </button>
                                         </div>
@@ -1197,6 +1215,11 @@ leisure and sports' => 'bi-trophy',
                 document.getElementById('formRateCurrency').value = data.rateCurrency;
                 document.getElementById('formRateMethod').value = data.rateMethod;
                 document.getElementById('formPaymentModel').value = data.paymentModel;
+                document.getElementById('formBenefits').value = data.benefits || '[]';
+                document.getElementById('formSurcharges').value = data.surcharges || '[]';
+                document.getElementById('formCancellationPolicy').value = data.cancellationPolicy || '';
+                document.getElementById('formHotelRemarks').value = data.hotelRemarks || '';
+                document.getElementById('formHotelAddress').value = data.hotelAddress || '';
 
                 selectPaymentType('pay_now');
 
@@ -1356,6 +1379,11 @@ leisure and sports' => 'bi-trophy',
                         <input type="hidden" name="rate_method" id="formRateMethod">
                         <input type="hidden" name="payment_model" id="formPaymentModel">
                         <input type="hidden" name="payment_type" id="formPaymentType" value="pay_now">
+                        <input type="hidden" name="benefits" id="formBenefits">
+                        <input type="hidden" name="surcharges" id="formSurcharges">
+                        <input type="hidden" name="cancellation_policy_text" id="formCancellationPolicy">
+                        <input type="hidden" name="hotel_remarks" id="formHotelRemarks">
+                        <input type="hidden" name="hotel_address" id="formHotelAddress">
 
                         <button type="submit" class="btn btn-primary-custom btn-hover-glow text-white w-100 py-3 fw-bold" style="font-size: 1.05rem;">
                             <i class="bi bi-lock me-2"></i>Proceed to Checkout

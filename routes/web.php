@@ -84,6 +84,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/booking/process', [BookingController::class, 'processPayment'])->name('booking.process');
     Route::get('/booking/confirmation/{booking}', [BookingController::class, 'confirmation'])->name('booking.confirmation');
     Route::get('/booking/receipt/{id}', [BookingController::class, 'confirmBooking'])->name('booking.receipt');
+
+    Route::get('success/{id}', [BookingController::class, 'success'])->name('booking.success');
 });
 
 Route::controller(SearchedContentController::class)->group(function () {
