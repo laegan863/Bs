@@ -683,6 +683,7 @@
 @push('scripts')
 <script>
 function fetchBookingDetail(bookingId) {
+    console.log('Fetching details for booking ID:', bookingId);
     const modal = new bootstrap.Modal(document.getElementById('bookingDetailModal'));
     document.getElementById('detailLoading').classList.remove('d-none');
     document.getElementById('detailError').classList.add('d-none');
@@ -694,6 +695,7 @@ function fetchBookingDetail(bookingId) {
     })
     .then(r => { if (!r.ok) throw new Error('Request failed'); return r.json(); })
     .then(data => {
+        console.log('Received booking detail data:', data);
         document.getElementById('detailLoading').classList.add('d-none');
         document.getElementById('detailContent').classList.remove('d-none');
 
