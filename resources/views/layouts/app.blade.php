@@ -900,6 +900,11 @@
     </section>
 
     @include('partials.footer')
+
+    <!-- Bottom color bar -->
+    {{-- <div style="height: 6px; background: linear-gradient(90deg, var(--primary-navy), #3949ab, #5c6bc0);"></div> --}}
+
+    <!-- Guest Selection Modal -->
     <div class="modal fade" id="guestModal" tabindex="-1" aria-labelledby="guestModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
