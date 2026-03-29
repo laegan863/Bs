@@ -457,8 +457,6 @@
     overflow: hidden;
 }
 
-<<<<<<< HEAD
-=======
 .promo-bar-cell-high {
     background: #2674d9;
     border-radius: 0 1.6rem 1.6rem 0;
@@ -466,15 +464,10 @@
     padding: 2rem;
 }
 
->>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
 .promo-bar-cell {
     padding: 2rem;
 }
 
-<<<<<<< HEAD
-.promo-bar-divider {
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
-=======
 /* .promo-bar-divider {
     border-left: 1px solid rgba(255, 255, 255, 0.2);
 } */
@@ -696,7 +689,6 @@
     .member-deals-header h3 {
         font-size: 1.15rem;
     }
->>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
 }
 
 /* ============================

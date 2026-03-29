@@ -54,15 +54,9 @@
             <div class="promo-bar">
                 <div class="row g-0 align-items-stretch">
                     <div class="col-lg-5">
-<<<<<<< HEAD
-                        <div class="promo-bar-cell h-100">
-                            <div class="row align-items-center h-100">
-                                <div class="col-7 d-flex flex-column justify-content-center">
-=======
                         <div class="promo-bar-cell-high h-100">
                             <div class="row align-items-center h-100">
                                 <div class="col-8 col-sm-7 d-flex flex-column justify-content-center">
->>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
                                     <h4 class="fw-bold text-white mb-2" style="font-size: 1.4rem; line-height: 1.3;">Join OKX Today</h4>
                                     <p class="small mb-3" style="color: rgba(255,255,255,0.65);">
                                         Claim $200 in OKX Crypto to trade or spend, and earn up to 10% back
@@ -72,13 +66,8 @@
                                         <a href="#" class="text-white small fw-semibold text-decoration-underline">Get started</a>
                                     </div>
                                 </div>
-<<<<<<< HEAD
-                                <div class="col-5 text-center">
-                                    <img src="{{ asset('assets/images/login-1.jpg') }}" alt="Promo" class="img-fluid" style="max-height: 140px; object-fit: contain; border-radius: 0.5rem;">
-=======
                                 <div class="col-4 col-sm-5 text-center">
                                     <img src="{{ asset('img.png') }}" alt="Promo" class="img-fluid" style="max-height: 140px; object-fit: contain; border-radius: 0.5rem;">
->>>>>>> 01e1b393d7ecc7292d9345a564ae81608b781041
                                 </div>
                             </div>
                         </div>
