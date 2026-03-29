@@ -27,17 +27,31 @@
         <div class="my-3">
             <h3 style="color: darkblue;" class="fw-bold">Secure Booking</h3>
         </div>
+        @if($bookingData['free_cancellation'] ?? false)
         <div class="rounded-4 px-3 py-2 d-flex flex-row mb-4 justify-content-start align-items-start gap-3 bg-white card">
             <div class="fs-4 text-center">🗓️</div>
             <div>
                 <div class="fw-semibold text-dark">
-                    Fully refundable before Thu, Nov 20, 6:00pm (property local time)
+                    Fully refundable before {{ \Carbon\Carbon::parse($bookingData['cancellation_deadline'] ?? now())->format('D, M d, g:ia') }} (property local time)
                 </div>
                 <div class="text-secondary">
                     You can change or cancel this stay if plans change. Because flexibility matters.
                 </div>
             </div>
         </div>
+        @else
+        <div class="rounded-4 px-3 py-2 d-flex flex-row mb-4 justify-content-start align-items-start gap-3 bg-white card">
+            <div class="fs-4 text-center">⚠️</div>
+            <div>
+                <div class="fw-semibold text-dark">
+                    Non-refundable
+                </div>
+                <div class="text-secondary">
+                    This booking cannot be cancelled or modified once confirmed. No refund will be issued.
+                </div>
+            </div>
+        </div>
+        @endif
 
             <div class="row g-4">
                 
@@ -124,8 +138,16 @@
                                     <span class="small fw-medium">US${{ number_format($bookingData['price_per_night'], 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted small">Taxes & fees</span>
-                                    <span class="small text-success fw-medium">Included</span>
+                                    <span class="text-muted small">Taxes</span>
+                                    <span class="small fw-medium">US${{ number_format($bookingData['rate_tax'] ?? 0, 2) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Fees</span>
+                                    <span class="small fw-medium">US${{ number_format($bookingData['rate_fees'] ?? 0, 2) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Surcharges</span>
+                                    <span class="small fw-medium">US${{ number_format($bookingData['surcharge_amount'] ?? 0, 2) }}</span>
                                 </div>
                                 <hr>
                                 <div class="d-flex justify-content-between">
@@ -162,7 +184,6 @@
                 <div class="col-lg-7">
                     <form action="{{ route('booking.process') }}" method="POST" id="checkoutForm">
                         @csrf
-
                         <!-- Step 1: Guest Details -->
                         <div class="checkout-card mb-4">
                             <div class="checkout-card-header">
@@ -345,24 +366,19 @@
         </div>
     </div>
 </section>
-<!-- Payment Iframe Modal -->
-<div class="modal fade" id="paymentIframeModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="paymentIframeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 95%; height: 90vh;">
-        <div class="modal-content" style="height: 90vh;">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="paymentIframeModalLabel">
-                    <i class="bi bi-shield-check text-success me-2"></i>Complete Your Payment
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-0 position-relative" style="flex: 1; overflow: hidden;">
-                <div id="content" style="width: 100%; height: 100%;"></div>
-            </div>
-        </div>
+<div id="paymentOverlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="position:relative; width:500px; max-width:95vw; height:80vh; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+        <button type="button" onclick="closePaymentOverlay()" style="position:absolute; top:10px; right:14px; z-index:10; background:none; border:none; font-size:1.5rem; cursor:pointer; color:#666;">&times;</button>
+        <div id="content" style="width:100%; height:100%;"></div>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    function closePaymentOverlay() {
+        const overlay = document.getElementById('paymentOverlay');
+        overlay.style.display = 'none';
+        document.getElementById('content').innerHTML = '';
+    }
     function selectCheckoutPayment(method) {
         document.querySelectorAll('.checkout-pay-tab').forEach(tab => {
             tab.classList.toggle('active', tab.dataset.method === method);
@@ -390,6 +406,8 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
 
+        document.getElementById('paymentOverlay').style.display = 'flex';
+
         const formData = new FormData(this);
 
         $.ajax({
@@ -406,25 +424,8 @@
             success: function(response) {
                 console.log('Payment URL response:', response);
                 if (response.url) {
-                    // const iframe = document.getElementById('paymentIframe');
-                    // const loader = document.getElementById('iframeLoader');
-
-                    // // Reset loader visibility
-                    // loader.style.display = 'flex';
-
-                    // iframe.src = response.url;
-                    // iframe.onload = function() {
-                    //     loader.style.display = 'none';
-                    // };
-
-                    // // Fallback: hide loader after 5 seconds in case onload doesn't fire
-                    // setTimeout(function() {
-                    //     loader.style.display = 'none';
-                    // }, 5000);
-
                     content.innerHTML = `<iframe id="paymentIframe" src="${response.url}" style="width: 100%; height: 100%; border: none;"></iframe>`;
-                    const modal = new bootstrap.Modal(document.getElementById('paymentIframeModal'));
-                    modal.show();
+                    document.getElementById('paymentOverlay').style.display = 'flex';
 
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-lock me-2"></i>Complete Booking';
@@ -433,6 +434,7 @@
             error: function(xhr) {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-lock me-2"></i>Complete Booking';
+                closePaymentOverlay();
                 let msg = 'Something went wrong. Please try again.';
                 if (xhr.responseJSON && xhr.responseJSON.error) {
                     msg = xhr.responseJSON.error;

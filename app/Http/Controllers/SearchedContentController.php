@@ -191,8 +191,18 @@ class SearchedContentController extends Controller
         return response()->json($this->extractToJson($query));
     }
 
+    public function fullHotelInfoById($id)
+    {
+        ini_set('memory_limit', '512M');
+        $query = Http::timeout(60)->get(env('BS_URL').'getfeed?feed_id=19&token=' . env('BS_TOKEN') . '&site_id=' . env('BS_SITE_ID') . '&mhotel_id=' . ($id ?? 13598552));
+        return $this->extractToJson($query);
+    }
+
     public function getHotelFullInfoByHotelId(Request $request, $id)
     {
+
+        // return response()->json($this->fullHotelInfoById($id));
+        
         ini_set('memory_limit', '512M');
 
         $checkIn = $request->input('checkin', now()->format('Y-m-d'));
@@ -237,13 +247,54 @@ class SearchedContentController extends Controller
         ])->post($api, $payload);
 
         $data = $response->json();
+
         $property = $data['properties'][0] ?? null;
         $searchedId = $data['searchId'] ?? null;
-        $searchedData = $this->index($id);
+
+        $fullInfo = $this->fullHotelInfoById($id);
+
+        $roomIds = collect($property['rooms'] ?? [])
+            ->flatMap(fn($room) => [
+                strval($room['roomId'] ?? ''),
+                strval($room['parentRoomId'] ?? ''),
+            ])
+            ->filter()
+            ->unique()
+            ->toArray();
+
+        $allRoomTypes = $fullInfo['roomtypes']['roomtype'] ?? [];
+        if (isset($allRoomTypes['hotel_room_type_id'])) {
+            $allRoomTypes = [$allRoomTypes];
+        }
+        $filteredRoomTypes = array_values(array_filter($allRoomTypes, function($rt) use ($roomIds) {
+            return in_array(strval($rt['hotel_room_type_id'] ?? ''), $roomIds, true);
+        }));
+
+        $matchedRoomTypeIds = collect($filteredRoomTypes)
+            ->pluck('hotel_room_type_id')
+            ->map(fn($id) => strval($id))
+            ->filter()
+            ->unique()
+            ->toArray();
+
+        $searchedData = [
+            'images' => ['pictures' => $fullInfo['pictures'] ?? []],
+            'room_images' => ['roomtypes' => ['roomtype' => $filteredRoomTypes]],
+            'facilities' => ['facilities' => $fullInfo['facilities'] ?? []],
+            'information' => $fullInfo['hotels'] ?? [],
+            'descriptions' => $fullInfo['hotel_descriptions'] ?? [],
+            'addresses' => $fullInfo['addresses'] ?? [],
+        ];
 
         $groupedRooms = [];
         if ($property && isset($property['rooms'])) {
             foreach ($property['rooms'] as $room) {
+                $roomId = strval($room['roomId'] ?? '');
+                $parentRoomId = strval($room['parentRoomId'] ?? '');
+                if (!in_array($roomId, $matchedRoomTypeIds, true) && !in_array($parentRoomId, $matchedRoomTypeIds, true)) {
+                    continue;
+                }
+
                 $parentName = $room['parentRoomName'] ?? $room['roomName'];
                 if (!isset($groupedRooms[$parentName])) {
                     $groupedRooms[$parentName] = [
@@ -255,12 +306,33 @@ class SearchedContentController extends Controller
             }
         }
 
+        $filteredRooms = [];
+        foreach ($groupedRooms as $group) {
+            foreach ($group['rooms'] as $r) {
+                $filteredRooms[] = $r;
+            }
+        }
+
         $roomTypeCount = count($groupedRooms);
-        $totalDeals = $property ? count($property['rooms'] ?? []) : 0;
+        $totalDeals = count($filteredRooms);
+
+        $allBenefits = collect($filteredRooms)
+            ->flatMap(function ($room) {
+                return collect($room['benefits'] ?? [])->map(function ($benefit) {
+                    return [
+                        'id' => $benefit['id'] ?? null,
+                        'name' => $benefit['translatedBenefitName'] ?? ($benefit['benefitName'] ?? null),
+                    ];
+                });
+            })
+            ->filter(fn($benefit) => !empty($benefit['name']))
+            ->unique('name')
+            ->values()
+            ->all();
 
         $lowestPrice = null;
-        if ($property && isset($property['rooms'])) {
-            foreach ($property['rooms'] as $room) {
+        if (!empty($filteredRooms)) {
+            foreach ($filteredRooms as $room) {
                 $price = $room['rate']['inclusive'] ?? null;
                 if ($price !== null && ($lowestPrice === null || $price < $lowestPrice)) {
                     $lowestPrice = $price;
@@ -273,6 +345,7 @@ class SearchedContentController extends Controller
             'property' => $property,
             'data' => $searchedData,
             'groupedRooms' => $groupedRooms,
+            'allBenefits' => $allBenefits,
             'roomTypeCount' => $roomTypeCount,
             'totalDeals' => $totalDeals,
             'lowestPrice' => $lowestPrice,

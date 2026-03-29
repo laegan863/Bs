@@ -145,6 +145,186 @@
         </div>
     </section>
 
+    @php
+        $hotelInfo = $data['information']['hotel'] ?? [];
+        $hotelDescription = $data['descriptions']['hotel_description']['overview'] ?? null;
+        $hotelRemark = $hotelInfo['remark'] ?? null;
+        $childPolicy = $hotelInfo['child_and_extra_bed_policy'] ?? [];
+        $hasChildPolicy = !empty($childPolicy);
+        $addressList = $data['addresses']['address'] ?? [];
+        $roomsForPolicy = collect($groupedRooms ?? [])->flatMap(fn($group) => $group['rooms'] ?? []);
+        if ($roomsForPolicy->isEmpty()) {
+            $roomsForPolicy = collect($property['rooms'] ?? []);
+        }
+        $firstPolicyRoom = $roomsForPolicy->first(function ($room) {
+            return !empty($room['cancellationPolicy']['translatedCancellationText'])
+                || !empty($room['cancellationPolicy']['cancellationText']);
+        });
+        $cancellationText = $firstPolicyRoom['cancellationPolicy']['translatedCancellationText']
+            ?? $firstPolicyRoom['cancellationPolicy']['cancellationText']
+            ?? null;
+        $hasFreeCancellation = $roomsForPolicy->contains(fn($room) => (bool)($room['freeCancellation'] ?? false));
+        $firstFreeCancellationRoom = $roomsForPolicy->first(fn($room) => (bool)($room['freeCancellation'] ?? false));
+        $freeCancellationDeadline = $firstFreeCancellationRoom['cancellationPolicy']['date'][0]['onward'] ?? null;
+
+        if (isset($addressList['address_type'])) {
+            $addressList = [$addressList];
+        }
+        $primaryAddress = collect($addressList)->firstWhere('address_type', 'English address') ?? ($addressList[0] ?? null);
+    @endphp
+
+    <section class="pb-4">
+        <div class="container">
+            <div class="property-info-card p-4" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: #f3f4f6; color: #334155;">
+                            <i class="bi bi-building-check"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0" style="color: #0f172a;">About This Property</h5>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 small text-muted">
+                        @if(!empty($hotelInfo['rating_average']))
+                        <span class="badge rounded-pill" style="background:#e2e8f0; color:#0f172a;">{{ $hotelInfo['rating_average'] }}</span>
+                        @endif
+                        @if(!empty($hotelInfo['number_of_reviews']))
+                        <span>{{ number_format((int) $hotelInfo['number_of_reviews']) }} reviews</span>
+                        @endif
+                    </div>
+                </div>
+
+                @if($primaryAddress)
+                <div class="rounded-3 px-3 py-2 mb-3" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="bi bi-geo-alt-fill mt-1" style="color:#64748b;"></i>
+                        <div>
+                            <span class="fw-semibold" style="color:#334155;">Address</span>
+                            <p class="mb-0 text-muted small">
+                                {{ $primaryAddress['address_line_1'] ?? '' }}
+                                @if(!empty($primaryAddress['address_line_2']) && !is_array($primaryAddress['address_line_2']))
+                                , {{ $primaryAddress['address_line_2'] }}
+                                @endif
+                                , {{ $primaryAddress['city'] ?? '' }}
+                                @if(!empty($primaryAddress['state']))
+                                , {{ $primaryAddress['state'] }}
+                                @endif
+                                @if(!empty($primaryAddress['postal_code']))
+                                {{ $primaryAddress['postal_code'] }}
+                                @endif
+                                @if(!empty($primaryAddress['country']))
+                                , {{ $primaryAddress['country'] }}
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                @if($hotelRemark || $hotelDescription || $cancellationText || $hasFreeCancellation || $hasChildPolicy)
+                <div class="accordion" id="aboutPropertyAccordion">
+                    @if($hotelRemark)
+                    <div class="accordion-item rounded-3 mb-2 overflow-hidden p-2" style="border:1px solid #e2e8f0; box-shadow:none;">
+                        <h2 class="accordion-header" id="aboutPropertyRemarkHeading">
+                            <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#aboutPropertyRemark" aria-expanded="true" aria-controls="aboutPropertyRemark" style="background:#f8fafc; color:#0f172a; box-shadow:none;">
+                                <i class="bi bi-exclamation-circle-fill me-2"></i> Important Remark
+                            </button>
+                        </h2>
+                        <div id="aboutPropertyRemark" class="accordion-collapse collapse show" aria-labelledby="aboutPropertyRemarkHeading" data-bs-parent="#aboutPropertyAccordion">
+                            <div class="accordion-body text-muted py-3" style="background:#ffffff; line-height:1.7;">
+                                {{ $hotelRemark }}
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($cancellationText || $hasFreeCancellation)
+                    <div class="accordion-item rounded-3 mb-2 overflow-hidden p-2" style="border:1px solid #e2e8f0; box-shadow:none;">
+                        <h2 class="accordion-header" id="aboutPropertyCancellationHeading">
+                            <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#aboutPropertyCancellation" aria-expanded="false" aria-controls="aboutPropertyCancellation" style="background:#f8fafc; color:#0f172a; box-shadow:none;">
+                                <i class="bi bi-shield-check me-2"></i> Cancellation Policy
+                            </button>
+                        </h2>
+                        <div id="aboutPropertyCancellation" class="accordion-collapse collapse" aria-labelledby="aboutPropertyCancellationHeading" data-bs-parent="#aboutPropertyAccordion">
+                            <div class="accordion-body text-muted py-3" style="background:#ffffff; line-height:1.7;">
+                                @if($hasFreeCancellation && $freeCancellationDeadline)
+                                <p class="mb-2">
+                                    <span class="badge rounded-pill" style="background:#e2e8f0; color:#0f172a;">Free Cancellation</span>
+                                    <span class="ms-2">Until {{ \Carbon\Carbon::parse($freeCancellationDeadline)->format('M d, Y') }}</span>
+                                </p>
+                                @elseif($hasFreeCancellation)
+                                <p class="mb-2"><span class="badge rounded-pill" style="background:#e2e8f0; color:#0f172a;">Free Cancellation Available</span></p>
+                                @endif
+
+                                @if($cancellationText)
+                                <p class="mb-0">{{ $cancellationText }}</p>
+                                @else
+                                <p class="mb-0">Please check the selected room policy before booking.</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($hasChildPolicy)
+                    <div class="accordion-item rounded-3 mb-2 overflow-hidden p-2" style="border:1px solid #e2e8f0; box-shadow:none;">
+                        <h2 class="accordion-header" id="aboutPropertyChildPolicyHeading">
+                            <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#aboutPropertyChildPolicy" aria-expanded="false" aria-controls="aboutPropertyChildPolicy" style="background:#f8fafc; color:#0f172a; box-shadow:none;">
+                                <i class="bi bi-people me-2"></i> Child & Extra Bed Policy
+                            </button>
+                        </h2>
+                        <div id="aboutPropertyChildPolicy" class="accordion-collapse collapse" aria-labelledby="aboutPropertyChildPolicyHeading" data-bs-parent="#aboutPropertyAccordion">
+                            <div class="accordion-body text-muted py-3" style="background:#ffffff; line-height:1.7;">
+                                <ul class="mb-0 ps-3">
+                                    <li>Infant age: {{ $childPolicy['infant_age'] ?? 'N/A' }}</li>
+                                    <li>Children age range: {{ $childPolicy['children_age_from'] ?? 'N/A' }} to {{ $childPolicy['children_age_to'] ?? 'N/A' }}</li>
+                                    <li>Children stay free: {{ (($childPolicy['children_stay_free'] ?? 'false') === 'true' || ($childPolicy['children_stay_free'] ?? false) === true) ? 'Yes' : 'No' }}</li>
+                                    <li>Minimum guest age: {{ $childPolicy['min_guest_age'] ?? 'N/A' }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($hotelDescription)
+                    <div class="accordion-item rounded-3 overflow-hidden p-2" style="border:1px solid #e2e8f0; box-shadow:none;">
+                        <h2 class="accordion-header" id="aboutPropertyDescriptionHeading">
+                            <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#aboutPropertyDescription" aria-expanded="false" aria-controls="aboutPropertyDescription" style="background:#f8fafc; color:#0f172a; box-shadow:none;">
+                                <i class="bi bi-card-text me-2"></i> Property Description
+                            </button>
+                        </h2>
+                        <div id="aboutPropertyDescription" class="accordion-collapse collapse" aria-labelledby="aboutPropertyDescriptionHeading" data-bs-parent="#aboutPropertyAccordion">
+                            <div class="accordion-body text-muted py-3" style="background:#ffffff; line-height:1.7;">
+                                {{ $hotelDescription }}
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                @endif
+            </div>
+        </div>
+    </section>
+
+    @if(!empty($allBenefits ?? []))
+    <section class="pb-4">
+        <div class="container">
+            <div class="property-info-card p-3" style="background:#ffffff; border:1px solid #e5e7eb; border-radius:14px;">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-stars" style="color:#334155;"></i>
+                    <h6 class="fw-bold mb-0" style="color:#0f172a;">Property Benefits</h6>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach($allBenefits as $benefit)
+                    <span class="badge rounded-pill px-3 py-2" style="background:#f1f5f9; color:#334155; border:1px solid #e2e8f0; font-weight:500;">
+                        <i class="bi bi-check2-circle me-1"></i>{{ $benefit['name'] }}
+                    </span>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </section>
+    @endif
+
     <!-- ============================
          Amenity Thumbnails Strip
          ============================ -->
@@ -357,6 +537,10 @@
                                             <p class="small text-muted mb-1" style="font-size: 0.72rem;">
                                                 <i class="bi bi-people me-1"></i> {{ $rooms }} room, {{ $adults }} adults
                                             </p>
+                                            <p class="small text-muted mb-1" style="font-size: 0.72rem;">
+                                                <i class="bi bi-plus-square me-1"></i>
+                                                {{ (int) ($room['extraBeds'] ?? 0) }} extra bed{{ ((int) ($room['extraBeds'] ?? 0)) === 1 ? '' : 's' }}
+                                            </p>
                                             <p class="small text-muted mb-0" style="font-size: 0.72rem;">
                                                 <i class="bi bi-credit-card me-1"></i> Pay with Card or Crypto
                                             </p>
@@ -385,6 +569,11 @@
                                     <!-- Book Button -->
                                     <div class="col-md-3">
                                         <div class="rate-action p-3 text-center">
+                                            @php
+                                                $roomSurchargeTotal = collect($room['surcharges'] ?? [])->sum(function ($s) {
+                                                    return (float) ($s['amount'] ?? $s['value'] ?? 0);
+                                                });
+                                            @endphp
                                             <button class="btn btn-primary-custom btn-hover-glow text-white w-100 py-2 fw-semibold btn-book-now"
                                                 data-room-id="{{ $room['roomId'] ?? '' }}"
                                                 data-room-name="{{ $room['roomName'] ?? $groupName }}"
@@ -395,6 +584,7 @@
                                                 data-rate-exclusive="{{ $room['rate']['exclusive'] ?? 0 }}"
                                                 data-rate-tax="{{ $room['rate']['tax'] ?? 0 }}"
                                                 data-rate-fees="{{ $room['rate']['fees'] ?? 0 }}"
+                                                data-surcharge-amount="{{ $roomSurchargeTotal }}"
                                                 data-rate-currency="{{ $room['rate']['currency'] ?? 'USD' }}"
                                                 data-rate-method="{{ $room['rate']['method'] ?? 'PRPN' }}"
                                                 data-payment-model="{{ $room['paymentModel'] ?? 'Merchant' }}"
@@ -536,7 +726,7 @@ leisure and sports' => 'bi-trophy',
     <!-- ============================
          Nearby Places & Top Attractions
          ============================ -->
-    <section class="py-5 bg-white">
+    {{-- <section class="py-5 bg-white">
         <div class="container">
             <div class="section-heading-row d-flex align-items-center gap-3 mb-4">
                 <div class="section-heading-icon" style="background: linear-gradient(135deg, #0ea5e9, #6366f1);">
@@ -643,33 +833,7 @@ leisure and sports' => 'bi-trophy',
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- ============================
-         Hotel Description
-         ============================ -->
-    <section class="py-5 bg-white">
-        <div class="container">
-            <div class="hotel-description-section">
-                <h3 class="fw-bold mb-4">About {{ $property['propertyName'] ?? 'This Hotel' }}</h3>
-                <p class="text-muted small">
-                    {{ $property['propertyName'] ?? 'This hotel' }} is a centrally located property offering excellent amenities
-                    and convenient access to local attractions. The property features comfortable rooms with modern furnishings,
-                    complimentary high-speed internet, and a selection of dining options. Guests enjoy premium amenities including
-                    a fitness center, and attentive customer service to ensure a pleasant stay.
-                </p>
-
-                <div class="mt-4">
-                    <h5 class="fw-bold mb-3">You need to know</h5>
-                    <ul class="hotel-info-list">
-                        <li class="small text-muted">Cashless payment methods are available for all transactions at this property.</li>
-                        <li class="small text-muted">Government-issued photo identification and a credit card, debit card, or cash deposit may be required at check-in for incidental charges.</li>
-                        <li class="small text-muted">This property welcomes guests of all sexual orientations and gender identities (LGBTQ+ friendly).</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
+    </section> --}}
 
     <!-- Gallery & Lightbox JS -->
     <script>
@@ -1029,6 +1193,7 @@ leisure and sports' => 'bi-trophy',
                 document.getElementById('formRateExclusive').value = data.rateExclusive;
                 document.getElementById('formRateTax').value = data.rateTax;
                 document.getElementById('formRateFees').value = data.rateFees;
+                document.getElementById('formSurchargeAmount').value = data.surchargeAmount || 0;
                 document.getElementById('formRateCurrency').value = data.rateCurrency;
                 document.getElementById('formRateMethod').value = data.rateMethod;
                 document.getElementById('formPaymentModel').value = data.paymentModel;
@@ -1186,6 +1351,7 @@ leisure and sports' => 'bi-trophy',
                         <input type="hidden" name="rate_exclusive" id="formRateExclusive">
                         <input type="hidden" name="rate_tax" id="formRateTax">
                         <input type="hidden" name="rate_fees" id="formRateFees">
+                        <input type="hidden" name="surcharge_amount" id="formSurchargeAmount" value="0">
                         <input type="hidden" name="rate_currency" id="formRateCurrency">
                         <input type="hidden" name="rate_method" id="formRateMethod">
                         <input type="hidden" name="payment_model" id="formPaymentModel">

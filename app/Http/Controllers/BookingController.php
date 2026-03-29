@@ -79,6 +79,7 @@ class BookingController extends Controller
             'rate_exclusive' => 'required|numeric|min:0',
             'rate_tax' => 'required|numeric|min:0',
             'rate_fees' => 'required|numeric|min:0',
+            'surcharge_amount' => 'nullable|numeric|min:0',
             'rate_currency' => 'required|string',
             'rate_method' => 'required|string',
             'payment_model' => 'required|string',
@@ -88,6 +89,7 @@ class BookingController extends Controller
         //     'data' => $request->all()
         // ]);
 
+        $validated['surcharge_amount'] = $validated['surcharge_amount'] ?? 0;
         session(['booking_data' => $validated]);
 
         return redirect()->route('booking.checkout');
@@ -129,6 +131,12 @@ class BookingController extends Controller
         $createVariantPaylink = $this->boomfiApi('GET', 'https://mapi.boomfi.xyz/v1/paylinks/generate-variant/'. $createdPaylink['data']['id'] , ['redirect_to' => url('/booking/receipt/' . $bookingId)]);
 
         $paymentUrl = $createVariantPaylink['data']['url'];
+
+        $paymentUrl = preg_replace('#(https://pay\.boomfi\.xyz)/(.*?)(\?.*)#', '$1/lite/$2', $paymentUrl);
+        $user = auth()->user();
+        if ($user) {
+            $paymentUrl .= '?name=' . urlencode($user->first_name . ' ' . $user->last_name) . '&email=' . urlencode($user->email);
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json(['url' => $paymentUrl]);
@@ -504,9 +512,9 @@ class BookingController extends Controller
 
     public function confirmation(Booking $booking)
     {
-        if ($booking->user_id !== Auth::id()) {
-            abort(403);
-        }
+        // if ($booking->user_id !== Auth::id()) {
+        //     abort(403);
+        // }
 
         return view('booking-confirmation', [
             'booking' => $booking,
