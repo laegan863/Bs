@@ -98,6 +98,14 @@ class Booking extends Model
     }
 
     /**
+     * Get the extended booking details.
+     */
+    public function bookingDetail(): HasOne
+    {
+        return $this->hasOne(BookingDetail::class);
+    }
+
+    /**
      * Scope: current (upcoming/active) bookings.
      */
     public function scopeCurrent($query)

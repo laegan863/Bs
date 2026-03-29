@@ -352,7 +352,12 @@
                                 </div>
                             </div>
                         </div>
-
+                        @if(session()->get('error'))
+                            <div class="alert alert-danger">
+                                {{ Session::get('error') }}
+                            </div>
+                        @endif
+                        <a href="{{ route('booking.success', ['id' => 2]) }}" class="btn btn-primary">overide checkout</a>
                         <!-- Submit Button -->
                         <button type="submit" class="btn btn-primary-custom btn-hover-glow text-white w-100 py-3 fw-bold checkout-submit-btn" style="font-size: 1.1rem;" id="completeBookingBtn">
                             <i class="bi bi-lock me-2"></i>Complete Booking
