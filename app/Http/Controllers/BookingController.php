@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AgodaBooking;
 use App\Models\Booking;
+use App\Models\BookingDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -83,6 +84,11 @@ class BookingController extends Controller
             'rate_currency' => 'required|string',
             'rate_method' => 'required|string',
             'payment_model' => 'required|string',
+            'benefits' => 'nullable|string',
+            'surcharges' => 'nullable|string',
+            'cancellation_policy_text' => 'nullable|string',
+            'hotel_remarks' => 'nullable|string',
+            'hotel_address' => 'nullable|string',
         ]);
 
         // return response()->json([
@@ -109,9 +115,75 @@ class BookingController extends Controller
         return json_decode($response->getBody()->getContents(), true);
     }
 
+    public function success($bookingId)
+    {
+        $bookingData = session('booking_data');
+
+        if(!$bookingData) {
+            return response()->json(['error' => 'No booking data in session. Please start the booking process again.'], 400);
+        }
+
+        $reference = Booking::generateReference();
+
+        $booking = Booking::create([
+            'user_id' => Auth::id(),
+            'agoda_booking_id' => null,
+            'property_id' => $bookingData['property_id'],
+            'property_name' => $bookingData['property_name'],
+            'property_image' => $bookingData['property_image'],
+            'room_id' => $bookingData['room_id'],
+            'room_name' => $bookingData['room_name'],
+            'room_type' => $bookingData['room_type'] ?? null,
+            'bed_type' => $bookingData['bed_type'] ?? null,
+            'check_in' => $bookingData['check_in'],
+            'check_out' => $bookingData['check_out'],
+            'rooms' => $bookingData['rooms'],
+            'adults' => $bookingData['adults'],
+            'children' => $bookingData['children'] ?? 0,
+            'price_per_night' => $bookingData['price_per_night'],
+            'total_price' => $bookingData['total_price'],
+            'tax_amount' => $bookingData['rate_tax'] ?? 0,
+            'fees_amount' => $bookingData['rate_fees'] ?? 0,
+            'currency' => $bookingData['rate_currency'] ?? 'USD',
+            'guest_first_name' => 'Laegan',
+            'guest_last_name' => 'Pangantihon   ',
+            'guest_email' => 'test@gmail.com',
+            'guest_phone' => '09123456789',
+            'special_requests' => 'sample request' ?? null,
+            'payment_method' => 'bitpay',
+            'payment_status' => 'pending',
+            'transaction_reference' => $reference,
+            'status' => 'pending',
+            'free_cancellation' => $bookingData['free_cancellation'] ?? false,
+            'cancellation_deadline' => $bookingData['cancellation_deadline'] ?? null,
+        ]);
+
+        $benefitsArray = json_decode($bookingData['benefits'] ?? '[]', true);
+        $surchargesArray = json_decode($bookingData['surcharges'] ?? '[]', true);
+
+        BookingDetail::create([
+            'booking_id' => $booking->id,
+            'hotel_address' => $bookingData['hotel_address'] ?? null,
+            'hotel_remarks' => $bookingData['hotel_remarks'] ?? null,
+            'room_type' => $bookingData['room_type'] ?? null,
+            'room_quantity' => $bookingData['rooms'] ?? 1,
+            'adults' => $bookingData['adults'] ?? 1,
+            'children' => $bookingData['children'] ?? 0,
+            'benefits' => is_array($benefitsArray) ? $benefitsArray : [],
+            'cancellation_policy' => $bookingData['cancellation_policy_text'] ?? null,
+            'free_cancellation' => $bookingData['free_cancellation'] ?? false,
+            'cancellation_deadline' => $bookingData['cancellation_deadline'] ?? null,
+            'special_requests' => 'sample',
+            'surcharges' => is_array($surchargesArray) ? $surchargesArray : [],
+            'surcharge_total' => $bookingData['surcharge_amount'] ?? 0,
+            'payment_type' => $bookingData['payment_type'] ?? 'pay_now',
+        ]);
+
+        return redirect()->route('booking.receipt', $booking->id);
+    }
+
     public function processBookingPayment($request, $bookingId)
     {
-
         $session = session('booking_data');
 
         if(!$session) {
@@ -119,6 +191,7 @@ class BookingController extends Controller
         }
 
         $client = new Client();
+
         $payload = [
             'name' => 'Solana Travels Payment -' . ($session['property_name'] ?? 'Unknown Property') . ' - ' . \Carbon\Carbon::now()->toDateTimeString(),
             'amount' => $session['total_price'],
@@ -184,6 +257,28 @@ class BookingController extends Controller
             'cancellation_deadline' => $bookingData['cancellation_deadline'] ?? null,
         ]);
 
+        // Create extended booking details in separate table
+        $benefitsArray = json_decode($bookingData['benefits'] ?? '[]', true);
+        $surchargesArray = json_decode($bookingData['surcharges'] ?? '[]', true);
+
+        BookingDetail::create([
+            'booking_id' => $booking->id,
+            'hotel_address' => $bookingData['hotel_address'] ?? null,
+            'hotel_remarks' => $bookingData['hotel_remarks'] ?? null,
+            'room_type' => $bookingData['room_type'] ?? null,
+            'room_quantity' => $bookingData['rooms'] ?? 1,
+            'adults' => $bookingData['adults'] ?? 1,
+            'children' => $bookingData['children'] ?? 0,
+            'benefits' => is_array($benefitsArray) ? $benefitsArray : [],
+            'cancellation_policy' => $bookingData['cancellation_policy_text'] ?? null,
+            'free_cancellation' => $bookingData['free_cancellation'] ?? false,
+            'cancellation_deadline' => $bookingData['cancellation_deadline'] ?? null,
+            'special_requests' => $request->input('special_requests'),
+            'surcharges' => is_array($surchargesArray) ? $surchargesArray : [],
+            'surcharge_total' => $bookingData['surcharge_amount'] ?? 0,
+            'payment_type' => $bookingData['payment_type'] ?? 'pay_now',
+        ]);
+
         return $this->processBookingPayment($request, $booking->id);
     }
 
@@ -208,8 +303,8 @@ class BookingController extends Controller
                 'searchId' => (int) $sessionData['searched_id'],
                 'tag' => 'test-tag',
                 'allowDuplication' => true,
-                'checkIn' => $bookingData['check_in'],
-                'checkOut' => $bookingData['check_out'],
+                'checkIn' => \Carbon\Carbon::parse($bookingData['check_in'])->toDateString(),
+                'checkOut' => \Carbon\Carbon::parse($bookingData['check_out'])->toDateString(),
                 'property' => [
                     'propertyId' => (int) $bookingData['property_id'],
                     'rooms' => [
@@ -271,8 +366,8 @@ class BookingController extends Controller
             ],
         ];
 
-        $agodaBookingId = null;
-        $agodaResult = null;
+        // $agodaBookingId = null;
+        // $agodaResult = null;
 
         try {
             $agodaResponse = Http::withoutVerifying()
@@ -296,7 +391,7 @@ class BookingController extends Controller
         if ($agodaResult && ($agodaResult['status'] ?? '') === '200') {
             $agodaDetails = $agodaResult['bookingDetails'][0] ?? null;
             if ($agodaDetails) {
-                AgodaBooking::create([
+                $agoda = AgodaBooking::create([
                     'booking_id' => $bookingData->id,
                     'agoda_booking_id' => $agodaDetails['id'],
                     'itinerary_id' => $agodaDetails['itineraryID'],
@@ -305,12 +400,23 @@ class BookingController extends Controller
                     'raw_response' => $agodaResult,
                 ]);
             }
+        }else{
+            return back()->with([
+                'error' => $agodaResult['errorMessage']['message']
+            ]);
         }
 
         $bookingData->update([
             'payment_status' => 'paid',
             'status' => 'confirmed',
         ]);
+
+        // return response()->json([
+        //     // 'data' => $bookingData->toArray(),
+        //     'agoda_response' => $agodaResult,
+        //     // 'agoda' => $agoda
+        // ]);
+
         session()->forget('booking_data');
         return redirect()->route('booking.confirmation', $bookingData->id);
     }
@@ -512,9 +618,7 @@ class BookingController extends Controller
 
     public function confirmation(Booking $booking)
     {
-        // if ($booking->user_id !== Auth::id()) {
-        //     abort(403);
-        // }
+        $booking->load('bookingDetail', 'agodaBooking');
 
         return view('booking-confirmation', [
             'booking' => $booking,
