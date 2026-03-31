@@ -77,6 +77,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookings/{booking}/detail', [BookingController::class, 'fetchAgodaDetail'])->name('bookings.detail');
     Route::post('/bookings/sync', [BookingController::class, 'storeAgodaBooking'])->name('bookings.sync');
     Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::get('/bookings/{booking}/cancellation-summary', [BookingController::class, 'cancellationSummary'])->name('bookings.cancellation.summary');
     Route::get('/bookings/{booking}/amend', [BookingController::class, 'editAmendment'])->name('bookings.amend');
     Route::patch('/bookings/{booking}/amend', [BookingController::class, 'submitAmendment'])->name('bookings.amend.submit');
 

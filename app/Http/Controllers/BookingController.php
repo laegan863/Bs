@@ -463,7 +463,7 @@ class BookingController extends Controller
         }
     }
 
-    public function cancel(Booking $booking)
+    public function cancel(Request $request, Booking $booking)
     {
         if ($booking->user_id !== Auth::id()) {
             abort(403);
@@ -472,6 +472,9 @@ class BookingController extends Controller
         $agodaBooking = $booking->agodaBooking;
 
         if (!$agodaBooking) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'error' => 'No Agoda booking linked to cancel.'], 404);
+            }
             return back()->with('error', 'No Agoda booking linked to cancel.');
         }
 
@@ -498,6 +501,9 @@ class BookingController extends Controller
             // Check for Agoda-level error in the response body first
             if (!empty($result['errorMessage']['message'])) {
                 $errorMsg = $result['errorMessage']['message'];
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'error' => 'Agoda cancellation failed: ' . $errorMsg]);
+                }
                 return back()->with('error', 'Agoda cancellation failed: ' . $errorMsg);
             }
 
@@ -505,15 +511,24 @@ class BookingController extends Controller
                 $booking->update(['status' => 'cancelled']);
                 $agodaBooking->update(['status' => 'Cancelled']);
 
+                if ($request->ajax()) {
+                    return response()->json(['success' => true, 'message' => 'Booking #' . $agodaBooking->agoda_booking_id . ' has been cancelled successfully.']);
+                }
                 return back()->with('success', 'Booking #' . $agodaBooking->agoda_booking_id . ' has been cancelled successfully.');
             }
 
             // Fallback error from HTTP-level failure
             $errorMsg = $result['message'] ?? $result['error'] ?? 'Unknown error from Agoda.';
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'error' => 'Agoda cancellation failed: ' . $errorMsg]);
+            }
             return back()->with('error', 'Agoda cancellation failed: ' . $errorMsg);
 
         } catch (\Exception $e) {
             Log::error('Agoda cancel failed: ' . $e->getMessage());
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'error' => 'Failed to cancel booking. Please try again later.'], 500);
+            }
             return back()->with('error', 'Failed to cancel booking. Please try again later.');
         }
     }
@@ -623,5 +638,43 @@ class BookingController extends Controller
         return view('booking-confirmation', [
             'booking' => $booking,
         ]);
+    }
+
+    public function cancellationSummary(Booking $booking)
+    {
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $agodaBooking = $booking->agodaBooking;
+
+        if (!$agodaBooking) {
+            return response()->json([
+                'success' => false,
+                'error' => 'No Agoda booking linked.',
+            ], 404);
+        }
+
+        try {
+            $response = Http::withoutVerifying()
+                ->timeout(120)
+                ->withHeaders([
+                    'Authorization' => '1952979:97af8aba-5b21-4a37-ad75-a034c9e46742',
+                    'Content-Type' => 'application/json',
+                ])->post('https://sandbox-affiliateapisecure.agoda.com/api/v4/postBooking/cancel', [
+                    'bookingId' => (int) $agodaBooking->agoda_booking_id
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'data' => $response->json(),
+                ]);
+        } catch (\Throwable $th) {
+            Log::error('Agoda cancellation summary failed: ' . $th->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to fetch cancellation summary. Please try again later.',
+            ], 500);
+        }
     }
 }

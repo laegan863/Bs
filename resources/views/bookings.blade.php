@@ -155,14 +155,10 @@
                             @endif
 
                             <div class="mt-3">
-                                    <form action="{{ route('bookings.cancel', $booking) }}" method="POST"
-                                          onsubmit="return confirm('Are you sure you want to cancel this booking?');">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="btn btn-sm btn-danger w-100 fw-bold py-2">
-                                            <i class="bi bi-x-circle me-1"></i>Cancel Booking
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger w-100 fw-bold py-2"
+                                        onclick="fetchCancellationSummary({{ $booking->id }})">
+                                        <i class="bi bi-x-circle me-1"></i>Cancel Booking
+                                    </button>
 
 
                                 {{-- View Details Button --}}
@@ -565,6 +561,110 @@
     </div>
 </div>
 
+{{-- Cancellation Summary Modal --}}
+<div class="modal fade" id="cancelSummaryModal" tabindex="-1" aria-labelledby="cancelSummaryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+
+            {{-- Header --}}
+            <div class="modal-header border-0 text-white px-4 py-3" style="background: linear-gradient(135deg, #b71c1c 0%, #e53935 100%);">
+                <div>
+                    <h5 class="modal-title fw-bold mb-0" id="cancelSummaryModalLabel">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Cancel Booking
+                    </h5>
+                    <small class="opacity-75" id="csHeaderSubtext">Review cancellation details</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body px-4 py-4">
+                {{-- Loading --}}
+                <div id="csLoading" class="text-center py-4">
+                    <div class="spinner-grow text-danger" role="status" style="width: 2.5rem; height: 2.5rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted fw-medium">Fetching cancellation summary...</p>
+                </div>
+
+                {{-- Error --}}
+                <div id="csError" class="d-none text-center py-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; background: #fff0f0;">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h6 class="fw-bold">Something went wrong</h6>
+                    <p class="text-muted small" id="csErrorMsg">Failed to fetch cancellation summary.</p>
+                </div>
+
+                {{-- Content --}}
+                <div id="csContent" class="d-none">
+                    {{-- Cancellation Policy --}}
+                    <div class="dt-section-card mb-3" style="background: #fff8f0; border: 1px solid #ffe0b2;">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="dt-section-icon-sm" style="background: #ffecb3;">
+                                <i class="bi bi-shield-exclamation text-warning"></i>
+                            </div>
+                            <span class="fw-semibold small" style="color: var(--primary-navy, #1a1a5e);">Cancellation Policy</span>
+                        </div>
+                        <p class="mb-0 small text-muted" id="csPolicyText" style="line-height: 1.7;">-</p>
+                    </div>
+
+                    {{-- Payment & Refund Summary --}}
+                    <div class="dt-section-card" style="background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%); border: 1px solid #e0e7ff;">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div class="dt-section-icon-sm" style="background: #e8eaf6;">
+                                <i class="bi bi-wallet2" style="color: var(--primary-navy, #1a1a5e);"></i>
+                            </div>
+                            <span class="fw-semibold small" style="color: var(--primary-navy, #1a1a5e);">Payment & Refund</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">Booking Value</span>
+                            <span class="fw-medium" id="csPaymentRate">-</span>
+                        </div>
+                        <hr style="border-style: dashed; border-color: #c5cae9;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Refund Amount</span>
+                            <span class="fw-bold fs-5" id="csRefundRate" style="color: #16a34a;">-</span>
+                        </div>
+                    </div>
+
+                    {{-- Warning --}}
+                    <div class="alert alert-danger mt-3 mb-0 d-flex align-items-start gap-2" style="border-radius: 12px;">
+                        <i class="bi bi-info-circle-fill mt-1"></i>
+                        <span class="small">This action cannot be undone. Please review the cancellation policy and refund details before confirming.</span>
+                    </div>
+                </div>
+
+                {{-- Result --}}
+                <div id="csResult" class="d-none">
+                    <div id="csSuccess" class="d-none text-center py-3">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; background: #f0fdf4;">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h6 class="fw-bold">Booking Cancelled</h6>
+                        <p class="text-muted small">Your booking has been cancelled successfully.</p>
+                    </div>
+                    <div id="csFail" class="d-none text-center py-3">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; background: #fff0f0;">
+                            <i class="bi bi-x-circle-fill text-danger" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h6 class="fw-bold">Cancellation Failed</h6>
+                        <p class="text-muted small" id="csFailMsg">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 px-4 py-3" style="background: #fafbfc;">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-medium" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i>Close
+                </button>
+                <button type="button" class="btn btn-danger rounded-pill px-4 fw-semibold" id="csConfirmBtn" style="display:none;" onclick="confirmCancellation()">
+                    <i class="bi bi-x-circle me-1"></i>Confirm Cancellation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('styles')
 <style>
     .booking-card {
@@ -951,6 +1051,113 @@ document.getElementById('amendForm').addEventListener('submit', function(e) {
         submitBtn.innerHTML = '<i class="bi bi-pencil-square me-1"></i>Submit Amendment';
     });
 });
+</script>
+<script>
+let cancelBookingId = null;
+
+function fetchCancellationSummary(bookingId) {
+    cancelBookingId = bookingId;
+    const modal = new bootstrap.Modal(document.getElementById('cancelSummaryModal'));
+    document.getElementById('csLoading').classList.remove('d-none');
+    document.getElementById('csError').classList.add('d-none');
+    document.getElementById('csContent').classList.add('d-none');
+    document.getElementById('csResult').classList.add('d-none');
+    document.getElementById('csSuccess').classList.add('d-none');
+    document.getElementById('csFail').classList.add('d-none');
+    document.getElementById('csConfirmBtn').style.display = 'none';
+    modal.show();
+
+    fetch(`/bookings/${bookingId}/cancellation-summary`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => { if (!r.ok) throw new Error('Request failed'); return r.json(); })
+    .then(data => {
+        document.getElementById('csLoading').classList.add('d-none');
+
+        if (!data.success) {
+            document.getElementById('csError').classList.remove('d-none');
+            document.getElementById('csErrorMsg').textContent = data.error || 'Failed to fetch cancellation summary.';
+            return;
+        }
+
+        document.getElementById('csContent').classList.remove('d-none');
+        document.getElementById('csConfirmBtn').style.display = 'inline-block';
+
+        const summary = data.data?.cancellationSummary || data.data || {};
+
+        // Cancellation policy
+        const policies = summary.cancellationPolicy || [];
+        const policyText = policies.map(p => p.policyText).join('\n') || 'No cancellation policy available.';
+        document.getElementById('csPolicyText').textContent = policyText;
+
+        // Payment rate
+        const paymentRates = summary.paymentRate || [];
+        if (paymentRates.length) {
+            const pr = paymentRates[0];
+            document.getElementById('csPaymentRate').textContent = pr.currency + ' ' + parseFloat(pr.inclusive).toFixed(2);
+        } else {
+            document.getElementById('csPaymentRate').textContent = '-';
+        }
+
+        // Refund rate
+        const refundRates = summary.refundRate || [];
+        if (refundRates.length) {
+            const rr = refundRates[0];
+            const refundAmt = parseFloat(rr.inclusive);
+            document.getElementById('csRefundRate').textContent = rr.currency + ' ' + refundAmt.toFixed(2);
+            document.getElementById('csRefundRate').style.color = refundAmt > 0 ? '#16a34a' : '#dc2626';
+        } else {
+            document.getElementById('csRefundRate').textContent = '-';
+        }
+    })
+    .catch(err => {
+        document.getElementById('csLoading').classList.add('d-none');
+        document.getElementById('csError').classList.remove('d-none');
+        document.getElementById('csErrorMsg').textContent = 'Failed to load cancellation summary. ' + err.message;
+    });
+}
+
+function confirmCancellation() {
+    if (!cancelBookingId) return;
+
+    const confirmBtn = document.getElementById('csConfirmBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Cancelling...';
+
+    fetch(`/bookings/${cancelBookingId}/cancel`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+        document.getElementById('csContent').classList.add('d-none');
+        document.getElementById('csResult').classList.remove('d-none');
+        confirmBtn.style.display = 'none';
+
+        if (ok && data.success) {
+            document.getElementById('csSuccess').classList.remove('d-none');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            document.getElementById('csFail').classList.remove('d-none');
+            document.getElementById('csFailMsg').textContent = data.error || 'Cancellation failed. Please try again.';
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="bi bi-x-circle me-1"></i>Confirm Cancellation';
+            confirmBtn.style.display = 'inline-block';
+        }
+    })
+    .catch(err => {
+        document.getElementById('csContent').classList.add('d-none');
+        document.getElementById('csResult').classList.remove('d-none');
+        document.getElementById('csFail').classList.remove('d-none');
+        document.getElementById('csFailMsg').textContent = 'Request failed. ' + err.message;
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="bi bi-x-circle me-1"></i>Confirm Cancellation';
+    });
+}
 </script>
 @endpush
 @endsection
