@@ -54,8 +54,7 @@
         @endif
 
             <div class="row g-4">
-                
-
+            
                 <!-- Right: Booking Summary Sidebar -->
                 <div class="col-lg-5">
                     <div class="checkout-summary-card sticky-top" style="top: 100px;">
@@ -357,7 +356,7 @@
                                 {{ Session::get('error') }}
                             </div>
                         @endif
-                        <a href="{{ route('booking.success', ['id' => 2]) }}" class="btn btn-primary">overide checkout</a>
+                        <a href="{{ route('booking.success') }}" class="btn btn-primary">overide checkout</a>
                         <!-- Submit Button -->
                         <button type="submit" class="btn btn-primary-custom btn-hover-glow text-white w-100 py-3 fw-bold checkout-submit-btn" style="font-size: 1.1rem;" id="completeBookingBtn">
                             <i class="bi bi-lock me-2"></i>Complete Booking

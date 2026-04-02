@@ -275,9 +275,12 @@
                         <div id="aboutPropertyChildPolicy" class="accordion-collapse collapse" aria-labelledby="aboutPropertyChildPolicyHeading" data-bs-parent="#aboutPropertyAccordion">
                             <div class="accordion-body text-muted py-3" style="background:#ffffff; line-height:1.7;">
                                 <ul class="mb-0 ps-3">
+                                    @php
+                                        $true = 'Acknowledge *<br> Please note that children will not be provided with an extra bed, and meals are not included. Any requested meals must be paid for directly to the hotel. Ensure your customers are informed of these conditions.';
+                                    @endphp
                                     <li>Infant age: {{ $childPolicy['infant_age'] ?? 'N/A' }}</li>
                                     <li>Children age range: {{ $childPolicy['children_age_from'] ?? 'N/A' }} to {{ $childPolicy['children_age_to'] ?? 'N/A' }}</li>
-                                    <li>Children stay free: {{ (($childPolicy['children_stay_free'] ?? 'false') === 'true' || ($childPolicy['children_stay_free'] ?? false) === true) ? 'Yes' : 'No' }}</li>
+                                    <li>Children stay free: {!! (($childPolicy['children_stay_free'] ?? 'false') === 'true' || ($childPolicy['children_stay_free'] ?? false) === true) ? $true : 'No' !!}</li>
                                     <li>Minimum guest age: {{ $childPolicy['min_guest_age'] ?? 'N/A' }}</li>
                                 </ul>
                             </div>
@@ -526,12 +529,33 @@
                                             @if(isset($room['cancellationPolicy']))
                                             <p class="small text-success mb-2" style="font-size: 0.7rem;">
                                                 <i class="bi bi-check-circle me-1"></i>
-                                                @if($room['freeCancellation'])
+                                                {{ $room['cancellationPolicy']['translatedCancellationText'] ?? '' }}
+                                                {{-- @if($room['freeCancellation'])
                                                     Free cancellation until {{ \Carbon\Carbon::parse($room['cancellationPolicy']['date'][0]['onward'] ?? '')->format('M d, Y') }}
                                                 @else
                                                     Non-refundable
-                                                @endif
+                                                @endif --}}
                                             </p>
+                                            @endif
+
+                                            
+                                            @if(isset($room['surcharges']))
+                                                <div class="d-flex align-items-center gap-2 mb-2 fw-bold">
+                                                    Surcharges:
+                                                </div>
+
+                                                @foreach($room['surcharges'] as $surcharge)
+                                                    <p class="small text-danger mb-2" style="font-size: 0.7rem;">
+                                                        <i class="bi bi-x-circle me-1"></i>
+                                                        Method: {{ $surcharge['method'] }} </br>
+                                                        Charge: {{ $surcharge['charge'] ?? '' }}</br>
+                                                        Margin: {{ $surcharge['margin'] ?? '' }}</br>
+                                                        name: {{ $surcharge['name'] ?? '' }}</br>
+                                                        rate: @foreach($surcharge['rate'] ?? [] as $rate => $rateDetails) 
+                                                            {{ $rate }} {{ $rateDetails ?? '' }} </br>
+                                                        @endforeach
+                                                    </p>
+                                                @endforeach
                                             @endif
 
                                             <p class="small text-muted mb-1" style="font-size: 0.72rem;">
@@ -571,7 +595,7 @@
                                         <div class="rate-action p-3 text-center">
                                             @php
                                                 $roomSurchargeTotal = collect($room['surcharges'] ?? [])->sum(function ($s) {
-                                                    return (float) ($s['amount'] ?? $s['value'] ?? 0);
+                                                    return (float) ($s['rate']['inclusive'] ?? $s['amount'] ?? $s['value'] ?? 0);
                                                 });
                                             @endphp
                                             @php
@@ -579,8 +603,8 @@
                                                 $roomSurchargesList = collect($room['surcharges'] ?? [])->map(function($s) {
                                                     return [
                                                         'name' => $s['name'] ?? $s['description'] ?? 'Surcharge',
-                                                        'amount' => (float) ($s['amount'] ?? $s['value'] ?? 0),
-                                                        'type' => $s['chargeType'] ?? ($s['type'] ?? 'mandatory'),
+                                                        'amount' => (float) ($s['rate']['inclusive'] ?? $s['amount'] ?? $s['value'] ?? 0),
+                                                        'type' => $s['charge'] ?? $s['chargeType'] ?? ($s['type'] ?? 'mandatory'),
                                                     ];
                                                 })->toArray();
                                                 $roomCancellationText = $room['cancellationPolicy']['translatedCancellationText']
@@ -614,6 +638,7 @@
                                                 data-children="{{ $children ?? 0 }}"
                                                 data-benefits='@json($roomBenefitsList)'
                                                 data-surcharges='@json($roomSurchargesList)'
+                                                data-surcharges-raw='@json($room['surcharges'] ?? [])'
                                                 data-cancellation-policy="{{ $roomCancellationText }}"
                                                 data-hotel-remarks="{{ $hotelRemark ?? '' }}"
                                                 data-hotel-address="{{ $primaryAddress ? trim(($primaryAddress['address_line_1'] ?? '') . ', ' . ($primaryAddress['city'] ?? '') . ', ' . ($primaryAddress['country'] ?? '')) : '' }}">
@@ -1217,6 +1242,7 @@ leisure and sports' => 'bi-trophy',
                 document.getElementById('formPaymentModel').value = data.paymentModel;
                 document.getElementById('formBenefits').value = data.benefits || '[]';
                 document.getElementById('formSurcharges').value = data.surcharges || '[]';
+                document.getElementById('formSurchargesRaw').value = data.surchargesRaw || '[]';
                 document.getElementById('formCancellationPolicy').value = data.cancellationPolicy || '';
                 document.getElementById('formHotelRemarks').value = data.hotelRemarks || '';
                 document.getElementById('formHotelAddress').value = data.hotelAddress || '';
@@ -1381,6 +1407,7 @@ leisure and sports' => 'bi-trophy',
                         <input type="hidden" name="payment_type" id="formPaymentType" value="pay_now">
                         <input type="hidden" name="benefits" id="formBenefits">
                         <input type="hidden" name="surcharges" id="formSurcharges">
+                        <input type="hidden" name="surcharges_raw" id="formSurchargesRaw">
                         <input type="hidden" name="cancellation_policy_text" id="formCancellationPolicy">
                         <input type="hidden" name="hotel_remarks" id="formHotelRemarks">
                         <input type="hidden" name="hotel_address" id="formHotelAddress">

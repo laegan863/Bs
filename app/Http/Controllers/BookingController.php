@@ -86,10 +86,15 @@ class BookingController extends Controller
             'payment_model' => 'required|string',
             'benefits' => 'nullable|string',
             'surcharges' => 'nullable|string',
+            'surcharges_raw' => 'nullable|string',
             'cancellation_policy_text' => 'nullable|string',
             'hotel_remarks' => 'nullable|string',
             'hotel_address' => 'nullable|string',
         ]);
+
+        // return response()->json([
+        //     'data' => $validated
+        // ]);
 
         // return response()->json([
         //     'data' => $request->all()
@@ -115,9 +120,15 @@ class BookingController extends Controller
         return json_decode($response->getBody()->getContents(), true);
     }
 
-    public function success($bookingId)
+    public function success()
     {
+        // return response()->json(['message' => 'Payment successful!']);
         $bookingData = session('booking_data');
+
+        // return response()->json([
+        //     'message' => 'Payment successful!',
+        //     'booking_data' => $bookingData,
+        // ]);
 
         if(!$bookingData) {
             return response()->json(['error' => 'No booking data in session. Please start the booking process again.'], 400);
@@ -318,7 +329,7 @@ class BookingController extends Controller
                                 'fees' => (float) $sessionData['rate_fees'],
                                 'method' => $sessionData['rate_method'],
                             ],
-                            'surcharges' => [],
+                            'surcharges' => json_decode($sessionData['surcharges_raw'] ?? '[]', true) ?: [],
                             'guestDetails' => [
                                 [
                                     'title' => 'Mr.',
@@ -387,6 +398,10 @@ class BookingController extends Controller
         } catch (\Exception $e) {
             Log::error('Agoda Book API call failed: ' . $e->getMessage());
         }
+
+        // return response()->json([
+        //     'agoda_response' => $agodaResult ?? null,
+        // ]);
 
         if ($agodaResult && ($agodaResult['status'] ?? '') === '200') {
             $agodaDetails = $agodaResult['bookingDetails'][0] ?? null;
