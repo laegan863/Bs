@@ -128,32 +128,79 @@
 
                             <!-- Price Breakdown -->
                             <div class="checkout-price-breakdown">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted small">Room rate ({{ $nights }} night{{ $nights > 1 ? 's' : '' }})</span>
-                                    <span class="small fw-medium">US${{ number_format($bookingData['price_per_night'] * $nights, 2) }}</span>
+                                @php
+                                    $checkoutSurcharges = json_decode($bookingData['surcharges'] ?? '[]', true) ?: [];
+                                    $checkoutIncluded   = array_filter($checkoutSurcharges, fn($s) => ($s['type'] ?? '') === 'Included');
+                                    $checkoutExcluded   = array_filter($checkoutSurcharges, fn($s) => in_array($s['type'] ?? '', ['Excluded', 'Mandatory']));
+                                    $checkoutRateTax    = (float)($bookingData['rate_tax'] ?? 0);
+                                    $checkoutRateFees   = (float)($bookingData['rate_fees'] ?? 0);
+                                    $checkoutRateExcl   = (float)($bookingData['rate_exclusive'] ?? 0);
+                                @endphp
+
+                                {{-- ── Paid Online ── --}}
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge rounded-pill" style="background:#e0f2fe; color:#0369a1; font-size:0.65rem; font-weight:600;">PAID ONLINE</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted small">Price per night</span>
                                     <span class="small fw-medium">US${{ number_format($bookingData['price_per_night'], 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted small">Taxes</span>
-                                    <span class="small fw-medium">US${{ number_format($bookingData['rate_tax'] ?? 0, 2) }}</span>
+                                    <span class="text-muted small">Duration</span>
+                                    <span class="small fw-medium">{{ $nights }} night{{ $nights > 1 ? 's' : '' }}</span>
                                 </div>
+                                @if($checkoutRateExcl > 0)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Room rate</span>
+                                    <span class="small fw-medium">US${{ number_format($checkoutRateExcl, 2) }}</span>
+                                </div>
+                                @endif
+                                @if($checkoutRateTax > 0)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Taxes</span>
+                                    <span class="small fw-medium">US${{ number_format($checkoutRateTax, 2) }}</span>
+                                </div>
+                                @endif
+                                @if($checkoutRateFees > 0)
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted small">Fees</span>
-                                    <span class="small fw-medium">US${{ number_format($bookingData['rate_fees'] ?? 0, 2) }}</span>
+                                    <span class="small fw-medium">US${{ number_format($checkoutRateFees, 2) }}</span>
                                 </div>
+                                @endif
+                                @foreach($checkoutIncluded as $cs)
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted small">Surcharges</span>
-                                    <span class="small fw-medium">US${{ number_format($bookingData['surcharge_amount'] ?? 0, 2) }}</span>
+                                    <span class="text-muted small">{{ $cs['name'] ?? 'Surcharge' }}</span>
+                                    <span class="small fw-medium">US${{ number_format((float)($cs['amount'] ?? 0), 2) }}</span>
                                 </div>
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <span class="fw-bold">Total Price</span>
+                                @endforeach
+                                <hr class="my-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="fw-bold">Total (paid online)</span>
                                     <span class="fw-bold checkout-total-price">US${{ number_format($bookingData['total_price'], 2) }}</span>
                                 </div>
-                                <small class="text-muted d-block mt-1">Including taxes and fees</small>
+                                <small class="text-muted d-block">Includes all taxes &amp; fees above</small>
+
+                                {{-- ── Pay at Hotel ── --}}
+                                @if(count($checkoutExcluded) > 0)
+                                <div class="mt-3 p-3 rounded-3" style="background:#fff8e1; border:1px solid #fde68a; border-top:2px solid #f59e0b;">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-building" style="color:#d97706;"></i>
+                                            <span class="fw-bold small" style="color:#92400e;">PAY AT HOTEL</span>
+                                        </div>
+                                        <span class="badge rounded-pill" style="background:#fef3c7; color:#92400e; font-size:0.6rem;">Not included in total</span>
+                                    </div>
+                                    @foreach($checkoutExcluded as $cs)
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="small" style="color:#92400e;">{{ $cs['name'] ?? 'Hotel fee' }}</span>
+                                        <span class="small fw-bold" style="color:#92400e;">
+                                            {{ (float)($cs['amount'] ?? 0) > 0 ? 'US$'.number_format((float)$cs['amount'], 2) : 'Varies' }}
+                                        </span>
+                                    </div>
+                                    @endforeach
+                                    <small class="d-block mt-2" style="font-size:0.68rem; color:#b45309;">Collected directly by the hotel at check-in or check-out.</small>
+                                </div>
+                                @endif
                             </div>
 
                             <!-- Payment Type Badge -->
