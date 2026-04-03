@@ -304,6 +304,12 @@
                                         <i class="bi bi-currency-bitcoin"></i>
                                         <span>Crypto (BoomFi)</span>
                                     </button>
+                                    @if($creditBalance > 0)
+                                    <button type="button" class="checkout-pay-tab" data-method="credit" onclick="selectCheckoutPayment('credit')">
+                                        <i class="bi bi-wallet2"></i>
+                                        <span>Travel Credit</span>
+                                    </button>
+                                    @endif
                                 </div>
 
                                 <input type="hidden" name="payment_method" id="checkoutPaymentMethod" value="bitpay">
@@ -345,6 +351,46 @@
                                         </p>
                                     </div>
                                 </div>
+
+                                <!-- Credit Section -->
+                                @if($creditBalance > 0)
+                                <div class="checkout-payment-section d-none" id="paySection_credit">
+                                    <div class="p-4 rounded-3 border" style="background: linear-gradient(135deg, #f1f8e9, #e8f5e9); border-color: #a5d6a7 !important;">
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                 style="width:48px; height:48px; background: linear-gradient(135deg,#66bb6a,#43a047);">
+                                                <i class="bi bi-wallet2 text-white fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-0">Pay with Travel Credit</h6>
+                                                <p class="small text-muted mb-0">Earned from cancelled online bookings</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center p-3 rounded-3 mb-3"
+                                             style="background: #fff; border: 1px solid #c8e6c9;">
+                                            <span class="text-muted small">Your credit balance</span>
+                                            <span class="fw-bold text-success fs-5">USD {{ number_format($creditBalance, 2) }}</span>
+                                        </div>
+                                        @if($creditBalance >= ($bookingData['total_price'] ?? 0))
+                                        <div class="d-flex align-items-center gap-2 p-3 rounded-3" style="background: #e8f5e9; border: 1px solid #a5d6a7;">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            <span class="small fw-medium text-success">
+                                                Your credit covers the full booking amount of USD {{ number_format($bookingData['total_price'] ?? 0, 2) }}.
+                                                No additional payment required.
+                                            </span>
+                                        </div>
+                                        @else
+                                        <div class="d-flex align-items-center gap-2 p-3 rounded-3" style="background: #fff3e0; border: 1px solid #ffcc02;">
+                                            <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                                            <span class="small fw-medium" style="color:#e65100;">
+                                                Insufficient credit. You need USD {{ number_format(($bookingData['total_price'] ?? 0) - $creditBalance, 2) }} more.
+                                            </span>
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                @endif
+
                                 @endif
                             </div>
                         </div>
@@ -403,7 +449,7 @@
                                 {{ Session::get('error') }}
                             </div>
                         @endif
-                        <a href="{{ route('booking.success') }}" class="btn btn-primary">overide checkout</a>
+                        {{-- <a href="{{ route('booking.success') }}" class="btn btn-primary">overide checkout</a> --}}
                         <!-- Submit Button -->
                         <button type="submit" class="btn btn-primary-custom btn-hover-glow text-white w-100 py-3 fw-bold checkout-submit-btn" style="font-size: 1.1rem;" id="completeBookingBtn">
                             <i class="bi bi-lock me-2"></i>Complete Booking
@@ -445,13 +491,24 @@
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        const paymentMethod = document.getElementById('checkoutPaymentMethod')?.value || 'bitpay';
+
+        // Travel Credit: change action and submit normally — no BoomFi overlay
+        if (paymentMethod === 'credit') {
+            const btn = document.getElementById('completeBookingBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing Credit Payment...';
+            this.action = '{{ route("booking.process.credit") }}';
+            this.submit();
+            return;
+        }
+
         const btn = document.getElementById('completeBookingBtn');
         const content = document.getElementById('content');
         content.innerHTML = `
             <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100">
                 <div class="spinner-border text-primary mb-3" role="status"></div>
-                <p class="text-muted
-                    <i class="bi bi-info-circle me-1"></i>Processing your payment, please wait...</p>
+                <p class="text-muted"><i class="bi bi-info-circle me-1"></i>Processing your payment, please wait...</p>
             </div>
         `;
         btn.disabled = true;
@@ -477,7 +534,6 @@
                 if (response.url) {
                     content.innerHTML = `<iframe id="paymentIframe" src="${response.url}" style="width: 100%; height: 100%; border: none;"></iframe>`;
                     document.getElementById('paymentOverlay').style.display = 'flex';
-
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-lock me-2"></i>Complete Booking';
                 }

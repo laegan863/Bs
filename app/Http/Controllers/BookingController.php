@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AgodaBooking;
 use App\Models\Booking;
 use App\Models\BookingDetail;
+use App\Models\UserCredit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -24,6 +25,7 @@ class BookingController extends Controller
         return view('checkout', [
             'bookingData' => $bookingData,
             'user' => Auth::user(),
+            'creditBalance' => Auth::user()->creditBalance(),
         ]);
     }
 
@@ -108,7 +110,7 @@ class BookingController extends Controller
 
     public function boomfiApi($method = null, $url = null, $payload = [])
     {
-        $client = new Client();
+        $client = new Client(['verify' => false]);
         $response = $client->request($method, $url ?? 'https://mapi.boomfi.xyz/v1/paylinks', [
             'body' => json_encode($payload),
             'headers' => [
@@ -291,6 +293,216 @@ class BookingController extends Controller
         ]);
 
         return $this->processBookingPayment($request, $booking->id);
+    }
+
+    public function processCreditPayment(Request $request)
+    {
+        $sessionData = session('booking_data');
+
+        if (!$sessionData) {
+            return redirect()->route('landing')->with('error', 'No booking data found. Please start the booking process again.');
+        }
+
+        $user = Auth::user();
+        $totalPrice = (float) ($sessionData['total_price'] ?? 0);
+        $currency   = $sessionData['rate_currency'] ?? 'USD';
+
+        // Validate sufficient credit balance
+        if ($user->creditBalance() < $totalPrice) {
+            return back()->with('error', 'Insufficient travel credit balance to complete this booking.');
+        }
+
+        // --- Create Booking ---
+        $reference = Booking::generateReference();
+
+        $booking = Booking::create([
+            'user_id'                => $user->id,
+            'agoda_booking_id'       => null,
+            'property_id'            => $sessionData['property_id'],
+            'property_name'          => $sessionData['property_name'],
+            'property_image'         => $sessionData['property_image'],
+            'room_id'                => $sessionData['room_id'],
+            'room_name'              => $sessionData['room_name'],
+            'room_type'              => $sessionData['room_type'] ?? null,
+            'bed_type'               => $sessionData['bed_type'] ?? null,
+            'check_in'               => $sessionData['check_in'],
+            'check_out'              => $sessionData['check_out'],
+            'rooms'                  => $sessionData['rooms'],
+            'adults'                 => $sessionData['adults'],
+            'children'               => $sessionData['children'] ?? 0,
+            'price_per_night'        => $sessionData['price_per_night'],
+            'total_price'            => $sessionData['total_price'],
+            'tax_amount'             => $sessionData['rate_tax'] ?? 0,
+            'fees_amount'            => $sessionData['rate_fees'] ?? 0,
+            'currency'               => $currency,
+            'guest_first_name'       => $request->input('guest_first_name'),
+            'guest_last_name'        => $request->input('guest_last_name'),
+            'guest_email'            => $request->input('guest_email'),
+            'guest_phone'            => $request->input('guest_phone'),
+            'special_requests'       => $request->input('special_requests') ?? null,
+            'payment_method'         => 'credit',
+            'payment_status'         => 'paid',
+            'transaction_reference'  => $reference,
+            'status'                 => 'pending',
+            'free_cancellation'      => $sessionData['free_cancellation'] ?? false,
+            'cancellation_deadline'  => $sessionData['cancellation_deadline'] ?? null,
+        ]);
+
+        // --- Create Booking Details ---
+        $benefitsArray   = json_decode($sessionData['benefits'] ?? '[]', true);
+        $surchargesArray = json_decode($sessionData['surcharges'] ?? '[]', true);
+
+        BookingDetail::create([
+            'booking_id'          => $booking->id,
+            'hotel_address'       => $sessionData['hotel_address'] ?? null,
+            'hotel_remarks'       => $sessionData['hotel_remarks'] ?? null,
+            'room_type'           => $sessionData['room_type'] ?? null,
+            'room_quantity'       => $sessionData['rooms'] ?? 1,
+            'adults'              => $sessionData['adults'] ?? 1,
+            'children'            => $sessionData['children'] ?? 0,
+            'benefits'            => is_array($benefitsArray) ? $benefitsArray : [],
+            'cancellation_policy' => $sessionData['cancellation_policy_text'] ?? null,
+            'free_cancellation'   => $sessionData['free_cancellation'] ?? false,
+            'cancellation_deadline' => $sessionData['cancellation_deadline'] ?? null,
+            'special_requests'    => $request->input('special_requests'),
+            'surcharges'          => is_array($surchargesArray) ? $surchargesArray : [],
+            'surcharge_total'     => $sessionData['surcharge_amount'] ?? 0,
+            'payment_type'        => $sessionData['payment_type'] ?? 'pay_now',
+        ]);
+
+        // --- Deduct Travel Credit ---
+        UserCredit::create([
+            'user_id'     => $user->id,
+            'booking_id'  => $booking->id,
+            'amount'      => -$totalPrice,
+            'currency'    => $currency,
+            'type'        => 'used',
+            'description' => 'Credit used for booking at ' . ($sessionData['property_name'] ?? ''),
+        ]);
+
+        // --- Call Agoda Booking API ---
+        $agodaPayload = [
+            'waitTime' => 120,
+            'bookingDetails' => [
+                'userCountry' => 'US',
+                'searchId'    => (int) $sessionData['searched_id'],
+                'tag'         => 'test-tag',
+                'allowDuplication' => true,
+                'checkIn'  => \Carbon\Carbon::parse($sessionData['check_in'])->toDateString(),
+                'checkOut' => \Carbon\Carbon::parse($sessionData['check_out'])->toDateString(),
+                'property' => [
+                    'propertyId' => (int) $sessionData['property_id'],
+                    'rooms' => [
+                        [
+                            'blockId' => $sessionData['block_id'],
+                            'rate' => [
+                                'currency'  => $sessionData['rate_currency'],
+                                'exclusive' => (float) $sessionData['rate_exclusive'],
+                                'inclusive' => (float) $sessionData['price_per_night'],
+                                'tax'       => (float) $sessionData['rate_tax'],
+                                'fees'      => (float) $sessionData['rate_fees'],
+                                'method'    => $sessionData['rate_method'],
+                            ],
+                            'surcharges'   => json_decode($sessionData['surcharges_raw'] ?? '[]', true) ?: [],
+                            'guestDetails' => [
+                                [
+                                    'title'              => 'Mr.',
+                                    'firstName'          => $request->input('guest_first_name'),
+                                    'lastName'           => $request->input('guest_last_name'),
+                                    'countryOfResidence' => 'US',
+                                    'gender'             => 'Male',
+                                    'age'                => 30,
+                                    'primary'            => true,
+                                ],
+                            ],
+                            'currency'     => $sessionData['rate_currency'],
+                            'paymentModel' => $sessionData['payment_model'],
+                            'count'        => (int) $sessionData['rooms'],
+                            'adults'       => (int) $sessionData['adults'],
+                            'children'     => (int) ($sessionData['children'] ?? 0),
+                            'specialRequest' => $request->filled('special_requests') ? $request->input('special_requests') : 'None',
+                        ],
+                    ],
+                ],
+            ],
+            'customerDetail' => [
+                'language'  => 'en-us',
+                'title'     => 'Mr.',
+                'firstName' => $request->input('guest_first_name'),
+                'lastName'  => $request->input('guest_last_name'),
+                'email'     => $request->input('guest_email'),
+                'phone'     => [
+                    'countryCode' => '1',
+                    'areaCode'    => '',
+                    'number'      => $request->input('guest_phone') ?? '09762016124',
+                ],
+                'newsletter' => false,
+            ],
+            'paymentDetails' => [
+                'creditCardInfo' => [
+                    'cardType'     => 'Visa',
+                    'number'       => '4111111111111111',
+                    'expiryDate'   => '032029',
+                    'cvc'          => '543',
+                    'holderName'   => strtoupper($request->input('guest_first_name') . ' ' . $request->input('guest_last_name')),
+                    'countryOfIssue' => 'US',
+                    'issuingBank'  => 'BankName',
+                ],
+            ],
+        ];
+
+        try {
+            $agodaResponse = Http::withoutVerifying()
+                ->timeout(120)
+                ->withHeaders([
+                    'Authorization' => '1952979:97af8aba-5b21-4a37-ad75-a034c9e46742',
+                    'Content-Type'  => 'application/json',
+                ])->post('https://sandbox-affiliateapisecure.agoda.com/api/v4/book', $agodaPayload);
+
+            $agodaResult = $agodaResponse->json();
+
+            Log::info('Agoda Book API response (credit payment)', [
+                'booking_id' => $booking->id,
+                'status'     => $agodaResponse->status(),
+                'response'   => $agodaResult,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Agoda Book API call failed (credit payment): ' . $e->getMessage());
+            $agodaResult = null;
+        }
+
+        if ($agodaResult && ($agodaResult['status'] ?? '') === '200') {
+            $agodaDetails = $agodaResult['bookingDetails'][0] ?? null;
+            if ($agodaDetails) {
+                AgodaBooking::create([
+                    'booking_id'       => $booking->id,
+                    'agoda_booking_id' => $agodaDetails['id'],
+                    'itinerary_id'     => $agodaDetails['itineraryID'],
+                    'self_service_url' => $agodaDetails['selfService'],
+                    'status'           => $agodaResult['status'],
+                    'raw_response'     => $agodaResult,
+                ]);
+            }
+
+            $booking->update(['status' => 'confirmed']);
+        } else {
+            // Refund the deducted credit on Agoda failure
+            UserCredit::create([
+                'user_id'     => $user->id,
+                'booking_id'  => $booking->id,
+                'amount'      => $totalPrice,
+                'currency'    => $currency,
+                'type'        => 'earned',
+                'description' => 'Credit refunded — Agoda booking failed for ' . ($sessionData['property_name'] ?? ''),
+            ]);
+            $booking->update(['payment_status' => 'failed', 'status' => 'cancelled']);
+
+            $errorMsg = $agodaResult['errorMessage']['message'] ?? 'Agoda booking failed. Your credit has been refunded.';
+            return back()->with('error', $errorMsg);
+        }
+
+        session()->forget('booking_data');
+        return redirect()->route('booking.confirmation', $booking->id);
     }
 
     public function confirmBooking($id)
@@ -526,8 +738,31 @@ class BookingController extends Controller
                 $booking->update(['status' => 'cancelled']);
                 $agodaBooking->update(['status' => 'Cancelled']);
 
+                // Award credit if booking was paid online and refund amount > 0
+                $refundAmount = (float) $request->input('refund_amount', 0);
+                $refundCurrency = $request->input('currency', $booking->currency ?? 'USD');
+                $creditAwarded = false;
+
+                if ($refundAmount > 0 && $booking->payment_method !== 'pay_at_hotel') {
+                    UserCredit::create([
+                        'user_id'     => $booking->user_id,
+                        'booking_id'  => $booking->id,
+                        'amount'      => $refundAmount,
+                        'currency'    => $refundCurrency,
+                        'type'        => 'earned',
+                        'description' => 'Refund credit for cancelled booking #' . ($agodaBooking->agoda_booking_id ?? $booking->id),
+                    ]);
+                    $creditAwarded = true;
+                }
+
                 if ($request->ajax()) {
-                    return response()->json(['success' => true, 'message' => 'Booking #' . $agodaBooking->agoda_booking_id . ' has been cancelled successfully.']);
+                    return response()->json([
+                        'success'        => true,
+                        'message'        => 'Booking #' . $agodaBooking->agoda_booking_id . ' has been cancelled successfully.',
+                        'credit_awarded' => $creditAwarded,
+                        'credit_amount'  => $creditAwarded ? $refundAmount : 0,
+                        'currency'       => $refundCurrency,
+                    ]);
                 }
                 return back()->with('success', 'Booking #' . $agodaBooking->agoda_booking_id . ' has been cancelled successfully.');
             }

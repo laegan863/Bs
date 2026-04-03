@@ -2,6 +2,59 @@
 @section('page-title', 'Profile')
 
 @section('dashboard-content')
+    {{-- Credit Balance Section --}}
+    @php
+        $creditBalance = $user->creditBalance();
+        $creditHistory = $user->credits()->with('booking')->latest()->take(5)->get();
+    @endphp
+    <div id="credit" class="profile-content-card mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:40px; height:40px; background: linear-gradient(135deg,#a5d6a7,#66bb6a);">
+                    <i class="bi bi-wallet2 text-white"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Travel Credit</h6>
+                    <small class="text-muted">Earned from cancelled online bookings</small>
+                </div>
+            </div>
+            <div class="text-end">
+                <div class="fw-bold fs-4 mb-0" style="color:#1b5e20;">
+                    USD {{ number_format($creditBalance, 2) }}
+                </div>
+                <small class="text-muted">Available balance</small>
+            </div>
+        </div>
+
+        @if($creditHistory->isNotEmpty())
+        <hr class="my-3">
+        <h6 class="fw-semibold mb-2 text-muted" style="font-size:0.8rem; text-transform:uppercase; letter-spacing:.5px;">Recent Activity</h6>
+        <div class="d-flex flex-column gap-2">
+            @foreach($creditHistory as $credit)
+            <div class="d-flex justify-content-between align-items-center p-2 rounded-3"
+                 style="background:{{ $credit->type === 'earned' ? '#f1f8e9' : '#fff3e0' }};">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi {{ $credit->type === 'earned' ? 'bi-arrow-down-circle-fill text-success' : 'bi-arrow-up-circle-fill text-warning' }}"></i>
+                    <div>
+                        <span class="small fw-medium">{{ $credit->description ?? ($credit->type === 'earned' ? 'Credit earned' : 'Credit used') }}</span>
+                        <span class="d-block text-muted" style="font-size:0.7rem;">{{ $credit->created_at->format('M d, Y') }}</span>
+                    </div>
+                </div>
+                <span class="fw-bold {{ $credit->type === 'earned' ? 'text-success' : 'text-warning' }}">
+                    {{ $credit->type === 'earned' ? '+' : '' }}{{ number_format($credit->amount, 2) }} {{ $credit->currency }}
+                </span>
+            </div>
+            @endforeach
+        </div>
+        @else
+        <p class="text-muted small mb-0 mt-2">
+            <i class="bi bi-info-circle me-1"></i>
+            No credit history yet. Credits are earned when you cancel a booking paid online with a refund.
+        </p>
+        @endif
+    </div>
+
     <div class="profile-content-card">
         <!-- Header -->
         <div class="profile-header d-flex justify-content-between align-items-start">
