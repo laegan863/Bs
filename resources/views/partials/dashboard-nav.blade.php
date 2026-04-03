@@ -20,6 +20,17 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link text-dark">Trips</a>
                 </li>
+                @auth
+                <li class="nav-item">
+                    <a href="{{ route('profile.show') }}#credit" class="nav-link d-flex align-items-center gap-1 text-dark" title="Your Credit Balance">
+                        <i class="bi bi-wallet2"></i>
+                        @php $creditBalance = Auth::user()->creditBalance(); @endphp
+                        <span class="badge rounded-pill px-2 py-1 fw-semibold" style="background: #e8f5e9; color: #1b5e20; font-size: 0.7rem;">
+                            USD {{ number_format($creditBalance, 2) }}
+                        </span>
+                    </a>
+                </li>
+                @endauth
                 <li class="nav-item">
                     <a href="#" class="nav-link text-dark">
                         <i class="bi bi-chat-dots"></i>

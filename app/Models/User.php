@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\PaymentMethod;
+use App\Models\UserCredit;
 
 class User extends Authenticatable
 {
@@ -59,6 +60,22 @@ class User extends Authenticatable
     public function paymentMethods(): HasMany
     {
         return $this->hasMany(PaymentMethod::class);
+    }
+
+    /**
+     * Get the credits for this user.
+     */
+    public function credits(): HasMany
+    {
+        return $this->hasMany(UserCredit::class);
+    }
+
+    /**
+     * Get the total credit balance for this user.
+     */
+    public function creditBalance(): float
+    {
+        return (float) $this->credits()->sum('amount');
     }
 
     /**
