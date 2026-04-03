@@ -130,8 +130,8 @@
                             <div class="checkout-price-breakdown">
                                 @php
                                     $checkoutSurcharges = json_decode($bookingData['surcharges'] ?? '[]', true) ?: [];
-                                    $checkoutIncluded   = array_filter($checkoutSurcharges, fn($s) => ($s['type'] ?? '') === 'Included');
-                                    $checkoutExcluded   = array_filter($checkoutSurcharges, fn($s) => in_array($s['type'] ?? '', ['Excluded', 'Mandatory']));
+                                    $checkoutIncluded   = array_filter($checkoutSurcharges, fn($s) => in_array($s['type'] ?? '', ['Included', 'Mandatory']));
+                                    $checkoutExcluded   = array_filter($checkoutSurcharges, fn($s) => ($s['type'] ?? '') === 'Excluded');
                                     $checkoutRateTax    = (float)($bookingData['rate_tax'] ?? 0);
                                     $checkoutRateFees   = (float)($bookingData['rate_fees'] ?? 0);
                                     $checkoutRateExcl   = (float)($bookingData['rate_exclusive'] ?? 0);

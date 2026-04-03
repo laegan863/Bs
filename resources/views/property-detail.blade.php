@@ -231,7 +231,20 @@
                         </h2>
                         <div id="aboutPropertyRemark" class="accordion-collapse collapse show" aria-labelledby="aboutPropertyRemarkHeading" data-bs-parent="#aboutPropertyAccordion">
                             <div class="accordion-body text-muted py-3" style="background:#ffffff; line-height:1.7;">
-                                {{ $hotelRemark }}
+                                @php
+                                    $cleanRemark = strip_tags($hotelRemark);
+                                    // Split on bullet characters (•) and filter empty
+                                    $remarkItems = array_values(array_filter(array_map('trim', preg_split('/[•●·]/', $cleanRemark)), fn($item) => $item !== ''));
+                                @endphp
+                                @if(count($remarkItems) > 1)
+                                <ul class="mb-0 ps-3" style="list-style-type: disc;">
+                                    @foreach($remarkItems as $item)
+                                    <li class="mb-1">{{ $item }}</li>
+                                    @endforeach
+                                </ul>
+                                @else
+                                {!! nl2br(e($cleanRemark)) !!}
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -558,8 +571,8 @@
                                             $_rateTax        = (float)($room['rate']['tax'] ?? 0);
                                             $_rateFees       = (float)($room['rate']['fees'] ?? 0);
                                             $_rateExcl       = (float)($room['rate']['exclusive'] ?? 0);
-                                            $_inclSurcharges = collect($room['surcharges'] ?? [])->filter(fn($s) => ($s['charge'] ?? '') === 'Included');
-                                            $_payAtHotel     = collect($room['surcharges'] ?? [])->filter(fn($s) => in_array($s['charge'] ?? '', ['Excluded', 'Mandatory']));
+                                            $_inclSurcharges = collect($room['surcharges'] ?? [])->filter(fn($s) => in_array($s['charge'] ?? '', ['Included', 'Mandatory']));
+                                            $_payAtHotel     = collect($room['surcharges'] ?? [])->filter(fn($s) => ($s['charge'] ?? '') === 'Excluded');
                                         @endphp
                                         <div class="rate-price p-3">
                                             <!-- ── Paid Online ── -->
@@ -637,9 +650,9 @@
                                     <div class="col-md-3">
                                         <div class="rate-action p-3 text-center">
                                             @php
-                                                // Only sum INCLUDED surcharges — excluded/mandatory are NOT part of online total
+                                                // Sum INCLUDED + MANDATORY surcharges — these are paid online
                                                 $roomSurchargeTotal = collect($room['surcharges'] ?? [])
-                                                    ->filter(fn($s) => ($s['charge'] ?? '') === 'Included')
+                                                    ->filter(fn($s) => in_array($s['charge'] ?? '', ['Included', 'Mandatory']))
                                                     ->sum(fn($s) => (float)($s['rate']['inclusive'] ?? 0));
                                             @endphp
                                             @php
@@ -1274,10 +1287,10 @@ leisure and sports' => 'bi-trophy',
                     feesRow.style.setProperty('display', 'none', 'important');
                 }
 
-                // --- Included / Excluded surcharges ---
+                // --- Included+Mandatory (paid online) / Excluded (pay at hotel) surcharges ---
                 const surcharges = JSON.parse(data.surcharges || '[]');
-                const includedSurcharges = surcharges.filter(s => s.type === 'Included');
-                const excludedSurcharges = surcharges.filter(s => s.type === 'Excluded' || s.type === 'Mandatory');
+                const includedSurcharges = surcharges.filter(s => s.type === 'Included' || s.type === 'Mandatory');
+                const excludedSurcharges = surcharges.filter(s => s.type === 'Excluded');
 
                 const inclContainer = document.getElementById('modalIncludedSurchargesContainer');
                 inclContainer.innerHTML = '';
