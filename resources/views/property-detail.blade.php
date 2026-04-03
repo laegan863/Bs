@@ -231,7 +231,20 @@
                         </h2>
                         <div id="aboutPropertyRemark" class="accordion-collapse collapse show" aria-labelledby="aboutPropertyRemarkHeading" data-bs-parent="#aboutPropertyAccordion">
                             <div class="accordion-body text-muted py-3" style="background:#ffffff; line-height:1.7;">
-                                {{ $hotelRemark }}
+                                @php
+                                    $cleanRemark = strip_tags($hotelRemark);
+                                    // Split on bullet characters (•) and filter empty
+                                    $remarkItems = array_values(array_filter(array_map('trim', preg_split('/[•●·]/', $cleanRemark)), fn($item) => $item !== ''));
+                                @endphp
+                                @if(count($remarkItems) > 1)
+                                <ul class="mb-0 ps-3" style="list-style-type: disc;">
+                                    @foreach($remarkItems as $item)
+                                    <li class="mb-1">{{ $item }}</li>
+                                    @endforeach
+                                </ul>
+                                @else
+                                {!! nl2br(e($cleanRemark)) !!}
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -539,25 +552,6 @@
                                             @endif
 
                                             
-                                            @if(isset($room['surcharges']))
-                                                <div class="d-flex align-items-center gap-2 mb-2 fw-bold">
-                                                    Surcharges:
-                                                </div>
-
-                                                @foreach($room['surcharges'] as $surcharge)
-                                                    <p class="small text-danger mb-2" style="font-size: 0.7rem;">
-                                                        <i class="bi bi-x-circle me-1"></i>
-                                                        Method: {{ $surcharge['method'] }} </br>
-                                                        Charge: {{ $surcharge['charge'] ?? '' }}</br>
-                                                        Margin: {{ $surcharge['margin'] ?? '' }}</br>
-                                                        name: {{ $surcharge['name'] ?? '' }}</br>
-                                                        rate: @foreach($surcharge['rate'] ?? [] as $rate => $rateDetails) 
-                                                            {{ $rate }} {{ $rateDetails ?? '' }} </br>
-                                                        @endforeach
-                                                    </p>
-                                                @endforeach
-                                            @endif
-
                                             <p class="small text-muted mb-1" style="font-size: 0.72rem;">
                                                 <i class="bi bi-people me-1"></i> {{ $rooms }} room, {{ $adults }} adults
                                             </p>
@@ -573,16 +567,78 @@
 
                                     <!-- Price -->
                                     <div class="col-md-4">
-                                        <div class="rate-price p-3 text-end">
-                                            <span class="rate-price-amount">US${{ number_format($room['rate']['inclusive'] ?? 0, 2) }}</span>
-                                            <small class="d-block text-muted" style="font-size: 0.68rem;">Cryptocurrency accepted</small>
-                                            <small class="d-block text-muted" style="font-size: 0.68rem;">Price per night, {{ $rooms }} room</small>
-                                            <small class="d-block text-muted" style="font-size: 0.68rem;">Including taxes and fees</small>
+                                        @php
+                                            $_rateTax        = (float)($room['rate']['tax'] ?? 0);
+                                            $_rateFees       = (float)($room['rate']['fees'] ?? 0);
+                                            $_rateExcl       = (float)($room['rate']['exclusive'] ?? 0);
+                                            $_inclSurcharges = collect($room['surcharges'] ?? [])->filter(fn($s) => in_array($s['charge'] ?? '', ['Included', 'Mandatory']));
+                                            $_payAtHotel     = collect($room['surcharges'] ?? [])->filter(fn($s) => ($s['charge'] ?? '') === 'Excluded');
+                                        @endphp
+                                        <div class="rate-price p-3">
+                                            <!-- ── Paid Online ── -->
+                                            <div class="text-end">
+                                                <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
+                                                    <span class="badge rounded-pill" style="background:#e0f2fe; color:#0369a1; font-size:0.6rem; font-weight:600;">PAID ONLINE</span>
+                                                </div>
+                                                <span class="rate-price-amount">US${{ number_format($room['rate']['inclusive'] ?? 0, 2) }}</span>
+                                                <small class="d-block text-muted" style="font-size: 0.68rem;">Per night · {{ $rooms }} room · incl. taxes &amp; fees</small>
+                                            </div>
+
+                                            <!-- ── Online price breakdown ── -->
+                                            @if($_rateExcl > 0 || $_rateTax > 0 || $_rateFees > 0 || $_inclSurcharges->count() > 0)
+                                            <div class="mt-2 pt-2" style="border-top:1px solid #e5e7eb;">
+                                                @if($_rateExcl > 0)
+                                                <div class="d-flex justify-content-between">
+                                                    <small style="font-size:0.65rem; color:#94a3b8;">Room rate</small>
+                                                    <small style="font-size:0.65rem; color:#94a3b8;">US${{ number_format($_rateExcl, 2) }}</small>
+                                                </div>
+                                                @endif
+                                                @if($_rateTax > 0)
+                                                <div class="d-flex justify-content-between">
+                                                    <small style="font-size:0.65rem; color:#94a3b8;">Taxes</small>
+                                                    <small style="font-size:0.65rem; color:#94a3b8;">US${{ number_format($_rateTax, 2) }}</small>
+                                                </div>
+                                                @endif
+                                                @if($_rateFees > 0)
+                                                <div class="d-flex justify-content-between">
+                                                    <small style="font-size:0.65rem; color:#94a3b8;">Fees</small>
+                                                    <small style="font-size:0.65rem; color:#94a3b8;">US${{ number_format($_rateFees, 2) }}</small>
+                                                </div>
+                                                @endif
+                                                @foreach($_inclSurcharges as $_s)
+                                                <div class="d-flex justify-content-between">
+                                                    <small style="font-size:0.65rem; color:#94a3b8;">{{ $_s['name'] ?? 'Surcharge' }}</small>
+                                                    <small style="font-size:0.65rem; color:#94a3b8;">US${{ number_format((float)($_s['rate']['inclusive'] ?? 0), 2) }}</small>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            @endif
+
+                                            <!-- ── Pay at Hotel ── -->
+                                            @if($_payAtHotel->count() > 0)
+                                            <div class="mt-2 pt-2 px-2 pb-2 rounded-2" style="background:#fff8e1; border:1px solid #fde68a; border-top:2px solid #f59e0b;">
+                                                <div class="d-flex align-items-center gap-1 mb-1">
+                                                    <i class="bi bi-building" style="font-size:0.72rem; color:#d97706;"></i>
+                                                    <span class="fw-bold" style="font-size:0.7rem; color:#92400e; letter-spacing:.02em;">PAY AT HOTEL</span>
+                                                    <span class="ms-auto" style="font-size:0.6rem; color:#b45309;">Not included in total</span>
+                                                </div>
+                                                @foreach($_payAtHotel as $_ph)
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small style="font-size:0.65rem; color:#92400e;">
+                                                        <i class="bi bi-dot"></i>{{ $_ph['name'] ?? 'Hotel fee' }}
+                                                    </small>
+                                                    <small style="font-size:0.65rem; color:#92400e; font-weight:600;">
+                                                        {{ (float)($_ph['rate']['inclusive'] ?? 0) > 0 ? 'US$'.number_format((float)$_ph['rate']['inclusive'], 2) : 'Varies' }}
+                                                    </small>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            @endif
 
                                             @if(isset($room['promotionDetail']['savingAmount']))
-                                            <div class="rate-promo-tag mt-2">
+                                            <div class="rate-promo-tag mt-2 text-end">
                                                 <small style="font-size: 0.65rem;">
-                                                    Approx. <strong>US${{ number_format($room['promotionDetail']['savingAmount'], 0) }}</strong> in AVA payback with
+                                                    Approx. <strong>US${{ number_format($room['promotionDetail']['savingAmount'], 0) }}</strong> AVA payback with
                                                     <span class="text-decoration-underline">FREE Smart membership</span>
                                                 </small>
                                             </div>
@@ -594,17 +650,18 @@
                                     <div class="col-md-3">
                                         <div class="rate-action p-3 text-center">
                                             @php
-                                                $roomSurchargeTotal = collect($room['surcharges'] ?? [])->sum(function ($s) {
-                                                    return (float) ($s['rate']['inclusive'] ?? $s['amount'] ?? $s['value'] ?? 0);
-                                                });
+                                                // Sum INCLUDED + MANDATORY surcharges — these are paid online
+                                                $roomSurchargeTotal = collect($room['surcharges'] ?? [])
+                                                    ->filter(fn($s) => in_array($s['charge'] ?? '', ['Included', 'Mandatory']))
+                                                    ->sum(fn($s) => (float)($s['rate']['inclusive'] ?? 0));
                                             @endphp
                                             @php
                                                 $roomBenefitsList = collect($room['benefits'] ?? [])->map(fn($b) => $b['translatedBenefitName'] ?? $b['benefitName'] ?? '')->filter()->values()->toArray();
                                                 $roomSurchargesList = collect($room['surcharges'] ?? [])->map(function($s) {
                                                     return [
-                                                        'name' => $s['name'] ?? $s['description'] ?? 'Surcharge',
-                                                        'amount' => (float) ($s['rate']['inclusive'] ?? $s['amount'] ?? $s['value'] ?? 0),
-                                                        'type' => $s['charge'] ?? $s['chargeType'] ?? ($s['type'] ?? 'mandatory'),
+                                                        'name'   => $s['name'] ?? $s['description'] ?? 'Surcharge',
+                                                        'amount' => (float)($s['rate']['inclusive'] ?? 0),
+                                                        'type'   => $s['charge'] ?? 'Included', // Included | Excluded | Mandatory
                                                     ];
                                                 })->toArray();
                                                 $roomCancellationText = $room['cancellationPolicy']['translatedCancellationText']
@@ -1200,6 +1257,67 @@ leisure and sports' => 'bi-trophy',
                 document.getElementById('modalTotalPrice').textContent = 'US$' + totalPrice.toFixed(2);
                 document.getElementById('modalPayAtHotelTotal').textContent = 'US$' + totalPrice.toFixed(2);
                 document.getElementById('modalPayNowTotal').textContent = 'US$' + totalPrice.toFixed(2);
+
+                // --- Price breakdown rows ---
+                const rateExclusive = parseFloat(data.rateExclusive || 0);
+                const rateTax       = parseFloat(data.rateTax || 0);
+                const rateFees      = parseFloat(data.rateFees || 0);
+
+                const rateRateRow = document.getElementById('modalRoomRateRow');
+                if (rateExclusive > 0) {
+                    document.getElementById('modalRoomRate').textContent = 'US$' + rateExclusive.toFixed(2);
+                    rateRateRow.style.removeProperty('display');
+                } else {
+                    rateRateRow.style.setProperty('display', 'none', 'important');
+                }
+
+                const taxRow = document.getElementById('modalTaxesRow');
+                if (rateTax > 0) {
+                    document.getElementById('modalTaxes').textContent = 'US$' + rateTax.toFixed(2);
+                    taxRow.style.removeProperty('display');
+                } else {
+                    taxRow.style.setProperty('display', 'none', 'important');
+                }
+
+                const feesRow = document.getElementById('modalFeesRow');
+                if (rateFees > 0) {
+                    document.getElementById('modalFees').textContent = 'US$' + rateFees.toFixed(2);
+                    feesRow.style.removeProperty('display');
+                } else {
+                    feesRow.style.setProperty('display', 'none', 'important');
+                }
+
+                // --- Included+Mandatory (paid online) / Excluded (pay at hotel) surcharges ---
+                const surcharges = JSON.parse(data.surcharges || '[]');
+                const includedSurcharges = surcharges.filter(s => s.type === 'Included' || s.type === 'Mandatory');
+                const excludedSurcharges = surcharges.filter(s => s.type === 'Excluded');
+
+                const inclContainer = document.getElementById('modalIncludedSurchargesContainer');
+                inclContainer.innerHTML = '';
+                includedSurcharges.forEach(function(s) {
+                    inclContainer.innerHTML +=
+                        '<div class="d-flex justify-content-between mb-2">' +
+                            '<span class="text-muted small">' + s.name + '</span>' +
+                            '<span class="small fw-medium">US$' + parseFloat(s.amount).toFixed(2) + '</span>' +
+                        '</div>';
+                });
+
+                const excSection = document.getElementById('modalPayAtHotelChargesSection');
+                const excList    = document.getElementById('modalPayAtHotelChargesList');
+                if (excludedSurcharges.length > 0) {
+                    excList.innerHTML = '';
+                    excludedSurcharges.forEach(function(s) {
+                        const amtLabel = parseFloat(s.amount) > 0 ? 'US$' + parseFloat(s.amount).toFixed(2) : 'Varies';
+                        excList.innerHTML +=
+                            '<div class="d-flex justify-content-between mb-1">' +
+                                '<span class="small" style="color:#92400e;">' + s.name + '</span>' +
+                                '<span class="small fw-medium" style="color:#92400e;">' + amtLabel + '</span>' +
+                            '</div>';
+                    });
+                    excSection.style.display = '';
+                } else {
+                    excSection.style.display = 'none';
+                }
                 document.getElementById('modalPropertyImg').src = data.propertyImage || '{{ asset("assets/images/login-1.jpg") }}';
 
                 const breakfastBadge = document.getElementById('modalBreakfast');
@@ -1358,6 +1476,10 @@ leisure and sports' => 'bi-trophy',
 
                     <!-- Price Breakdown -->
                     <div class="booking-modal-price">
+                        {{-- ── Paid Online ── --}}
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge rounded-pill" style="background:#e0f2fe; color:#0369a1; font-size:0.65rem; font-weight:600;">PAID ONLINE</span>
+                        </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted small">Price per night</span>
                             <span class="small fw-medium" id="modalPricePerNight">US$0.00</span>
@@ -1366,12 +1488,38 @@ leisure and sports' => 'bi-trophy',
                             <span class="text-muted small">Duration</span>
                             <span class="small fw-medium" id="modalNightsSummary"></span>
                         </div>
-                        <hr>
-                        <div class="d-flex justify-content-between">
-                            <span class="fw-bold">Total</span>
+                        <div class="d-flex justify-content-between mb-2" id="modalRoomRateRow" style="display:none !important;">
+                            <span class="text-muted small">Room rate</span>
+                            <span class="small fw-medium" id="modalRoomRate">US$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" id="modalTaxesRow" style="display:none !important;">
+                            <span class="text-muted small">Taxes</span>
+                            <span class="small fw-medium" id="modalTaxes">US$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" id="modalFeesRow" style="display:none !important;">
+                            <span class="text-muted small">Fees</span>
+                            <span class="small fw-medium" id="modalFees">US$0.00</span>
+                        </div>
+                        <div id="modalIncludedSurchargesContainer"></div>
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold">Total (paid online)</span>
                             <span class="fw-bold" id="modalTotalPrice" style="font-size: 1.2rem; color: var(--primary-navy);">US$0.00</span>
                         </div>
-                        <small class="text-muted d-block mt-1">Including taxes and fees</small>
+                        <small class="text-muted d-block">Includes all taxes &amp; fees above</small>
+
+                        {{-- ── Pay at Hotel ── --}}
+                        <div id="modalPayAtHotelChargesSection" class="mt-3 p-3 rounded-3" style="background:#fff8e1; border:1px solid #fde68a; border-top:2px solid #f59e0b; display:none;">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-building" style="color:#d97706;"></i>
+                                    <span class="fw-bold small" style="color:#92400e;">PAY AT HOTEL</span>
+                                </div>
+                                <span class="badge rounded-pill" style="background:#fef3c7; color:#92400e; font-size:0.6rem;">Not included in total</span>
+                            </div>
+                            <div id="modalPayAtHotelChargesList"></div>
+                            <small class="d-block mt-2" style="font-size:0.68rem; color:#b45309;">Collected directly by the hotel at check-in or check-out.</small>
+                        </div>
                     </div>
                 </div>
 
