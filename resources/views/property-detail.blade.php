@@ -573,6 +573,8 @@
                                             $_rateExcl       = (float)($room['rate']['exclusive'] ?? 0);
                                             $_inclSurcharges = collect($room['surcharges'] ?? [])->filter(fn($s) => in_array($s['charge'] ?? '', ['Included', 'Mandatory']));
                                             $_payAtHotel     = collect($room['surcharges'] ?? [])->filter(fn($s) => ($s['charge'] ?? '') === 'Excluded');
+                                            $_inclSurchargeTotal = $_inclSurcharges->sum(fn($s) => (float)($s['rate']['inclusive'] ?? 0));
+                                            $_paidOnlineTotal = (float)($room['rate']['inclusive'] ?? 0) + $_inclSurchargeTotal;
                                         @endphp
                                         <div class="rate-price p-3">
                                             <!-- ── Paid Online ── -->
@@ -580,8 +582,8 @@
                                                 <div class="d-flex align-items-center justify-content-end gap-1 mb-1">
                                                     <span class="badge rounded-pill" style="background:#e0f2fe; color:#0369a1; font-size:0.6rem; font-weight:600;">PAID ONLINE</span>
                                                 </div>
-                                                <span class="rate-price-amount">US${{ number_format($room['rate']['inclusive'] ?? 0, 2) }}</span>
-                                                <small class="d-block text-muted" style="font-size: 0.68rem;">Per night · {{ $rooms }} room · incl. taxes &amp; fees</small>
+                                                <span class="rate-price-amount">{{ $room['rate']['currency'] ?? 'USD' }} ${{ number_format($_paidOnlineTotal, 2) }}</span>
+                                                <small class="d-block text-muted" style="font-size: 0.68rem;">Total · {{ $rooms }} room · incl. taxes &amp; fees</small>
                                             </div>
 
                                             <!-- ── Online price breakdown ── -->
@@ -1241,8 +1243,10 @@ leisure and sports' => 'bi-trophy',
                 const checkIn = new Date(data.checkIn);
                 const checkOut = new Date(data.checkOut);
                 const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-                const pricePerNight = parseFloat(data.price);
-                const totalPrice = pricePerNight * nights;
+                const rateInclusive = parseFloat(data.price);
+                const surchargeAmount = parseFloat(data.surchargeAmount || 0);
+                const totalPrice = rateInclusive + surchargeAmount;
+                const pricePerNight = nights > 0 ? totalPrice / nights : totalPrice;
                 const rooms = parseInt(data.rooms);
 
                 // Populate modal fields
