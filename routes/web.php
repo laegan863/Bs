@@ -83,10 +83,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/booking/checkout', [BookingController::class, 'checkout'])->name('booking.checkout');
     Route::post('/booking/process', [BookingController::class, 'processPayment'])->name('booking.process');
+    Route::post('/booking/process-credit', [BookingController::class, 'processCreditPayment'])->name('booking.process.credit');
     Route::get('/booking/confirmation/{booking}', [BookingController::class, 'confirmation'])->name('booking.confirmation');
     Route::get('/booking/receipt/{id}', [BookingController::class, 'confirmBooking'])->name('booking.receipt');
 
-    Route::get('success/{id}', [BookingController::class, 'success'])->name('booking.success');
+    Route::get('success', [BookingController::class, 'success'])->name('booking.success');
 });
 
 Route::controller(SearchedContentController::class)->group(function () {

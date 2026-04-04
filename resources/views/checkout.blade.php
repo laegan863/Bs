@@ -54,8 +54,7 @@
         @endif
 
             <div class="row g-4">
-                
-
+            
                 <!-- Right: Booking Summary Sidebar -->
                 <div class="col-lg-5">
                     <div class="checkout-summary-card sticky-top" style="top: 100px;">
@@ -129,32 +128,79 @@
 
                             <!-- Price Breakdown -->
                             <div class="checkout-price-breakdown">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted small">Room rate ({{ $nights }} night{{ $nights > 1 ? 's' : '' }})</span>
-                                    <span class="small fw-medium">US${{ number_format($bookingData['price_per_night'] * $nights, 2) }}</span>
+                                @php
+                                    $checkoutSurcharges = json_decode($bookingData['surcharges'] ?? '[]', true) ?: [];
+                                    $checkoutIncluded   = array_filter($checkoutSurcharges, fn($s) => in_array($s['type'] ?? '', ['Included', 'Mandatory']));
+                                    $checkoutExcluded   = array_filter($checkoutSurcharges, fn($s) => ($s['type'] ?? '') === 'Excluded');
+                                    $checkoutRateTax    = (float)($bookingData['rate_tax'] ?? 0);
+                                    $checkoutRateFees   = (float)($bookingData['rate_fees'] ?? 0);
+                                    $checkoutRateExcl   = (float)($bookingData['rate_exclusive'] ?? 0);
+                                @endphp
+
+                                {{-- ── Paid Online ── --}}
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge rounded-pill" style="background:#e0f2fe; color:#0369a1; font-size:0.65rem; font-weight:600;">PAID ONLINE</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted small">Price per night</span>
                                     <span class="small fw-medium">US${{ number_format($bookingData['price_per_night'], 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted small">Taxes</span>
-                                    <span class="small fw-medium">US${{ number_format($bookingData['rate_tax'] ?? 0, 2) }}</span>
+                                    <span class="text-muted small">Duration</span>
+                                    <span class="small fw-medium">{{ $nights }} night{{ $nights > 1 ? 's' : '' }}</span>
                                 </div>
+                                @if($checkoutRateExcl > 0)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Room rate</span>
+                                    <span class="small fw-medium">US${{ number_format($checkoutRateExcl, 2) }}</span>
+                                </div>
+                                @endif
+                                @if($checkoutRateTax > 0)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted small">Taxes</span>
+                                    <span class="small fw-medium">US${{ number_format($checkoutRateTax, 2) }}</span>
+                                </div>
+                                @endif
+                                @if($checkoutRateFees > 0)
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted small">Fees</span>
-                                    <span class="small fw-medium">US${{ number_format($bookingData['rate_fees'] ?? 0, 2) }}</span>
+                                    <span class="small fw-medium">US${{ number_format($checkoutRateFees, 2) }}</span>
                                 </div>
+                                @endif
+                                @foreach($checkoutIncluded as $cs)
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted small">Surcharges</span>
-                                    <span class="small fw-medium">US${{ number_format($bookingData['surcharge_amount'] ?? 0, 2) }}</span>
+                                    <span class="text-muted small">{{ $cs['name'] ?? 'Surcharge' }}</span>
+                                    <span class="small fw-medium">US${{ number_format((float)($cs['amount'] ?? 0), 2) }}</span>
                                 </div>
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <span class="fw-bold">Total Price</span>
+                                @endforeach
+                                <hr class="my-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="fw-bold">Total (paid online)</span>
                                     <span class="fw-bold checkout-total-price">US${{ number_format($bookingData['total_price'], 2) }}</span>
                                 </div>
-                                <small class="text-muted d-block mt-1">Including taxes and fees</small>
+                                <small class="text-muted d-block">Includes all taxes &amp; fees above</small>
+
+                                {{-- ── Pay at Hotel ── --}}
+                                @if(count($checkoutExcluded) > 0)
+                                <div class="mt-3 p-3 rounded-3" style="background:#fff8e1; border:1px solid #fde68a; border-top:2px solid #f59e0b;">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="bi bi-building" style="color:#d97706;"></i>
+                                            <span class="fw-bold small" style="color:#92400e;">PAY AT HOTEL</span>
+                                        </div>
+                                        <span class="badge rounded-pill" style="background:#fef3c7; color:#92400e; font-size:0.6rem;">Not included in total</span>
+                                    </div>
+                                    @foreach($checkoutExcluded as $cs)
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="small" style="color:#92400e;">{{ $cs['name'] ?? 'Hotel fee' }}</span>
+                                        <span class="small fw-bold" style="color:#92400e;">
+                                            {{ (float)($cs['amount'] ?? 0) > 0 ? 'US$'.number_format((float)$cs['amount'], 2) : 'Varies' }}
+                                        </span>
+                                    </div>
+                                    @endforeach
+                                    <small class="d-block mt-2" style="font-size:0.68rem; color:#b45309;">Collected directly by the hotel at check-in or check-out.</small>
+                                </div>
+                                @endif
                             </div>
 
                             <!-- Payment Type Badge -->
@@ -258,6 +304,12 @@
                                         <i class="bi bi-currency-bitcoin"></i>
                                         <span>Crypto (BoomFi)</span>
                                     </button>
+                                    @if($creditBalance > 0)
+                                    <button type="button" class="checkout-pay-tab" data-method="credit" onclick="selectCheckoutPayment('credit')">
+                                        <i class="bi bi-wallet2"></i>
+                                        <span>Travel Credit</span>
+                                    </button>
+                                    @endif
                                 </div>
 
                                 <input type="hidden" name="payment_method" id="checkoutPaymentMethod" value="bitpay">
@@ -299,6 +351,46 @@
                                         </p>
                                     </div>
                                 </div>
+
+                                <!-- Credit Section -->
+                                @if($creditBalance > 0)
+                                <div class="checkout-payment-section d-none" id="paySection_credit">
+                                    <div class="p-4 rounded-3 border" style="background: linear-gradient(135deg, #f1f8e9, #e8f5e9); border-color: #a5d6a7 !important;">
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                 style="width:48px; height:48px; background: linear-gradient(135deg,#66bb6a,#43a047);">
+                                                <i class="bi bi-wallet2 text-white fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-0">Pay with Travel Credit</h6>
+                                                <p class="small text-muted mb-0">Earned from cancelled online bookings</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center p-3 rounded-3 mb-3"
+                                             style="background: #fff; border: 1px solid #c8e6c9;">
+                                            <span class="text-muted small">Your credit balance</span>
+                                            <span class="fw-bold text-success fs-5">USD {{ number_format($creditBalance, 2) }}</span>
+                                        </div>
+                                        @if($creditBalance >= ($bookingData['total_price'] ?? 0))
+                                        <div class="d-flex align-items-center gap-2 p-3 rounded-3" style="background: #e8f5e9; border: 1px solid #a5d6a7;">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            <span class="small fw-medium text-success">
+                                                Your credit covers the full booking amount of USD {{ number_format($bookingData['total_price'] ?? 0, 2) }}.
+                                                No additional payment required.
+                                            </span>
+                                        </div>
+                                        @else
+                                        <div class="d-flex align-items-center gap-2 p-3 rounded-3" style="background: #fff3e0; border: 1px solid #ffcc02;">
+                                            <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                                            <span class="small fw-medium" style="color:#e65100;">
+                                                Insufficient credit. You need USD {{ number_format(($bookingData['total_price'] ?? 0) - $creditBalance, 2) }} more.
+                                            </span>
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                @endif
+
                                 @endif
                             </div>
                         </div>
@@ -357,7 +449,7 @@
                                 {{ Session::get('error') }}
                             </div>
                         @endif
-                        <a href="{{ route('booking.success', ['id' => 2]) }}" class="btn btn-primary">overide checkout</a>
+                        <a href="{{ route('booking.success') }}" class="btn btn-primary">overide checkout</a>
                         <!-- Submit Button -->
                         <button type="submit" class="btn btn-primary-custom btn-hover-glow text-white w-100 py-3 fw-bold checkout-submit-btn" style="font-size: 1.1rem;" id="completeBookingBtn">
                             <i class="bi bi-lock me-2"></i>Complete Booking
@@ -399,13 +491,24 @@
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        const paymentMethod = document.getElementById('checkoutPaymentMethod')?.value || 'bitpay';
+
+        // Travel Credit: change action and submit normally — no BoomFi overlay
+        if (paymentMethod === 'credit') {
+            const btn = document.getElementById('completeBookingBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing Credit Payment...';
+            this.action = '{{ route("booking.process.credit") }}';
+            this.submit();
+            return;
+        }
+
         const btn = document.getElementById('completeBookingBtn');
         const content = document.getElementById('content');
         content.innerHTML = `
             <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100">
                 <div class="spinner-border text-primary mb-3" role="status"></div>
-                <p class="text-muted
-                    <i class="bi bi-info-circle me-1"></i>Processing your payment, please wait...</p>
+                <p class="text-muted"><i class="bi bi-info-circle me-1"></i>Processing your payment, please wait...</p>
             </div>
         `;
         btn.disabled = true;
@@ -431,7 +534,6 @@
                 if (response.url) {
                     content.innerHTML = `<iframe id="paymentIframe" src="${response.url}" style="width: 100%; height: 100%; border: none;"></iframe>`;
                     document.getElementById('paymentOverlay').style.display = 'flex';
-
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-lock me-2"></i>Complete Booking';
                 }

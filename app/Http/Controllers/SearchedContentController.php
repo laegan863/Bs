@@ -248,10 +248,14 @@ class SearchedContentController extends Controller
 
         $data = $response->json();
 
+        // return response()->json($data);
+
         $property = $data['properties'][0] ?? null;
         $searchedId = $data['searchId'] ?? null;
 
         $fullInfo = $this->fullHotelInfoById($id);
+
+        // return response()->json($fullInfo);
 
         $roomIds = collect($property['rooms'] ?? [])
             ->flatMap(fn($room) => [
@@ -339,6 +343,10 @@ class SearchedContentController extends Controller
                 }
             }
         }
+
+        // return response()->json([
+        //     'rooms' => $property['rooms'] ?? [],
+        // ]);
 
         return view('property-detail', [
             'searchedId' => $searchedId,

@@ -1054,6 +1054,8 @@ document.getElementById('amendForm').addEventListener('submit', function(e) {
 </script>
 <script>
 let cancelBookingId = null;
+let csRefundAmount = 0;
+let csRefundCurrency = 'USD';
 
 function fetchCancellationSummary(bookingId) {
     cancelBookingId = bookingId;
@@ -1104,9 +1106,12 @@ function fetchCancellationSummary(bookingId) {
         if (refundRates.length) {
             const rr = refundRates[0];
             const refundAmt = parseFloat(rr.inclusive);
+            csRefundAmount = refundAmt;
+            csRefundCurrency = rr.currency;
             document.getElementById('csRefundRate').textContent = rr.currency + ' ' + refundAmt.toFixed(2);
             document.getElementById('csRefundRate').style.color = refundAmt > 0 ? '#16a34a' : '#dc2626';
         } else {
+            csRefundAmount = 0;
             document.getElementById('csRefundRate').textContent = '-';
         }
     })
@@ -1130,7 +1135,8 @@ function confirmCancellation() {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
+        },
+        body: JSON.stringify({ refund_amount: csRefundAmount, currency: csRefundCurrency })
     })
     .then(r => r.json().then(data => ({ ok: r.ok, data })))
     .then(({ ok, data }) => {
@@ -1139,8 +1145,23 @@ function confirmCancellation() {
         confirmBtn.style.display = 'none';
 
         if (ok && data.success) {
-            document.getElementById('csSuccess').classList.remove('d-none');
-            setTimeout(() => location.reload(), 1500);
+            const successEl = document.getElementById('csSuccess');
+            successEl.classList.remove('d-none');
+
+            // Show credit notification if credit was awarded
+            if (data.credit_awarded && data.credit_amount > 0) {
+                const creditMsg = document.createElement('div');
+                creditMsg.className = 'd-flex align-items-center gap-2 mt-3 p-3 rounded-3';
+                creditMsg.style.cssText = 'background:#e8f5e9; border:1px solid #a5d6a7;';
+                creditMsg.innerHTML = `<i class="bi bi-wallet2-fill text-success fs-5"></i>
+                    <div>
+                        <span class="fw-semibold text-success d-block">Travel Credit Added!</span>
+                        <span class="small text-success">USD ${parseFloat(data.credit_amount).toFixed(2)} has been added to your credit balance.</span>
+                    </div>`;
+                successEl.appendChild(creditMsg);
+            }
+
+            setTimeout(() => location.reload(), 2500);
         } else {
             document.getElementById('csFail').classList.remove('d-none');
             document.getElementById('csFailMsg').textContent = data.error || 'Cancellation failed. Please try again.';
