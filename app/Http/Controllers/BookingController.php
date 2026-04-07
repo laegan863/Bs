@@ -92,6 +92,10 @@ class BookingController extends Controller
             'cancellation_policy_text' => 'nullable|string',
             'hotel_remarks' => 'nullable|string',
             'hotel_address' => 'nullable|string',
+            'total_payment_inclusive' => 'nullable|numeric|min:0',
+            'total_payment_exclusive' => 'nullable|numeric|min:0',
+            'total_payment_tax' => 'nullable|numeric|min:0',
+            'total_payment_fees' => 'nullable|numeric|min:0',
         ]);
 
         // return response()->json([
@@ -103,6 +107,10 @@ class BookingController extends Controller
         // ]);
 
         $validated['surcharge_amount'] = $validated['surcharge_amount'] ?? 0;
+        $validated['total_payment_inclusive'] = $validated['total_payment_inclusive'] ?? $validated['total_price'];
+        $validated['total_payment_exclusive'] = $validated['total_payment_exclusive'] ?? $validated['rate_exclusive'];
+        $validated['total_payment_tax'] = $validated['total_payment_tax'] ?? $validated['rate_tax'];
+        $validated['total_payment_fees'] = $validated['total_payment_fees'] ?? $validated['rate_fees'];
         session(['booking_data' => $validated]);
 
         return redirect()->route('booking.checkout');
@@ -155,8 +163,8 @@ class BookingController extends Controller
             'children' => $bookingData['children'] ?? 0,
             'price_per_night' => $bookingData['price_per_night'],
             'total_price' => $bookingData['total_price'],
-            'tax_amount' => $bookingData['rate_tax'] ?? 0,
-            'fees_amount' => $bookingData['rate_fees'] ?? 0,
+            'tax_amount' => $bookingData['total_payment_tax'] ?? $bookingData['rate_tax'] ?? 0,
+            'fees_amount' => $bookingData['total_payment_fees'] ?? $bookingData['rate_fees'] ?? 0,
             'currency' => $bookingData['rate_currency'] ?? 'USD',
             'guest_first_name' => 'Laegan',
             'guest_last_name' => 'Pangantihon   ',
@@ -254,8 +262,8 @@ class BookingController extends Controller
             'children' => $bookingData['children'] ?? 0,
             'price_per_night' => $bookingData['price_per_night'],
             'total_price' => $bookingData['total_price'],
-            'tax_amount' => $bookingData['rate_tax'] ?? 0,
-            'fees_amount' => $bookingData['rate_fees'] ?? 0,
+            'tax_amount' => $bookingData['total_payment_tax'] ?? $bookingData['rate_tax'] ?? 0,
+            'fees_amount' => $bookingData['total_payment_fees'] ?? $bookingData['rate_fees'] ?? 0,
             'currency' => $bookingData['rate_currency'] ?? 'USD',
             'guest_first_name' => $request->input('guest_first_name'),
             'guest_last_name' => $request->input('guest_last_name'),
@@ -332,8 +340,8 @@ class BookingController extends Controller
             'children'               => $sessionData['children'] ?? 0,
             'price_per_night'        => $sessionData['price_per_night'],
             'total_price'            => $sessionData['total_price'],
-            'tax_amount'             => $sessionData['rate_tax'] ?? 0,
-            'fees_amount'            => $sessionData['rate_fees'] ?? 0,
+            'tax_amount'             => $sessionData['total_payment_tax'] ?? $sessionData['rate_tax'] ?? 0,
+            'fees_amount'            => $sessionData['total_payment_fees'] ?? $sessionData['rate_fees'] ?? 0,
             'currency'               => $currency,
             'guest_first_name'       => $request->input('guest_first_name'),
             'guest_last_name'        => $request->input('guest_last_name'),

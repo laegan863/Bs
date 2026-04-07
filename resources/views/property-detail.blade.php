@@ -531,7 +531,11 @@
                                         <div class="rate-info p-3">
                                             <div class="d-flex align-items-center gap-2 mb-2">
                                                 <span class="fw-semibold small">
-                                                    {{ $room['freeBreakfast'] ? 'With Breakfast' : 'Room Only' }}
+                                                    @if($room['freeBreakfast'])
+                                                        With Breakfast for {{ (int)$adults + (int)$children }}
+                                                    @else
+                                                        Room Only
+                                                    @endif
                                                     {{ $room['freeCancellation'] ? '| Free Cancellation' : '' }}
                                                 </span>
                                                 @if($room['promotionDetail']['description'] ?? false)
@@ -568,13 +572,13 @@
                                     <!-- Price -->
                                     <div class="col-md-4">
                                         @php
-                                            $_rateTax        = (float)($room['rate']['tax'] ?? 0);
-                                            $_rateFees       = (float)($room['rate']['fees'] ?? 0);
-                                            $_rateExcl       = (float)($room['rate']['exclusive'] ?? 0);
+                                            $_rateTax        = (float)($room['totalPayment']['tax'] ?? 0);
+                                            $_rateFees       = (float)($room['totalPayment']['fees'] ?? 0);
+                                            $_rateExcl       = (float)($room['totalPayment']['exclusive'] ?? 0);
                                             $_inclSurcharges = collect($room['surcharges'] ?? [])->filter(fn($s) => in_array($s['charge'] ?? '', ['Included', 'Mandatory']));
                                             $_payAtHotel     = collect($room['surcharges'] ?? [])->filter(fn($s) => ($s['charge'] ?? '') === 'Excluded');
                                             $_inclSurchargeTotal = $_inclSurcharges->sum(fn($s) => (float)($s['rate']['inclusive'] ?? 0));
-                                            $_paidOnlineTotal = (float)($room['rate']['inclusive'] ?? 0) + $_inclSurchargeTotal;
+                                            $_paidOnlineTotal = (float)($room['totalPayment']['inclusive'] ?? 0) + $_inclSurchargeTotal;
                                         @endphp
                                         <div class="rate-price p-3">
                                             <!-- ── Paid Online ── -->
@@ -681,6 +685,10 @@
                                                 data-rate-tax="{{ $room['rate']['tax'] ?? 0 }}"
                                                 data-rate-fees="{{ $room['rate']['fees'] ?? 0 }}"
                                                 data-surcharge-amount="{{ $roomSurchargeTotal }}"
+                                                data-total-inclusive="{{ $room['totalPayment']['inclusive'] ?? 0 }}"
+                                                data-total-exclusive="{{ $room['totalPayment']['exclusive'] ?? 0 }}"
+                                                data-total-tax="{{ $room['totalPayment']['tax'] ?? 0 }}"
+                                                data-total-fees="{{ $room['totalPayment']['fees'] ?? 0 }}"
                                                 data-rate-currency="{{ $room['rate']['currency'] ?? 'USD' }}"
                                                 data-rate-method="{{ $room['rate']['method'] ?? 'PRPN' }}"
                                                 data-payment-model="{{ $room['paymentModel'] ?? 'Merchant' }}"
@@ -1245,7 +1253,8 @@ leisure and sports' => 'bi-trophy',
                 const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
                 const rateInclusive = parseFloat(data.price);
                 const surchargeAmount = parseFloat(data.surchargeAmount || 0);
-                const totalPrice = rateInclusive + surchargeAmount;
+                const totalInclusive = parseFloat(data.totalInclusive || data.price);
+                const totalPrice = totalInclusive + surchargeAmount;
                 const pricePerNight = nights > 0 ? totalPrice / nights : totalPrice;
                 const rooms = parseInt(data.rooms);
 
@@ -1263,9 +1272,9 @@ leisure and sports' => 'bi-trophy',
                 document.getElementById('modalPayNowTotal').textContent = 'US$' + totalPrice.toFixed(2);
 
                 // --- Price breakdown rows ---
-                const rateExclusive = parseFloat(data.rateExclusive || 0);
-                const rateTax       = parseFloat(data.rateTax || 0);
-                const rateFees      = parseFloat(data.rateFees || 0);
+                const rateExclusive = parseFloat(data.totalExclusive || data.rateExclusive || 0);
+                const rateTax       = parseFloat(data.totalTax || data.rateTax || 0);
+                const rateFees      = parseFloat(data.totalFees || data.rateFees || 0);
 
                 const rateRateRow = document.getElementById('modalRoomRateRow');
                 if (rateExclusive > 0) {
@@ -1325,7 +1334,13 @@ leisure and sports' => 'bi-trophy',
                 document.getElementById('modalPropertyImg').src = data.propertyImage || '{{ asset("assets/images/login-1.jpg") }}';
 
                 const breakfastBadge = document.getElementById('modalBreakfast');
-                breakfastBadge.style.display = data.freeBreakfast === '1' ? 'inline-flex' : 'none';
+                if (data.freeBreakfast === '1') {
+                    const totalGuests = parseInt(data.adults || 0) + parseInt(data.children || 0);
+                    breakfastBadge.innerHTML = '<i class="bi bi-cup-hot me-1"></i>Breakfast Included for ' + totalGuests;
+                    breakfastBadge.style.display = 'inline-flex';
+                } else {
+                    breakfastBadge.style.display = 'none';
+                }
 
                 const cancellationBadge = document.getElementById('modalCancellation');
                 if (data.freeCancellation === '1') {
@@ -1368,6 +1383,10 @@ leisure and sports' => 'bi-trophy',
                 document.getElementById('formCancellationPolicy').value = data.cancellationPolicy || '';
                 document.getElementById('formHotelRemarks').value = data.hotelRemarks || '';
                 document.getElementById('formHotelAddress').value = data.hotelAddress || '';
+                document.getElementById('formTotalPaymentInclusive').value = data.totalInclusive || data.price;
+                document.getElementById('formTotalPaymentExclusive').value = data.totalExclusive || data.rateExclusive;
+                document.getElementById('formTotalPaymentTax').value = data.totalTax || data.rateTax;
+                document.getElementById('formTotalPaymentFees').value = data.totalFees || data.rateFees;
 
                 selectPaymentType('pay_now');
 
@@ -1563,6 +1582,10 @@ leisure and sports' => 'bi-trophy',
                         <input type="hidden" name="cancellation_policy_text" id="formCancellationPolicy">
                         <input type="hidden" name="hotel_remarks" id="formHotelRemarks">
                         <input type="hidden" name="hotel_address" id="formHotelAddress">
+                        <input type="hidden" name="total_payment_inclusive" id="formTotalPaymentInclusive">
+                        <input type="hidden" name="total_payment_exclusive" id="formTotalPaymentExclusive">
+                        <input type="hidden" name="total_payment_tax" id="formTotalPaymentTax">
+                        <input type="hidden" name="total_payment_fees" id="formTotalPaymentFees">
 
                         <button type="submit" class="btn btn-primary-custom btn-hover-glow text-white w-100 py-3 fw-bold" style="font-size: 1.05rem;">
                             <i class="bi bi-lock me-2"></i>Proceed to Checkout

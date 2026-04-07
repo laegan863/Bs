@@ -117,7 +117,8 @@
                             <!-- Badges -->
                             <div class="d-flex flex-wrap gap-2 my-3">
                                 @if($bookingData['free_breakfast'] ?? false)
-                                <span class="badge bg-primary-subtle text-primary"><i class="bi bi-cup-hot me-1"></i>Breakfast Included</span>
+                                @php $totalGuests = (int)($bookingData['adults'] ?? 0) + (int)($bookingData['children'] ?? 0); @endphp
+                                <span class="badge bg-primary-subtle text-primary"><i class="bi bi-cup-hot me-1"></i>Breakfast Included for {{ $totalGuests }}</span>
                                 @endif
                                 @if($bookingData['free_cancellation'] ?? false)
                                 <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Free Cancellation</span>
@@ -132,9 +133,12 @@
                                     $checkoutSurcharges = json_decode($bookingData['surcharges'] ?? '[]', true) ?: [];
                                     $checkoutIncluded   = array_filter($checkoutSurcharges, fn($s) => in_array($s['type'] ?? '', ['Included', 'Mandatory']));
                                     $checkoutExcluded   = array_filter($checkoutSurcharges, fn($s) => ($s['type'] ?? '') === 'Excluded');
-                                    $checkoutRateTax    = (float)($bookingData['rate_tax'] ?? 0);
-                                    $checkoutRateFees   = (float)($bookingData['rate_fees'] ?? 0);
-                                    $checkoutRateExcl   = (float)($bookingData['rate_exclusive'] ?? 0);
+                                    $checkoutRateTax    = (float)($bookingData['total_payment_tax'] ?? $bookingData['rate_tax'] ?? 0);
+                                    $checkoutRateFees   = (float)($bookingData['total_payment_fees'] ?? $bookingData['rate_fees'] ?? 0);
+                                    $checkoutRateExcl   = (float)($bookingData['total_payment_exclusive'] ?? $bookingData['rate_exclusive'] ?? 0);
+                                    $checkoutTotalInclusive = (float)($bookingData['total_payment_inclusive'] ?? $bookingData['total_price'] ?? 0);
+                                    $checkoutInclSurchargeTotal = collect($checkoutIncluded)->sum(fn($s) => (float)($s['amount'] ?? 0));
+                                    $checkoutPaidOnlineTotal = $checkoutTotalInclusive + $checkoutInclSurchargeTotal;
                                 @endphp
 
                                 {{-- ── Paid Online ── --}}
@@ -176,7 +180,7 @@
                                 <hr class="my-2">
                                 <div class="d-flex justify-content-between mb-1">
                                     <span class="fw-bold">Total (paid online)</span>
-                                    <span class="fw-bold checkout-total-price">US${{ number_format($bookingData['total_price'], 2) }}</span>
+                                    <span class="fw-bold checkout-total-price">US${{ number_format($checkoutPaidOnlineTotal, 2) }}</span>
                                 </div>
                                 <small class="text-muted d-block">Includes all taxes &amp; fees above</small>
 
